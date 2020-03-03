@@ -1,0 +1,27 @@
+{
+  "name": "react-store",
+  "version": "0.1.0",
+  "main": "index.js",
+  "repository": "https://github.com/amirqasemi74/ifetch.git",
+  "author": "Amir Hossein Qasemi Moqaddam <amir.qasemi74@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "reflect-metadata": "^0.1.13",
+    "use-force-update": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "html-webpack-plugin": "^3.2.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
+  },
+  "scripts": {
+    "start": "webpack-dev-server"
+  }
+}
