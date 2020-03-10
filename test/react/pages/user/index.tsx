@@ -4,6 +4,10 @@ import Password from "./Password";
 import UserStore from "./user.store";
 import Username from "./Username";
 
+export interface UserPageProps {
+  username: string;
+}
+
 const UserPage: React.FC<UserPageProps> = props => {
   const vm = useStore(UserStore);
 
@@ -20,10 +24,6 @@ const UserPage: React.FC<UserPageProps> = props => {
     </UserContext>
   );
 };
-
-export interface UserPageProps {
-  username: string;
-}
 
 const UserContext = createStoreContext(UserStore);
 

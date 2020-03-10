@@ -12,7 +12,7 @@ export default class UserStore {
   private props: UserPageProps;
 
   didMount() {
-    console.log("Hi didmoutns", this.props);
+    // console.log("Hi didmoutns", this.props);
   }
 
   onUsernameChange(e: ChangeEvent<HTMLInputElement>) {

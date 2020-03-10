@@ -19,6 +19,7 @@ const buildProviderComponent = <T extends any>(
 ): React.FC<ProviderComponentProps> => ({ children, props }) => {
   let store: Store;
   const id = useRef<string>(uid());
+  const forceUpdate = useForceUpdate();
 
   /**
    * This component will be used in context component provider.
@@ -35,16 +36,24 @@ const buildProviderComponent = <T extends any>(
     if (lastStore!.type === StoreType) {
       store = lastStore!;
     } else {
-      store = appContext.resolveStore({ StoreType, id: id.current, type: "context" });
+      store = appContext.resolveStore({
+        StoreType,
+        id: id.current,
+        type: "context"
+      });
     }
   } else {
-    store = appContext.resolveStore({ StoreType, id: id.current, type: "context" });
+    store = appContext.resolveStore({
+      StoreType,
+      id: id.current,
+      type: "context"
+    });
   }
 
-  if (!store.rerender) {
-    store.rerender = useForceUpdate();
-  }
-
+  useEffect(() => {
+    store.consumers.push({ forceUpdate });
+  }, [forceUpdate]);
+  
   if (props) {
     Reflect.set(store.instance, PROPS, props);
   }
