@@ -1,1 +1,3 @@
-we are working on it...
+# react-over
+
+React-over is a library for better state managment in react hooks new world.

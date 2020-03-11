@@ -4,7 +4,6 @@ import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import useForceUpdate from "use-force-update";
 import ReactAppContext from "../appContext";
-import { PROPS } from "../constant";
 import Store from "../store";
 import {
   getStoreUsedContextesByStoreType,

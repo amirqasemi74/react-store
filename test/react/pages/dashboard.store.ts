@@ -1,4 +1,4 @@
-import { ContextualStore } from "react-vm";
+import { ContextualStore } from "react-over";
 
 @ContextualStore()
 export default class DashboardStore {
@@ -7,7 +7,7 @@ export default class DashboardStore {
 
   toggleShow() {
     console.log(this.show);
-    
+
     this.show = !this.show;
   }
 }

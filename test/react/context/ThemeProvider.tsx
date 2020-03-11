@@ -12,6 +12,7 @@ export default function ThemeProvider({ children }) {
       secondary: "Red"
     });
   };
+
   return (
     <ThemeContext.Provider
       value={{

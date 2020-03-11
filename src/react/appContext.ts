@@ -3,6 +3,7 @@ import { ClassType } from "src/types";
 import Store from "./store";
 import { Context } from "react";
 import uid from "src/utils/uid";
+import { Injectable } from "src/decorators/Injectable";
 
 interface ResolveStoreArgs {
   StoreType: ClassType;
@@ -13,6 +14,8 @@ interface StoreContext<T = any> {
   context: Context<T>;
   storeType: ClassType;
 }
+
+@Injectable
 export default class ReactAppContext {
   private lastContextualStore: Store | null = null;
 
@@ -56,7 +59,9 @@ export default class ReactAppContext {
   registerStoreContext({ context, storeType }: StoreContext) {
     const provider = this.storeContexts.find(sc => sc.storeType === storeType);
     if (provider) {
-      this.storeContexts = this.storeContexts.filter(sc => sc.storeType !== storeType);
+      this.storeContexts = this.storeContexts.filter(
+        sc => sc.storeType !== storeType
+      );
     }
     this.storeContexts.push({ context, storeType });
   }

@@ -12,7 +12,7 @@
     "noImplicitAny": false,
     "jsx": "react",
     "paths": {
-      "react-vm": ["src"]
+      "react-over": ["src"]
     },
     "sourceMap": true
   },

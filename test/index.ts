@@ -1,5 +1,5 @@
-import './react'
-import { Injectable, getFromContainer } from "react-vm";
+import "./react";
+import { Injectable, getFromContainer } from "react-over";
 
 class Post {
   title: string;

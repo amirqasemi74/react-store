@@ -1,5 +1,5 @@
 import { ChangeEvent, ContextType } from "react";
-import { ContextualStore, Props, UseContext } from "react-vm";
+import { ContextualStore, Props, UseContext } from "react-over";
 import { UserPageProps } from ".";
 import { ThemeContext } from "test/react/context/ThemeProvider";
 
