@@ -10,10 +10,20 @@ export default class Store {
 
   consumers: StoreConsumer[] = [];
 
+  isRenderAllow = true;
+
   constructor({ id, instance }: Args) {
     this.id = id;
     this.type = getType(instance);
     this.instance = observe(instance, this);
+  }
+
+  turnOffRender() {
+    this.isRenderAllow = false;
+  }
+
+  turnOnRender() {
+    this.isRenderAllow = true;
   }
 }
 

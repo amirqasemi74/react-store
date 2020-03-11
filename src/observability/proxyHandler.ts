@@ -13,7 +13,7 @@ export default class ProxyHandler<T extends object> implements ProxyHandler<T> {
   set(target: T, propertyKey: PropertyKey, value: any, receiver: any) {
     Reflect.set(target, propertyKey, value, receiver);
     // console.log("Set:", target, propertyKey, value);
-    if (propertyKey !== PROPS) {
+    if (this.store.isRenderAllow) {
       this.store.consumers.forEach(cnsr => cnsr.forceUpdate());
     }
 

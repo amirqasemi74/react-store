@@ -5,20 +5,21 @@ const srcDir = resolve(__dirname, "src");
 const testDir = resolve(__dirname, "test");
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: "source-map",
   entry: resolve(testDir, "index.ts"),
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
       "react-vm": srcDir,
-      "src": srcDir
+      src: srcDir,
+      test: testDir
     }
   },
   module: {
     rules: [
-      { 
-        test: /\.tsx?$/, 
-        loader: "ts-loader" 
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader"
       }
     ]
   },
@@ -27,4 +28,4 @@ module.exports = {
       template: resolve(testDir, "index.html")
     })
   ]
-}
+};

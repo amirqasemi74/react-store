@@ -1,9 +1,14 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import useForceUpdate from "use-force-update";
 import ReactAppContext from "../appContext";
 import useUniqueID from "./useUniqueID";
+import {} from "../constant";
+import {
+  getStoreUsedContextesByStoreType,
+  setStoreUsedContextesToStoreInstance
+} from "../handlers/contextHandler";
 
 const appContext = getFromContainer(ReactAppContext);
 
@@ -11,6 +16,8 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
   let storeInstance: InstanceType<T>;
   const id = useUniqueID();
   const forceUpdate = useForceUpdate();
+  const contextes = getStoreUsedContextesByStoreType(storeType);
+
   // check if it has context pointer
   const storeContext = appContext.findStoreContext(storeType);
 
@@ -28,6 +35,8 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
       useEffect(() => {
         store.consumers.push({ forceUpdate });
       }, [forceUpdate]);
+
+      setStoreUsedContextesToStoreInstance(store, contextes);
 
       storeInstance = store.instance as InstanceType<T>;
     }

@@ -6,6 +6,10 @@ import useForceUpdate from "use-force-update";
 import ReactAppContext from "../appContext";
 import { PROPS } from "../constant";
 import Store from "../store";
+import {
+  getStoreUsedContextesByStoreType,
+  setStoreUsedContextesToStoreInstance
+} from "../handlers/contextHandler";
 
 interface ProviderComponentProps {
   props?: any;
@@ -20,6 +24,7 @@ const buildProviderComponent = <T extends any>(
   let store: Store;
   const id = useRef<string>(uid());
   const forceUpdate = useForceUpdate();
+  const contextes = getStoreUsedContextesByStoreType(StoreType);
 
   /**
    * This component will be used in context component provider.
@@ -50,13 +55,11 @@ const buildProviderComponent = <T extends any>(
     });
   }
 
+  setStoreUsedContextesToStoreInstance(store, contextes);
+
   useEffect(() => {
     store.consumers.push({ forceUpdate });
   }, [forceUpdate]);
-  
-  if (props) {
-    Reflect.set(store.instance, PROPS, props);
-  }
 
   useEffect(() => {
     if (Reflect.has(store.instance, "didMount")) {
@@ -64,6 +67,7 @@ const buildProviderComponent = <T extends any>(
     }
   }, []);
 
+  useEffect(() => {}, []);
   return (
     <TheContext.Provider value={(store.instance as unknown) as T}>
       {children}

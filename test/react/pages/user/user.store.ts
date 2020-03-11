@@ -1,6 +1,7 @@
-import { ChangeEvent } from "react";
-import { ContextualStore, Props } from "react-vm";
+import { ChangeEvent, ContextType } from "react";
+import { ContextualStore, Props, UseContext } from "react-vm";
 import { UserPageProps } from ".";
+import { ThemeContext } from "test/react/context/ThemeProvider";
 
 @ContextualStore()
 export default class UserStore {
@@ -9,10 +10,13 @@ export default class UserStore {
   password = "725," + Math.floor(Math.random() * 100);
 
   @Props
-  private props: UserPageProps;
+  props: UserPageProps;
+
+  @UseContext(ThemeContext)
+  theme: ContextType<typeof ThemeContext>;
 
   didMount() {
-    // console.log("Hi didmoutns", this.props);
+    console.log("Hi didmoutns", this.theme);
   }
 
   onUsernameChange(e: ChangeEvent<HTMLInputElement>) {

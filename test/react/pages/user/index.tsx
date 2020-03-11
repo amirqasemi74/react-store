@@ -20,6 +20,7 @@ const UserPage: React.FC<UserPageProps> = props => {
           user: {vm.username} <br /> pass: {vm.password}
         </p>
         <br />
+        <p>theme.colors.primary: {vm.theme?.colors.primary}</p>
       </div>
     </UserContext>
   );
