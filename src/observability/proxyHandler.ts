@@ -1,4 +1,3 @@
-import { PROPS } from "src/react/constant";
 import Store from "src/react/store";
 
 export default class ProxyHandler<T extends object> implements ProxyHandler<T> {

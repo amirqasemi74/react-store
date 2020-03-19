@@ -8,7 +8,7 @@ export interface StoreUsedContext {
   value?: any;
 }
 
-export const getStoreUsedContextesByStoreType = (storeType: Function) => {
+export const getUsedContextes = (storeType: Function) => {
   const storeUsedContextes: StoreUsedContext[] =
     storeType[STORE_USED_CONTEXTES] || [];
 
@@ -18,7 +18,7 @@ export const getStoreUsedContextesByStoreType = (storeType: Function) => {
   }));
 };
 
-export const setStoreUsedContextesToStoreInstance = (
+export const setUsedContextesToInstance = (
   store: Store,
   contextes: StoreUsedContext[]
 ) => {

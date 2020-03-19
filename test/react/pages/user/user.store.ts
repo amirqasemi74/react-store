@@ -16,7 +16,7 @@ export default class UserStore {
   theme: ContextType<typeof ThemeContext>;
 
   didMount() {
-    console.log("Hi didmoutns", this.theme);
+    console.log("Hi didmoutns", this.props);
   }
 
   onUsernameChange(e: ChangeEvent<HTMLInputElement>) {
