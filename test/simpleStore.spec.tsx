@@ -1,6 +1,6 @@
-import React from "react";
-import { ContextualStore, createStoreContext, useStore } from "react-over";
 import { render } from "@testing-library/react";
+import React from "react";
+import { conntectToStore, ContextualStore, useStore } from "react-over";
 
 describe("", () => {
   it("store hav value", () => {
@@ -9,18 +9,17 @@ describe("", () => {
       username = "amir.qasemi74";
       password = "123456";
     }
-    const UserContext = createStoreContext(UserStore);
 
     const App = () => {
       const vm = useStore(UserStore);
       return (
-        <UserContext>
+        <div>
           username: {vm.username}
           password: {vm.password}
-        </UserContext>
+        </div>
       );
     };
-
-    const { debug } = render(<App />);
+    const AppWithStore = conntectToStore(App, UserStore);
+    const { debug } = render(<AppWithStore />);
   });
 });

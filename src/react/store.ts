@@ -33,5 +33,5 @@ interface Args {
 }
 
 interface StoreConsumer {
-  forceUpdate: Function;
+  render: Function;
 }

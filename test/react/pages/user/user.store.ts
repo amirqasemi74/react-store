@@ -16,7 +16,7 @@ export default class UserStore {
   theme: ContextType<typeof ThemeContext>;
 
   didMount() {
-    console.log("Hi didmoutns", this.props);
+    console.log("Hi did mount", this.props);
   }
 
   onUsernameChange(e: ChangeEvent<HTMLInputElement>) {

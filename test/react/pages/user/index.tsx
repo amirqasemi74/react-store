@@ -1,5 +1,5 @@
 import React from "react";
-import { createStoreContext, useStore } from "react-over";
+import { useStore, conntectToStore } from "react-over";
 import Password from "./Password";
 import UserStore from "./user.store";
 import Username from "./Username";
@@ -8,24 +8,19 @@ export interface UserPageProps {
   username: string;
 }
 
-const UserPage: React.FC<UserPageProps> = props => {
+const UserPage = conntectToStore<UserPageProps>((props) => {
   const vm = useStore(UserStore);
-
   return (
-    <UserContext props={props}>
-      <div>
-        <Username />
-        <Password />
-        <p>
-          user: {vm.username} <br /> pass: {vm.password}
-        </p>
-        <br />
-        <p>theme.colors.primary: {vm.theme?.colors.primary}</p>
-      </div>
-    </UserContext>
+    <div>
+      <Username />
+      <Password />
+      <p>
+        user: {vm.username} <br /> pass: {vm.password}
+      </p>
+      <br />
+      <p>theme.colors.primary: {vm.theme?.colors.primary}</p>
+    </div>
   );
-};
-
-const UserContext = createStoreContext(UserStore);
+}, UserStore);
 
 export default UserPage;

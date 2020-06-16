@@ -1,4 +1,4 @@
-import { Injectable, useStore, createStoreContext } from "react-over";
+import { Injectable, useStore, conntectToStore } from "react-over";
 import React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
@@ -11,7 +11,6 @@ describe("Contextual store", () => {
       username = "amir.qasemi74";
       password = "123456";
     }
-    const UserContext = createStoreContext(UserStore);
 
     let usernameStoreRef: UserStore | null = null,
       passwordStoreRef: UserStore | null = null,
@@ -31,15 +30,15 @@ describe("Contextual store", () => {
       const vm = useStore(UserStore);
       appStoreRef = vm;
       return (
-        <UserContext>
+        <>
           <p>{vm.title}</p>
           <Password />
           <Username />
-        </UserContext>
+        </>
       );
     };
-
-    const { getByText } = render(<App />);
+    const AppWithStore = conntectToStore(App, UserStore);
+    const { getByText } = render(<AppWithStore />);
     // debug();
 
     expect(appStoreRef).not.toBe(null);
