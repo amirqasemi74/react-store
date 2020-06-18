@@ -3,32 +3,31 @@ import React, { createContext, useState } from "react";
 export default function ThemeProvider({ children }) {
   const [colors, setColors] = useState({
     primary: "white",
-    secondary: "gray"
+    secondary: "gray",
   });
 
   const changeTheme = () => {
     setColors({
       primary: "Blue",
-      secondary: "Red"
+      secondary: "Red",
     });
   };
 
   return (
     <ThemeContext.Provider
       value={{
-        colors
+        colors,
       }}
     >
-      <button onClick={changeTheme}>change theme</button>
       {children}
     </ThemeContext.Provider>
   );
 }
 
-export interface ThemeContextInterface {
+export interface ThemeContext {
   colors: {
     primary: string;
     secondary: string;
   };
 }
-export const ThemeContext = createContext<ThemeContextInterface | null>(null);
+export const ThemeContext = createContext<ThemeContext | null>(null);

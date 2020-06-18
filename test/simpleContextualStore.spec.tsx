@@ -1,4 +1,4 @@
-import { Injectable, useStore, conntectToStore } from "react-over";
+import { Injectable, useStore, connectToStore } from "react-over";
 import React from "react";
 import { render } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
@@ -37,7 +37,7 @@ describe("Contextual store", () => {
         </>
       );
     };
-    const AppWithStore = conntectToStore(App, UserStore);
+    const AppWithStore = connectToStore(App, UserStore);
     const { getByText } = render(<AppWithStore />);
     // debug();
 

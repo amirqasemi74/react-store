@@ -2,16 +2,13 @@ import React, { Context, useEffect, useRef, useState } from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
-import useForceUpdate from "use-force-update";
 import ReactAppContext, { StoreContextValue } from "../appContext";
-import Store from "../store";
 import {
   getUsedContextes,
   setUsedContextesToInstance,
 } from "../handlers/contextHandler";
 import didMountHandler from "../handlers/didMountHandler";
 import propsHandler from "../handlers/propsHandler";
-import { ThemeContext } from "test/react/context/ThemeProvider";
 
 interface ProviderComponentProps {
   props?: any;

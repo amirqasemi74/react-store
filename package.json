@@ -6,8 +6,11 @@
   "author": "Amir Hossein Qasemi Moqaddam <amir.qasemi74@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@types/styled-components": "^5.1.0",
     "reflect-metadata": "^0.1.13",
-    "use-force-update": "^1.0.7"
+    "styled-components": "^5.1.1",
+    "use-force-update": "^1.0.7",
+    "websocket-extensions": "^0.1.4"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.1",

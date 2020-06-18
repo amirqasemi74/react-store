@@ -6,26 +6,26 @@ const testDir = resolve(__dirname, "test");
 
 module.exports = {
   devtool: "source-map",
-  entry: resolve(testDir, "index.ts"),
+  entry: resolve(testDir, "sampleApp", "index.tsx"),
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
       "react-over": srcDir,
       src: srcDir,
-      test: testDir
-    }
+      test: testDir,
+    },
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: "ts-loader"
-      }
-    ]
+        loader: "ts-loader",
+      },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: resolve(testDir, "index.html")
-    })
-  ]
+      template: resolve(testDir, "sampleApp", "index.html"),
+    }),
+  ],
 };

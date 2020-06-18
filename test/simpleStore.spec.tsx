@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import React from "react";
-import { conntectToStore, ContextualStore, useStore } from "react-over";
+import { connectToStore, ContextualStore, useStore } from "react-over";
 
 describe("", () => {
   it("store hav value", () => {
@@ -19,7 +19,7 @@ describe("", () => {
         </div>
       );
     };
-    const AppWithStore = conntectToStore(App, UserStore);
+    const AppWithStore = connectToStore(App, UserStore);
     const { debug } = render(<AppWithStore />);
   });
 });
