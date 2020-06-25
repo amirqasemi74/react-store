@@ -8,15 +8,15 @@ const ToDos: React.FC = () => {
   const vm = useStore(ToDoStore);
   return (
     <ToDoWrapper>
-      <Title>To Do Application</Title>
+      <Title style={{ color: vm.theme.primary }}>To Do Application</Title>
       <TodoInput
-        placeholder="Enter to do"
+        placeholder="Enter To Do"
         value={vm.inputVal}
-        onChange={vm.onInputChange.bind(vm)}
-        onKeyDown={vm.onInputKeyDown.bind(vm)}
+        onChange={vm.onInputChange}
+        onKeyDown={vm.onInputKeyDown}
       />
       <ToDoList />
-      <ToDoCount>To Do Count: {vm.todos.length}</ToDoCount>
+      <ToDoCount>ToDo Count: {vm.todos.length}</ToDoCount>
     </ToDoWrapper>
   );
 };
@@ -47,7 +47,8 @@ const TodoInput = styled.input`
 `;
 
 const ToDoCount = styled.section`
+  text-align: center;
   border-top: 1px solid;
   margin-top: 20px;
-  padding-top: 20px;
+  padding-top: 10px;
 `;

@@ -12,6 +12,8 @@ export default class Store {
 
   isRenderAllow = true;
 
+  observeablePropertyKeys = new Set<PropertyKey>();
+
   constructor({ id, instance }: Args) {
     this.id = id;
     this.type = getType(instance);

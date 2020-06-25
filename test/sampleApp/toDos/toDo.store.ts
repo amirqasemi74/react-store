@@ -1,17 +1,25 @@
-import { ContextualStore } from "react-over";
-import { KeyboardEvent, ChangeEvent } from "react";
+import { ChangeEvent, KeyboardEvent } from "react";
+import { ContextStore } from "react-over";
+import { ThemeStore } from "../theme.store";
 
-@ContextualStore()
+@ContextStore()
 export class ToDoStore {
   todos: string[] = [];
 
   inputVal = "";
 
+  constructor(public theme: ThemeStore) {}
+
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.inputVal = e.target.value;
   }
+
   onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" && this.inputVal) {
+    if (
+      e.key === "Enter" &&
+      this.inputVal &&
+      !this.todos.includes(e.currentTarget.value)
+    ) {
       this.todos.push(this.inputVal);
       this.inputVal = "";
     }
@@ -19,11 +27,10 @@ export class ToDoStore {
 
   removeTodo(id: number) {
     this.todos = this.todos.filter((item, i) => i !== id);
+    console.log(this);
   }
 
   editTodo(id: number, value: string) {
     this.todos[id] = value;
   }
 }
-
-console.log(ToDoStore.prototype);

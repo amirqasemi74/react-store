@@ -8,23 +8,19 @@ export interface StoreUsedContext {
   value?: any;
 }
 
-export const getUsedContextes = (storeType: Function) => {
+export const setUsedContextesToInstance = (store: Store) => {
   const storeUsedContextes: StoreUsedContext[] =
-    storeType[STORE_USED_CONTEXTES] || [];
+    store.type[STORE_USED_CONTEXTES] || [];
 
-  return storeUsedContextes.map<StoreUsedContext>(storeUsedCtx => ({
-    ...storeUsedCtx,
-    value: useContext(storeUsedCtx.type)
-  }));
-};
-
-export const setUsedContextesToInstance = (
-  store: Store,
-  contextes: StoreUsedContext[]
-) => {
   store.turnOffRender();
-  contextes.forEach(storeUsedCtx => {
-    Reflect.set(store.instance, storeUsedCtx.propertyKey, storeUsedCtx.value);
-  });
+
+  storeUsedContextes
+    .map<StoreUsedContext>((storeUsedCtx) => ({
+      ...storeUsedCtx,
+      value: useContext(storeUsedCtx.type),
+    }))
+    .forEach((storeUsedCtx) => {
+      Reflect.set(store.instance, storeUsedCtx.propertyKey, storeUsedCtx.value);
+    });
   store.turnOnRender();
 };

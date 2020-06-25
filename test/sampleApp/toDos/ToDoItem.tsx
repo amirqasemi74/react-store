@@ -10,7 +10,7 @@ interface Props {
 const ToDoItem: React.FC<Props> = ({ itemIndex }) => {
   const vm = useStore(ToDoStore);
   const [isEditing, setIsEditing] = useState(false);
-  
+
   const onInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       setIsEditing((pre) => !pre);
@@ -40,7 +40,6 @@ const ToDoItem: React.FC<Props> = ({ itemIndex }) => {
 };
 
 export default ToDoItem;
-
 
 const ToDoItemWrapper = styled.div`
   display: flex;

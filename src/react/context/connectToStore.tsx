@@ -1,26 +1,27 @@
 import React from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
-import uid from "src/utils/uid";
-import ReactAppContext, { StoreContextValue } from "../appContext";
+import ReactAppContext from "../appContext";
 import buildProviderComponent from "./buildProviderComponent";
-
-const appContext = getFromContainer(ReactAppContext);
 
 const connectToStore = <T extends object>(
   Component: React.FC<T>,
   storeType: ClassType
 ): React.FC<T> => {
-  const TheContext = React.createContext<StoreContextValue>({
-    storeInstance: null,
-    renderKey: uid(),
-  });
-  TheContext.displayName = `${storeType.name}`;
-  const ContextProvider = buildProviderComponent(TheContext, storeType);
+  const storeContext = getFromContainer(ReactAppContext).findStoreContext(
+    storeType
+  );
 
-  // store context provider in app container
-  // to use context ref in useStore to get context value
-  appContext.registerStoreContext({ storeType, context: TheContext });
+  if (!storeContext) {
+    throw new Error(
+      `${storeType.name} doesn't decorated with @ContextStore/@GlobalStore`
+    );
+  }
+
+  const ContextProvider = buildProviderComponent(
+    storeContext.context,
+    storeType
+  );
 
   return (props: any) => {
     return (

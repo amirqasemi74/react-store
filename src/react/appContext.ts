@@ -1,4 +1,4 @@
-import { resolveDepsFromContainer } from "src/container";
+import { resolveDepsFromContainer, getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import Store from "./store";
 import { Context } from "react";
@@ -9,15 +9,11 @@ interface ResolveStoreArgs {
   StoreType: ClassType;
   id?: string;
   type?: "context";
-}
-
-export interface StoreContextValue {
-  storeInstance: any;
-  renderKey: string;
+  storeDeps?: { dep: ClassType; value: object }[];
 }
 
 interface StoreContext {
-  context: Context<StoreContextValue>;
+  context: Context<Store | null>;
   storeType: ClassType;
 }
 
@@ -27,17 +23,20 @@ export default class ReactAppContext {
 
   private storeContexts: StoreContext[] = [];
 
-  resolveStore({ StoreType, id, type }: ResolveStoreArgs): Store {
-    let store = this.stores.find(
-      (s) =>
-        //local and contextual store
-        s.id === id && s.type === StoreType
-    );
+  resolveStore({ StoreType, id, storeDeps }: ResolveStoreArgs): Store {
+    let store = this.stores.find((s) => s.id === id && s.type === StoreType);
+    const deps: ClassType[] =
+      Reflect.getMetadata("design:paramtypes", StoreType) || [];
+
+    const depsValue = deps.map((dep) => {
+      const storeDep = storeDeps?.find((sd) => sd.dep === dep);
+      return storeDep ? storeDep.value : getFromContainer(dep);
+    });
 
     if (!store) {
       store = new Store({
         id: id || uid(),
-        instance: new StoreType(...resolveDepsFromContainer(StoreType)),
+        instance: new StoreType(...depsValue),
       });
       this.stores.push(store);
     }

@@ -1,11 +1,11 @@
-import { Injectable, useStore, connectToStore } from "react-over";
-import React from "react";
-import { render } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
+import { render } from "@testing-library/react";
+import React from "react";
+import { connectToStore, ContextStore, useStore } from "react-over";
 
 describe("Contextual store", () => {
   it("each component which use contextual store should have same instacnce of it", () => {
-    @Injectable
+    @ContextStore()
     class UserStore {
       title = "User store";
       username = "amir.qasemi74";

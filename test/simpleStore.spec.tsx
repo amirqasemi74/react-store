@@ -1,10 +1,10 @@
 import { render } from "@testing-library/react";
 import React from "react";
-import { connectToStore, ContextualStore, useStore } from "react-over";
+import { connectToStore, ContextStore, useStore } from "react-over";
 
 describe("", () => {
   it("store hav value", () => {
-    @ContextualStore()
+    @ContextStore()
     class UserStore {
       username = "amir.qasemi74";
       password = "123456";

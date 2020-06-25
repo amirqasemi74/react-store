@@ -2,13 +2,12 @@ import React, { Context, useEffect, useRef, useState } from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
-import ReactAppContext, { StoreContextValue } from "../appContext";
-import {
-  getUsedContextes,
-  setUsedContextesToInstance,
-} from "../handlers/contextHandler";
+import ReactAppContext from "../appContext";
+import { setUsedContextesToInstance } from "../handlers/contextHandler";
 import didMountHandler from "../handlers/didMountHandler";
 import propsHandler from "../handlers/propsHandler";
+import Store from "../store";
+import storeInjectionHandler from "../handlers/storeInjectionHandler";
 
 interface ProviderComponentProps {
   props?: any;
@@ -17,38 +16,27 @@ interface ProviderComponentProps {
 const appContext = getFromContainer(ReactAppContext);
 
 const buildProviderComponent = (
-  TheContext: Context<StoreContextValue>,
+  TheContext: Context<Store | null>,
   StoreType: ClassType
 ): React.FC<ProviderComponentProps> => ({ children, props }) => {
-  const id = useRef<string>(uid());
+  const id = useRef(uid()).current;
+
   const store = useRef(
     appContext.resolveStore({
       StoreType,
-      id: id.current,
+      id,
       type: "context",
+      storeDeps: storeInjectionHandler(StoreType),
     })
   ).current;
-  const [renderKey, setRenderKey] = useState(uid());
-  const contextes = getUsedContextes(StoreType);
 
-  setUsedContextesToInstance(store, contextes);
+  setUsedContextesToInstance(store);
 
   propsHandler(props, store);
 
   didMountHandler(store);
 
-  useEffect(() => {
-    store.consumers.push({
-      render: () => {
-        setRenderKey(uid());
-      },
-    });
-  }, []);
-  return (
-    <TheContext.Provider value={{ storeInstance: store.instance, renderKey }}>
-      {children}
-    </TheContext.Provider>
-  );
+  return <TheContext.Provider value={store}>{children}</TheContext.Provider>;
 };
 
 export default buildProviderComponent;
