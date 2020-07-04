@@ -1,14 +1,19 @@
 import { ChangeEvent, KeyboardEvent } from "react";
-import { ContextStore } from "react-over";
+import { ContextStore, Effect } from "react-over";
 import { ThemeStore } from "../theme.store";
 
 @ContextStore()
 export class ToDoStore {
-  todos: string[] = [];
+  todos: string[] = ["a", "b", "c"];
 
-  inputVal = "";
+  inputVal = "a";
 
   constructor(public theme: ThemeStore) {}
+
+  @Effect()
+  async effect1() {
+    console.log(this.inputVal);
+  }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.inputVal = e.target.value;
@@ -27,7 +32,6 @@ export class ToDoStore {
 
   removeTodo(id: number) {
     this.todos = this.todos.filter((item, i) => i !== id);
-    console.log(this);
   }
 
   editTodo(id: number, value: string) {

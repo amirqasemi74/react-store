@@ -8,7 +8,7 @@ export class FunctionProxyHandler<T extends (...args: any[]) => any>
     private methodKey: PropertyKey
   ) {}
 
-  public apply(target: T, thisArg: any, argArray?: any) {
+  apply(target: T, thisArg: any, argArray?: any) {
     // this.store.addToMethodPropertyKeysCallStack({
     //   propertyKey: this.methodKey,
     //   isAsync: false,

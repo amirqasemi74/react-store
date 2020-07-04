@@ -4,7 +4,7 @@ export class ArrayProxyHandler<T extends any[]> implements ProxyHandler<T> {
   constructor(private store: Store, private storePropertyKey: PropertyKey) {}
 
   get(target: T, propertyKey: PropertyKey, receiver: any): any {
-    // console.log("Array::get" , target, propertyKey, this.storePropertyKey);
+    // console.log("Array::get", target, propertyKey, this.storePropertyKey);
     return Reflect.get(target, propertyKey, receiver);
   }
 
@@ -18,14 +18,14 @@ export class ArrayProxyHandler<T extends any[]> implements ProxyHandler<T> {
     //     "You can't change store state directly without calling any method"
     //   );
     // }
-    console.log(
-      "Array::set",
-      target,
-      propertyKey,
-      value,
-      this.storePropertyKey
-    );
-
+    // console.log(
+    //   "Array::set",
+    //   target,
+    //   propertyKey,
+    //   value,
+    //   this.storePropertyKey
+    // );
+    this.store.renderConsumers();
     return Reflect.set(target, propertyKey, value, receiver);
   }
 }

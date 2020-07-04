@@ -1,5 +1,5 @@
-import { AdtProxyBuilder } from "../AdtProxyBuilder";
-import { ArrayProxyHandler } from "./ArrayProxyHandler";
+import { AdtProxyBuilder } from "../adtProxyBuilder";
+import { ArrayProxyHandler } from "./arrayProxyHandler";
 import Store from "src/react/store";
 
 interface ArrayProxyBuilderArgs {

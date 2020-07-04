@@ -8,7 +8,7 @@ export class AsyncFunctionProxyHandler<T extends (...args: any[]) => any>
     private methodKey: PropertyKey
   ) {}
 
-  public async apply(target: T, thisArg: any, argArray?: any) {
+  async apply(target: T, thisArg: any, argArray?: any) {
     const { store } = this;
     // store.addToMethodPropertyKeysCallStack({propertyKey: this.methodKey, isAsync: true});
 

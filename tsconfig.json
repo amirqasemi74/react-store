@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ES5",
     "moduleResolution": "node",
     "baseUrl": ".",
     "downlevelIteration": true,
@@ -16,5 +16,5 @@
     },
     "sourceMap": true
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "sampleApp"]
 }

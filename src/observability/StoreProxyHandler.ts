@@ -1,4 +1,4 @@
-import { AdtProxyBuilder } from "./ADTsProxyBuilder/AdtProxyBuilder";
+import { AdtProxyBuilder } from "./adtProxyBuilder/adtProxyBuilder";
 import Store from "src/react/store";
 
 export default class StoreProxyHandler<T extends object>
@@ -6,35 +6,40 @@ export default class StoreProxyHandler<T extends object>
   constructor(private store: Store) {}
 
   get(target: T, propertyKey: PropertyKey, receiver: any) {
-    // console.log("Store::get", propertyKey);
+    // console.log(
+    //   "Store::get",
+    //   `${target.constructor.name}.${propertyKey.toString()}`
+    // );
+
     let value = Reflect.get(target, propertyKey, receiver);
 
-    if (!this.store.observeablePropertyKeys.has(propertyKey)) {
-      value = AdtProxyBuilder({
-        value,
-        propertyKey,
-        receiver,
-        store: this.store,
-      });
-      // Save proxied value to pure store object for next accessing to it's property
-      // and not creating again a proxy object
-      Reflect.set(target, propertyKey, value);
+    value = AdtProxyBuilder({
+      value,
+      propertyKey,
+      receiver,
+      store: this.store,
+    });
+    // Save proxied value to pure store object for next accessing to it's property
+    // and not creating again a proxy object
+    // Reflect.set(target, propertyKey, value);
 
-      // Add to proxied value property keys for next checking
-      this.store.observeablePropertyKeys.add(propertyKey);
-    }
+    // Add to proxied value property keys for next checking
+    // this.store.observeablePropertyKeys.add(propertyKey);
+
+    //Effect Deps
+    // this.store.addEffectDep(propertyKey,t)
 
     return value;
   }
 
   set(target: T, propertyKey: PropertyKey, value: any, receiver: any) {
     // Build Proxy from the value
-    let proxiedValue = AdtProxyBuilder({
-      value,
-      propertyKey,
-      receiver,
-      store: this.store,
-    });
+    // let proxiedValue = AdtProxyBuilder({
+    //   value,
+    //   propertyKey,
+    //   receiver,
+    //   store: this.store,
+    // });
 
     // if (this.store.isAnyMethodRunning) {
     //   // console.log("Store::set ->", propertyKey, "=", value);
@@ -45,11 +50,9 @@ export default class StoreProxyHandler<T extends object>
     //     "You can't change store state directly without calling any method"
     //   );
     // }
-    Reflect.set(target, propertyKey, proxiedValue, receiver);
+    Reflect.set(target, propertyKey, value, receiver);
 
-    if (this.store.isRenderAllow) {
-      this.store.consumers.forEach((cnsr) => cnsr.render());
-    }
+    this.store.renderConsumers();
     return true;
   }
 }

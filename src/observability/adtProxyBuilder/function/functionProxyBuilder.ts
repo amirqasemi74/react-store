@@ -1,5 +1,5 @@
-import { AsyncFunctionProxyHandler } from "./AsyncFunctionProxyHandler";
-import { FunctionProxyHandler } from "./FunctionProxyHandler";
+import { AsyncFunctionProxyHandler } from "./asyncFunctionProxyHandler";
+import { FunctionProxyHandler } from "./functionProxyHandler";
 import Store from "src/react/store";
 import { FunctionType } from "src/types";
 
