@@ -1,9 +1,9 @@
-import { resolveDepsFromContainer, getFromContainer } from "src/container";
-import { ClassType } from "src/types";
-import Store from "./store";
 import { Context } from "react";
-import uid from "src/utils/uid";
+import { getFromContainer } from "src/container";
 import { Injectable } from "src/decorators/Injectable";
+import { ClassType } from "src/types";
+import uid from "src/utils/uid";
+import Store from "./store";
 
 interface ResolveStoreArgs {
   StoreType: ClassType;

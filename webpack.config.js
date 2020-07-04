@@ -2,17 +2,16 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { resolve } = require("path");
 
 const srcDir = resolve(__dirname, "src");
-const testDir = resolve(__dirname, "test");
+const sampeAppDir = resolve(__dirname, "sampleApp");
 
 module.exports = {
   devtool: "source-map",
-  entry: resolve(testDir, "sampleApp", "index.tsx"),
+  entry: resolve(sampeAppDir, "index.tsx"),
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
       "react-over": srcDir,
       src: srcDir,
-      test: testDir,
     },
   },
   module: {
@@ -25,7 +24,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: resolve(testDir, "sampleApp", "index.html"),
+      template: resolve(sampeAppDir, "index.html"),
     }),
   ],
 };
