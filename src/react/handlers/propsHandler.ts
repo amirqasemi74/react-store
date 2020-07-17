@@ -2,9 +2,9 @@ import Store from "../store";
 import { PROPS_PROPERTY_KEY } from "../constant";
 import { useEffect } from "react";
 
-export default function propsHandler(props: any, store: Store) {
+export default function propsHandler(store: Store, props: object) {
   const propsPropertyKey: string | undefined = Reflect.get(
-    store.type,
+    store.constructorType,
     PROPS_PROPERTY_KEY
   );
   useEffect(() => {

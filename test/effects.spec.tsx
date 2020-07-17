@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
-import { connectToStore, ContextStore, Effect, useStore } from "react-over";
+import { connectStore, ContextStore, Effect, useStore } from "react-over";
 
 describe("Effects", () => {
   it("must be called when dependecies are being changed", async () => {
@@ -30,7 +30,7 @@ describe("Effects", () => {
       }
     }
 
-    const User = connectToStore(() => {
+    const User = connectStore(() => {
       const vm = useStore(UserStore);
       return (
         <>
@@ -50,7 +50,7 @@ describe("Effects", () => {
       return <User />;
     };
 
-    const AppWithStore = connectToStore(App, AppStore);
+    const AppWithStore = connectStore(App, AppStore);
     const { findByTestId } = render(<AppWithStore />);
     const input = await findByTestId("username-input");
 

@@ -1,33 +1,28 @@
-import { getType } from "src/utils/utils";
 import { ClassType } from "src/types";
+import { getDepsConstructorType } from "src/utils/utils";
 
-export class Container {
-  private instances: object[] = [];
+class Container {
+  private instances = new Map<Function, object>();
 
-  resolve(someClass: ClassType): InstanceType<ClassType> {
-    let instance = this.instances.find(i => getType(i) === someClass);
+  resolve(SomeClass: ClassType): InstanceType<ClassType> {
+    let instance = this.instances.get(SomeClass);
     if (!instance) {
-      instance = new someClass(...this.resolveDependencies(someClass));
-      this.instances.push(instance!);
+      instance = new SomeClass(...this.resolveDependencies(SomeClass));
+      this.instances.set(SomeClass, instance!);
     }
     return instance;
   }
 
   resolveDependencies(someClass: ClassType) {
-    const deps: ClassType[] =
-      Reflect.getMetadata("design:paramtypes", someClass) || [];
-    return deps.map(d => this.resolve(d));
+    return getDepsConstructorType(someClass).map((d) => this.resolve(d));
   }
 
   remove(someClass: ClassType) {
-    const index = this.instances.findIndex(i => getType(i) === someClass);
-    if (index !== -1) {
-      this.instances.splice(index, 1);
-    }
+    this.instances.delete(someClass);
   }
 
   clearContainer() {
-    this.instances = [];
+    this.instances.clear();
   }
 }
 
@@ -36,16 +31,17 @@ const defaultContainer = new Container();
 export const getFromContainer = <T extends ClassType>(
   someClass: T,
   container = defaultContainer
-): InstanceType<T> => defaultContainer.resolve(someClass);
+): InstanceType<T> => container.resolve(someClass);
 
 export const removeFromContainer = (
   someClass: ClassType,
   container = defaultContainer
-) => defaultContainer.remove(someClass);
+) => container.remove(someClass);
 
 export const resolveDepsFromContainer = (
   someClass: ClassType,
   container = defaultContainer
-) => defaultContainer.resolveDependencies(someClass);
+) => container.resolveDependencies(someClass);
 
-export const clearContainer = () => defaultContainer.clearContainer();
+export const clearContainer = (container = defaultContainer) =>
+  container.clearContainer();

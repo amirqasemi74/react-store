@@ -1,6 +1,6 @@
 import React from "react";
-import { connectToStore, useStore } from "react-over";
-import { ToDoStore } from "./toDo.store";
+import { connectStore, useStore } from "react-over";
+import ToDoStore from "./toDo.store";
 import styled from "styled-components";
 import ToDoList from "./ToDoList";
 
@@ -22,7 +22,7 @@ const ToDos: React.FC = () => {
   );
 };
 
-export default connectToStore(ToDos, ToDoStore);
+export default connectStore(ToDos, ToDoStore);
 
 const ToDoWrapper = styled.section`
   display: flex;

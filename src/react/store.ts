@@ -1,11 +1,11 @@
-import { observe } from "src/observability";
+import observe from "src/observation";
 import { getType } from "src/utils/utils";
 import { STORE_REF } from "./constant";
 
 export default class Store {
   id?: string;
 
-  type: Function;
+  constructorType: Function;
 
   pureInstance: any;
 
@@ -19,7 +19,7 @@ export default class Store {
 
   constructor({ id, instance }: Args) {
     this.id = id;
-    this.type = getType(instance);
+    this.constructorType = getType(instance);
     this.pureInstance = instance;
     this.instance = observe(instance, this);
     // to access store in deep proxy for effects handler

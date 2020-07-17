@@ -5,7 +5,8 @@ import proxyDeep from "./proxyDeep";
 import objectPath from "object-path";
 
 const effectHandler = (store: Store) => {
-  const effects: PropertyKey[] = Reflect.get(store.type, EFFECTS) || [];
+  const effects: PropertyKey[] =
+    Reflect.get(store.constructorType, EFFECTS) || [];
 
   effects.forEach((effectKey) => {
     useEffect(() => {
@@ -16,7 +17,7 @@ const effectHandler = (store: Store) => {
           getSetStack,
         });
         const effect = store.getEffect(effectKey);
-        
+
         if (effect?.isCalledOnce) {
           const despValue = effect.deps.map((path) =>
             objectPath.get(store.pureInstance, path)

@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import React from "react";
-import { connectToStore, ContextStore, useStore } from "react-over";
+import { connectStore, ContextStore, useStore } from "react-over";
 
 describe("Contextual store", () => {
   it("each component which use contextual store should have same instacnce of it", () => {
@@ -37,7 +37,7 @@ describe("Contextual store", () => {
         </>
       );
     };
-    const AppWithStore = connectToStore(App, UserStore);
+    const AppWithStore = connectStore(App, UserStore);
     const { getByText } = render(<AppWithStore />);
     // debug();
 

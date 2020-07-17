@@ -4,6 +4,8 @@
     "importHelpers": true,
     "removeComments": true,
     "module": "ESNext",
+    "lib": ["ES2015", "DOM"],
+    "target": "ES5",
     "outDir": "./dist",
     "declaration": true,
     "types": ["react"]

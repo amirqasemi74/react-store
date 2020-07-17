@@ -14,7 +14,7 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
   const storeContext = appContext.findStoreContext(storeType);
 
   if (storeContext) {
-    const store = useContext(storeContext.context);
+    const store = useContext(storeContext);
     if (!store) {
       throw new Error(
         `${storeType.name} haven't been connected to the component tree!`
