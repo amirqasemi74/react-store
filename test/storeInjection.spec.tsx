@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import React from "react";
-import { connectToStore, ContextStore, useStore } from "react-over";
+import { connectStore, ContextStore, useStore } from "react-over";
 
 describe("Store Injection", () => {
   it("Upper store should inject into lower store", () => {
@@ -23,7 +23,7 @@ describe("Store Injection", () => {
       }
     }
 
-    const User = connectToStore(() => {
+    const User = connectStore(() => {
       const vm = useStore(UserStore);
       return (
         <>
@@ -43,7 +43,7 @@ describe("Store Injection", () => {
         </>
       );
     };
-    const AppWithStore = connectToStore(App, AppStore);
+    const AppWithStore = connectStore(App, AppStore);
     const { getByText } = render(<AppWithStore />);
 
     expect(appStoreRef).not.toBe(null);

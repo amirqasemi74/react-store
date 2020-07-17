@@ -4,7 +4,7 @@ import { ClassType } from "src/types";
 import ReactAppContext from "../appContext";
 import buildProviderComponent from "./buildProviderComponent";
 
-const connectToStore = <T extends object>(
+const connectStore = <T extends object>(
   Component: React.FC<T>,
   storeType: ClassType
 ): React.FC<T> => {
@@ -18,10 +18,7 @@ const connectToStore = <T extends object>(
     );
   }
 
-  const ContextProvider = buildProviderComponent(
-    storeContext.context,
-    storeType
-  );
+  const ContextProvider = buildProviderComponent(storeContext, storeType);
 
   return (props: any) => {
     return (
@@ -31,4 +28,4 @@ const connectToStore = <T extends object>(
     );
   };
 };
-export default connectToStore;
+export default connectStore;

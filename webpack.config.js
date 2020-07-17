@@ -11,6 +11,7 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
       "react-over": srcDir,
+      sampleApp: sampeAppDir,
       src: srcDir,
     },
   },

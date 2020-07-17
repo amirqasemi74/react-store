@@ -1,12 +1,17 @@
-import { ContextStore } from "react-over";
+import { ContextStore, Effect } from "react-over";
 
 @ContextStore()
-export class ThemeStore {
+export default class ThemeStore {
   primary = "black";
 
   secondary = "gray";
 
   changePrimary() {
     this.primary = "green";
+  }
+
+  @Effect()
+  effect1() {
+    console.log(this.primary);
   }
 }

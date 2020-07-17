@@ -1,6 +1,6 @@
 import React, { useState, KeyboardEvent } from "react";
 import { useStore } from "react-over";
-import { ToDoStore } from "./toDo.store";
+import ToDoStore from "./toDo.store";
 import styled from "styled-components";
 
 interface Props {

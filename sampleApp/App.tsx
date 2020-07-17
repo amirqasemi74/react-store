@@ -1,7 +1,7 @@
 import React from "react";
 import ToDos from "./toDos";
-import { connectToStore, useStore } from "react-over";
-import { ThemeStore } from "./theme.store";
+import { connectStore, useStore } from "react-over";
+import ThemeStore from "./theme.store";
 
 const App = () => {
   const vm = useStore(ThemeStore);
@@ -13,4 +13,4 @@ const App = () => {
   );
 };
 
-export default connectToStore(App, ThemeStore);
+export default connectStore(App, ThemeStore);

@@ -6,7 +6,7 @@ import { useContext } from "react";
 const storeInjectionHandler = (storeType: ClassType) => {
   const deps: ClassType[] =
     Reflect.getMetadata("design:paramtypes", storeType) || [];
-  const storeDepsValue: { dep: ClassType; value: object }[] = [];
+  const storeDepsValue = new Map<Function, object>();
 
   // Find dependecies which is store type
   // then resolve them from context
@@ -22,17 +22,14 @@ const storeInjectionHandler = (storeType: ClassType) => {
     if (!storeContext) {
       return;
     }
-    
-    const context = useContext(storeContext.context);
+
+    const context = useContext(storeContext);
     if (!context) {
       throw new Error(
         `${dep.name} haven't been connected to the component tree!`
       );
     }
-    storeDepsValue.push({
-      dep,
-      value: context.instance,
-    });
+    storeDepsValue.set(dep, context.instance);
   });
 
   return storeDepsValue;

@@ -12,7 +12,8 @@
     "noImplicitAny": false,
     "jsx": "react",
     "paths": {
-      "react-over": ["src"]
+      "react-over": ["src"],
+      "sampleApp": ["sampleApp"]
     },
     "sourceMap": true
   },

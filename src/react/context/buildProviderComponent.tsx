@@ -3,12 +3,9 @@ import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import ReactAppContext from "../appContext";
-import { setUsedContextesToInstance } from "../handlers/contextHandler";
-import didMountHandler from "../handlers/didMountHandler";
-import propsHandler from "../handlers/propsHandler";
-import Store from "../store";
+import registerHandlers from "../handlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
-import effectHandler from "../handlers/effectHandler";
+import Store from "../store";
 
 interface ProviderComponentProps {
   props?: any;
@@ -37,13 +34,7 @@ const buildProviderComponent = (
     store.consumers.push({ render: () => setRenderKey(uid()) });
   }, []);
 
-  setUsedContextesToInstance(store);
-
-  propsHandler(props, store);
-
-  didMountHandler(store);
-
-  effectHandler(store);
+  registerHandlers(store, props);
 
   return <TheContext.Provider value={store}>{children}</TheContext.Provider>;
 };

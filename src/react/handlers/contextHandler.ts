@@ -8,9 +8,9 @@ export interface StoreUsedContext {
   value?: any;
 }
 
-export const setUsedContextesToInstance = (store: Store) => {
+const usedContextesHandler = (store: Store) => {
   const storeUsedContextes: StoreUsedContext[] =
-    store.type[STORE_USED_CONTEXTES] || [];
+    store.constructorType[STORE_USED_CONTEXTES] || [];
 
   store.turnOffRender();
 
@@ -24,3 +24,5 @@ export const setUsedContextesToInstance = (store: Store) => {
     });
   store.turnOnRender();
 };
+
+export default usedContextesHandler;
