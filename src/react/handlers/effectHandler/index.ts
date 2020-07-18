@@ -4,59 +4,54 @@ import Store from "src/react/store";
 import proxyDeep from "./proxyDeep";
 import objectPath from "object-path";
 
+let i = 0;
+
 const effectHandler = (store: Store) => {
   const effects: PropertyKey[] =
     Reflect.get(store.constructorType, EFFECTS) || [];
 
   effects.forEach((effectKey) => {
     useEffect(() => {
-      (() => {
-        const getSetStack: GetSetStack[] = [];
-        const context = proxyDeep({
-          store,
-          getSetStack,
-        });
-        const effect = store.getEffect(effectKey);
+      const getSetStack: GetSetStack[] = [];
+      const context = proxyDeep({
+        store,
+        getSetStack,
+      });
+      const effect = store.getEffect(effectKey);
 
-        if (effect?.isCalledOnce) {
-          const despValue = effect.deps.map((path) =>
-            objectPath.get(store.pureInstance, path)
-          );
+      if (effect?.isCalledOnce) {
+        const despValue = effect.deps.map((path) =>
+          objectPath.get(store.pureInstance, path)
+        );
 
-          let isDepsEqual = true;
-          for (let i = 0; i < despValue.length; i++) {
-            if (!Object.is(despValue[i], effect.preDepsValues[i])) {
-              isDepsEqual = false;
-              break;
-            }
+        let isDepsEqual = true;
+        for (let i = 0; i < despValue.length; i++) {
+          if (!Object.is(despValue[i], effect.preDepsValues[i])) {
+            isDepsEqual = false;
+            break;
           }
-          if (!isDepsEqual) {
-            Promise.resolve(
-              Reflect.apply(store.pureInstance[effectKey], context, [])
-            ).then(() => {
-              const deps = DependeciesExtarctor(getSetStack, store);
-              store.storeEffet(effectKey, {
-                deps,
-                isCalledOnce: true,
-                preDepsValues: despValue,
-              });
-            });
-          }
-        } else {
-          Promise.resolve(
-            Reflect.apply(store.pureInstance[effectKey], context, [])
-          ).then(() => {
-            const deps = DependeciesExtarctor(getSetStack, store);
-            store.storeEffet(effectKey, {
-              deps,
-              isCalledOnce: true,
-              preDepsValues: deps.map((path) =>
-                objectPath.get(store.pureInstance, path)
-              ),
-            });
+        }
+
+        if (!isDepsEqual) {
+          Reflect.apply(store.pureInstance[effectKey], context, []);
+          const deps = DependeciesExtarctor(getSetStack, store);
+          store.storeEffet(effectKey, {
+            deps,
+            isCalledOnce: true,
+            preDepsValues: despValue,
           });
         }
-      })();
+      } else {
+        Reflect.apply(store.pureInstance[effectKey], context, []);
+        const deps = DependeciesExtarctor(getSetStack, store);
+        store.storeEffet(effectKey, {
+          deps,
+          isCalledOnce: true,
+          preDepsValues: deps.map((path) =>
+            objectPath.get(store.pureInstance, path)
+          ),
+        });
+      }
     });
   });
 };

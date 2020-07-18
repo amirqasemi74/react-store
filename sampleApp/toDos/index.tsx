@@ -17,7 +17,7 @@ const ToDos: React.FC = () => {
         onKeyDown={vm.onInputKeyDown}
       />
       <ToDoList />
-      <ToDoCount>ToDo Count: {vm.todos.length}</ToDoCount>
+      <ToDoCount>ToDo Count: {vm.todoCount}</ToDoCount>
     </ToDoWrapper>
   );
 };

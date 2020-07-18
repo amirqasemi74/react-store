@@ -7,15 +7,15 @@ import ToDoService from "sampleApp/services/todos.service";
 export default class ToDoStore {
   todos: string[] = ["a", "b", "c"];
 
+  todoCount = 0;
+
   inputVal = "a";
 
-  constructor(public theme: ThemeStore, public service: ToDoService) {
-    console.log(service);
-  }
+  constructor(public theme: ThemeStore, public service: ToDoService) {}
 
   @Effect()
   effect1() {
-    console.log(this.theme.primary);
+    this.todoCount = this.todos.length;
   }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
