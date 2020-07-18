@@ -6,3 +6,4 @@ tsconfig*
 babel*
 jest*
 .vscode
+_config.yml

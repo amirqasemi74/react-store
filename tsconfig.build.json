@@ -1,15 +1,28 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
     "importHelpers": true,
     "removeComments": true,
-    "module": "ESNext",
-    "lib": ["ES2015", "DOM"],
-    "target": "ES5",
-    "outDir": "./dist",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "target": "ES6",
+    "rootDir": "src",
     "declaration": true,
-    "types": ["react"]
+    "declarationDir": "dist",
+    "plugins": [
+      {
+        "transform": "@zerollup/ts-transform-paths",
+        "exclude": ["*"]
+      }
+    ]
   },
+
   "include": ["src"],
   "exclude": ["src/**/*.spec.ts"]
 }
