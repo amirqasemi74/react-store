@@ -31,7 +31,7 @@ describe("Effect handler", () => {
       target[STORE_REF] = store;
       const getSetStack: GetSetStack[] = [];
       const userStore = proxyDeep({
-        target,
+        store,
         getSetStack,
       });
       userStore.effect1();

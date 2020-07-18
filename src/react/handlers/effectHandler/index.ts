@@ -13,7 +13,7 @@ const effectHandler = (store: Store) => {
       (() => {
         const getSetStack: GetSetStack[] = [];
         const context = proxyDeep({
-          target: store.pureInstance,
+          store,
           getSetStack,
         });
         const effect = store.getEffect(effectKey);
