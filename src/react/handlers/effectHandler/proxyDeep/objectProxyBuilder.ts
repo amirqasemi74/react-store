@@ -1,14 +1,17 @@
+import Store from "src/react/store";
 import { GetSetStack } from "..";
 import AdtProxyBuilder from "./adtProxyBuilder";
 
 interface ObjectrPoxyBuilderArgs {
   object: object;
   getSetStack: Array<GetSetStack>;
+  store: Store;
 }
 
 const objectProxyBuilder = ({
   object,
   getSetStack,
+  store,
 }: ObjectrPoxyBuilderArgs) => {
   return new Proxy<object>(object, {
     get(target: any, propertyKey: PropertyKey, receiver: any) {
@@ -19,6 +22,7 @@ const objectProxyBuilder = ({
 
       return AdtProxyBuilder({
         value,
+        store,
         getSetStack: getSetStack,
       });
     },
@@ -26,7 +30,9 @@ const objectProxyBuilder = ({
     set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {
       // console.log("Object::set", target, propertyKey, value);
       getSetStack.push({ type: "SET", target, propertyKey, value });
-      return Reflect.set(target, propertyKey, value, receiver);
+      const res = Reflect.set(target, propertyKey, value, receiver);
+      store.renderConsumers();
+      return res;
     },
   });
 };

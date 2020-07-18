@@ -1,3 +1,4 @@
+import Store from "src/react/store";
 import { GetSetStack } from "..";
 import { STORE_REF } from "../../../constant";
 import arrayProxyBuilder from "./arrayProxyBuilder";
@@ -6,16 +7,21 @@ import objectProxyBuilder from "./objectProxyBuilder";
 interface AdtProxyBuilderArgs {
   value: any;
   getSetStack: Array<GetSetStack>;
+  store: Store;
 }
 
-const AdtProxyBuilder = ({ value, getSetStack }: AdtProxyBuilderArgs) => {
+const AdtProxyBuilder = ({
+  value,
+  getSetStack,
+  store,
+}: AdtProxyBuilderArgs) => {
   const constructorName: BaseJsConstructorsName = value.constructor.name;
 
   switch (constructorName) {
     case "Array":
-      return arrayProxyBuilder({ array: value, getSetStack });
+      return arrayProxyBuilder({ array: value, getSetStack, store });
     case "Object":
-      return objectProxyBuilder({ object: value, getSetStack });
+      return objectProxyBuilder({ object: value, getSetStack, store });
     case "Boolean":
     case "Number":
     case "RegExp":
@@ -23,7 +29,7 @@ const AdtProxyBuilder = ({ value, getSetStack }: AdtProxyBuilderArgs) => {
       return value;
     default: {
       if (value instanceof Object && value[STORE_REF]) {
-        return objectProxyBuilder({ object: value, getSetStack });
+        return objectProxyBuilder({ object: value, getSetStack, store });
       }
       return value;
     }

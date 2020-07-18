@@ -1,12 +1,18 @@
+import Store from "src/react/store";
 import { GetSetStack } from "..";
 import AdtProxyBuilder from "./adtProxyBuilder";
 
 interface ArrayProxyBuilderArgs {
   array: any[];
   getSetStack: Array<GetSetStack>;
+  store: Store;
 }
 
-const arrayProxyBuilder = ({ array, getSetStack }: ArrayProxyBuilderArgs) => {
+const arrayProxyBuilder = ({
+  array,
+  getSetStack,
+  store,
+}: ArrayProxyBuilderArgs) => {
   return new Proxy<any[]>(array, {
     get(target: any, propertyKey: PropertyKey, receiver: any) {
       let value = Reflect.get(target, propertyKey, receiver);
@@ -19,6 +25,7 @@ const arrayProxyBuilder = ({ array, getSetStack }: ArrayProxyBuilderArgs) => {
       // console.log("Array::get", propertyKey, value);
       return AdtProxyBuilder({
         value,
+        store,
         getSetStack: getSetStack,
       });
     },
@@ -26,7 +33,9 @@ const arrayProxyBuilder = ({ array, getSetStack }: ArrayProxyBuilderArgs) => {
     set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {
       // console.log("Array::set", target, propertyKey, value);
       getSetStack.push({ type: "SET", target, propertyKey, value });
-      return Reflect.set(target, propertyKey, value, receiver);
+      const res = Reflect.set(target, propertyKey, value, receiver);
+      store.renderConsumers();
+      return res;
     },
   });
 };

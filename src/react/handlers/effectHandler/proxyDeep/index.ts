@@ -1,12 +1,13 @@
 import { GetSetStack } from "..";
 import AdtProxyBuilder from "./adtProxyBuilder";
+import Store from "src/react/store";
 
-interface ProxyDeepArgs<T> {
-  target: T;
+interface ProxyDeepArgs {
+  store: Store;
   getSetStack: Array<GetSetStack>;
 }
 
-const proxyDeep = <T>({ target, getSetStack }: ProxyDeepArgs<T>): T =>
-  AdtProxyBuilder({ value: target, getSetStack });
+const proxyDeep = ({ store, getSetStack }: ProxyDeepArgs) =>
+  AdtProxyBuilder({ value: store.pureInstance, getSetStack, store });
 
 export default proxyDeep;
