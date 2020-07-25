@@ -13,5 +13,6 @@ export default class ThemeStore {
   @Effect()
   effect1() {
     console.log(this.primary);
+    return 2;
   }
 }

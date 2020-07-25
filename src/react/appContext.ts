@@ -12,10 +12,17 @@ interface ResolveStoreArgs {
   storeDeps?: Map<Function, object>;
 }
 
+interface CurrentRunnigEffect {
+  depsList: () => any[];
+  clearEffect: () => void;
+}
+
 export default class ReactAppContext {
   private stores: Store[] = [];
 
   private storeContexts = new Map<Function, React.Context<Store | null>>();
+
+  currentRunningEffect: CurrentRunnigEffect;
 
   resolveStore({ StoreType, id, storeDeps }: ResolveStoreArgs): Store {
     let store = this.stores.find(

@@ -1,7 +1,8 @@
 import { STORE_REF } from "src/react/constant";
 import Store from "src/react/store";
-import { DependeciesExtarctor, GetSetStack } from ".";
+import dependeciesExtarctor from "./dependenciesExtractor";
 import proxyDeep from "./proxyDeep";
+import { GetSetStack } from "./runEffect";
 
 describe("Effect handler", () => {
   describe("Dependecies Detector", () => {
@@ -35,7 +36,7 @@ describe("Effect handler", () => {
         getSetStack,
       });
       userStore.effect1();
-      const dependecies = DependeciesExtarctor(getSetStack, store);
+      const dependecies = dependeciesExtarctor(getSetStack, store);
       expect(dependecies).toEqual([
         "effect1",
         "username",

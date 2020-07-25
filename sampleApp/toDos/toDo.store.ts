@@ -1,5 +1,5 @@
 import { ChangeEvent, KeyboardEvent } from "react";
-import { ContextStore, Effect } from "react-over";
+import { ContextStore, Effect, dep } from "react-over";
 import ThemeStore from "../theme.store";
 import ToDoService from "sampleApp/services/todos.service";
 
@@ -9,13 +9,14 @@ export default class ToDoStore {
 
   todoCount = 0;
 
-  inputVal = "a";
+  inputVal = "d";
 
   constructor(public theme: ThemeStore, public service: ToDoService) {}
 
   @Effect()
   effect1() {
     this.todoCount = this.todos.length;
+    return () => console.log("clear Effect from effect 1 in ToDo Store");
   }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {

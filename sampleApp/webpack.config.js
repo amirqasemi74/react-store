@@ -1,8 +1,8 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { resolve } = require("path");
 
-const srcDir = resolve(__dirname, "src");
-const sampeAppDir = resolve(__dirname, "sampleApp");
+const srcDir = resolve(__dirname, "../src");
+const sampeAppDir = resolve(__dirname);
 
 module.exports = {
   devtool: "source-map",

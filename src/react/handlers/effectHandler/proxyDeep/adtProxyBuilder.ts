@@ -1,6 +1,6 @@
 import Store from "src/react/store";
-import { GetSetStack } from "..";
 import { STORE_REF } from "../../../constant";
+import { GetSetStack } from "../runEffect";
 import arrayProxyBuilder from "./arrayProxyBuilder";
 import objectProxyBuilder from "./objectProxyBuilder";
 

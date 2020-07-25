@@ -1,7 +1,6 @@
 import React from "react";
 import { getFromContainer } from "src/container";
 import ReactAppContext from "src/react/appContext";
-import { ClassType } from "src/types";
 import Store from "src/react/store";
 
 export default function ContextStore(): ClassDecorator {

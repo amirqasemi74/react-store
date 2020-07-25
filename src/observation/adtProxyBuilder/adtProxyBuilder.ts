@@ -21,46 +21,39 @@ export const AdtProxyBuilder = ({
   receiver,
   store,
   depth,
-}: AdtProxyBuilderArgs): any => {
-  let proxiedValue = value;
-
+}: AdtProxyBuilderArgs) => {
   if (value) {
     switch (value.constructor) {
       case Object:
-        proxiedValue = objectProxyBuilder({
+        return objectProxyBuilder({
           store,
           storePropertyKey: propertyKey,
           object: value,
           depth: depth !== undefined ? depth : OBJECT_OBSERVABILITY_DEPTH,
         });
-        break;
 
       case Array:
-        proxiedValue = arrayProxyBuilder({
+        return arrayProxyBuilder({
           store,
           storePropertyKey: propertyKey,
           array: value,
           depth: depth !== undefined ? depth : ARRAY_OBSERVABILITY_DEPTH,
         });
-        break;
 
       case Function:
-        proxiedValue = functionProxyBuilder({
+        return functionProxyBuilder({
           store,
           methodKey: propertyKey,
           func: value,
           context: receiver,
         });
-        break;
 
       case Number:
       case String:
       case RegExp:
       case Boolean:
       default:
-        proxiedValue = value;
+        return value;
     }
   }
-
-  return proxiedValue;
 };

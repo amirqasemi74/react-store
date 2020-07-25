@@ -1,4 +1,4 @@
-import { GetSetStack } from "..";
+import { GetSetStack } from "../runEffect";
 import AdtProxyBuilder from "./adtProxyBuilder";
 import Store from "src/react/store";
 

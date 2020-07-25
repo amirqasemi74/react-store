@@ -58,8 +58,9 @@ interface Args {
 
 interface Effect {
   deps: string[];
-  preDepsValues: any[];
+  depsValues: any[];
   isCalledOnce: boolean;
+  clearEffect?: (() => void) | null;
 }
 interface StoreConsumer {
   render: Function;
