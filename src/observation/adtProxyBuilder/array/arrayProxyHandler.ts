@@ -1,6 +1,7 @@
 import Store from "src/react/store";
 
-export class ArrayProxyHandler<T extends any[]> implements ProxyHandler<T> {
+export default class ArrayProxyHandler<T extends any[]>
+  implements ProxyHandler<T> {
   constructor(private store: Store, private storePropertyKey: PropertyKey) {}
 
   get(target: T, propertyKey: PropertyKey, receiver: any): any {
@@ -25,7 +26,8 @@ export class ArrayProxyHandler<T extends any[]> implements ProxyHandler<T> {
     //   value,
     //   this.storePropertyKey
     // );
+    const res = Reflect.set(target, propertyKey, value, receiver);
     this.store.renderConsumers();
-    return Reflect.set(target, propertyKey, value, receiver);
+    return res;
   }
 }

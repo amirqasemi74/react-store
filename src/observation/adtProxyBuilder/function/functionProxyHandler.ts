@@ -1,6 +1,6 @@
 import Store from "src/react/store";
 
-export class FunctionProxyHandler<T extends (...args: any[]) => any>
+export default class FunctionProxyHandler<T extends (...args: any[]) => any>
   implements ProxyHandler<T> {
   constructor(
     private store: Store,

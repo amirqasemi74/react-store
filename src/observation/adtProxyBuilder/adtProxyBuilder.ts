@@ -1,6 +1,6 @@
-import { arrayProxyBuilder } from "./array/arrayProxyBuilder";
-import { functionProxyBuilder } from "./function/functionProxyBuilder";
-import { objectProxyBuilder } from "./object/objectProxyBuilder";
+import arrayProxyBuilder from "./array/arrayProxyBuilder";
+import functionProxyBuilder from "./function/functionProxyBuilder";
+import objectProxyBuilder from "./object/objectProxyBuilder";
 import Store from "src/react/store";
 import {
   OBJECT_OBSERVABILITY_DEPTH,
@@ -14,15 +14,14 @@ interface AdtProxyBuilderArgs {
   depth?: number;
   store: Store;
 }
-
-export const AdtProxyBuilder = ({
+const adtProxyBuilder = ({
   value,
   propertyKey,
   receiver,
   store,
   depth,
 }: AdtProxyBuilderArgs) => {
-  if (value) {
+  try {
     switch (value.constructor) {
       case Object:
         return objectProxyBuilder({
@@ -55,5 +54,9 @@ export const AdtProxyBuilder = ({
       default:
         return value;
     }
+  } catch (error) {
+    return value;
   }
 };
+
+export default adtProxyBuilder;

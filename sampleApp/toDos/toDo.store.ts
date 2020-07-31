@@ -7,15 +7,15 @@ import ToDoService from "sampleApp/services/todos.service";
 export default class ToDoStore {
   todos: string[] = ["a", "b", "c"];
 
-  todoCount = 0;
+  todoCount = "0";
 
-  inputVal = "d";
+  inputVal = "";
 
   constructor(public theme: ThemeStore, public service: ToDoService) {}
 
   @Effect()
   effect1() {
-    this.todoCount = this.todos.length;
+    this.todoCount = this.todos.length.toString();
     return () => console.log("clear Effect from effect 1 in ToDo Store");
   }
 

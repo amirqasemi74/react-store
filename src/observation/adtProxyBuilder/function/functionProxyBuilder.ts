@@ -1,5 +1,5 @@
 import Store from "src/react/store";
-import { FunctionProxyHandler } from "./functionProxyHandler";
+import FunctionProxyHandler from "./functionProxyHandler";
 
 interface FunctionProxyHandlerArgs {
   func: Function;
@@ -8,7 +8,7 @@ interface FunctionProxyHandlerArgs {
   methodKey: PropertyKey;
 }
 
-export const functionProxyBuilder = ({
+const functionProxyBuilder = ({
   func,
   context,
   store,
@@ -19,3 +19,4 @@ export const functionProxyBuilder = ({
     new FunctionProxyHandler(store, context, methodKey)
   );
 };
+export default functionProxyBuilder;

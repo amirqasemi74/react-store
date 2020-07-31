@@ -1,6 +1,7 @@
 import Store from "src/react/store";
 
-export class ObjectProxyHandler<T extends object> implements ProxyHandler<T> {
+export default class ObjectProxyHandler<T extends object>
+  implements ProxyHandler<T> {
   constructor(private store: Store, private storePropertyKey: PropertyKey) {}
 
   get(target: T, propertyKey: PropertyKey, receiver: any): any {
@@ -19,6 +20,8 @@ export class ObjectProxyHandler<T extends object> implements ProxyHandler<T> {
     //   );
     // }
 
-    return Reflect.set(target, propertyKey, value, receiver);
+    const res = Reflect.set(target, propertyKey, value, receiver);
+    this.store.renderConsumers();
+    return res;
   }
 }

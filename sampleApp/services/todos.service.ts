@@ -1,4 +1,8 @@
 import { Injectable } from "react-over";
 
 @Injectable
-export default class ToDoService {}
+export default class ToDoService {
+  constructor() {
+    // console.log(this.constructor.name);
+  }
+}

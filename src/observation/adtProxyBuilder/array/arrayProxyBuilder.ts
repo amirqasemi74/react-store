@@ -1,5 +1,5 @@
-import { AdtProxyBuilder } from "../adtProxyBuilder";
-import { ArrayProxyHandler } from "./arrayProxyHandler";
+import adtProxyBuilder from "../adtProxyBuilder";
+import ArrayProxyHandler from "./arrayProxyHandler";
 import Store from "src/react/store";
 
 interface ArrayProxyBuilderArgs {
@@ -9,7 +9,7 @@ interface ArrayProxyBuilderArgs {
   depth: number;
 }
 
-export const arrayProxyBuilder = ({
+const arrayProxyBuilder = ({
   store,
   storePropertyKey,
   array,
@@ -23,7 +23,7 @@ export const arrayProxyBuilder = ({
     new ArrayProxyHandler(store, storePropertyKey)
   );
   for (const arrElementIndex in array) {
-    array[arrElementIndex] = AdtProxyBuilder({
+    array[arrElementIndex] = adtProxyBuilder({
       store,
       propertyKey: storePropertyKey,
       value: array[arrElementIndex],
@@ -33,3 +33,5 @@ export const arrayProxyBuilder = ({
   }
   return proxiedArray;
 };
+
+export default arrayProxyBuilder;

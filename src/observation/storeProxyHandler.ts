@@ -1,5 +1,5 @@
-import { AdtProxyBuilder } from "./adtProxyBuilder/adtProxyBuilder";
 import Store from "src/react/store";
+import adtProxyBuilder from "./adtProxyBuilder/adtProxyBuilder";
 
 export default class StoreProxyHandler<T extends object>
   implements ProxyHandler<T> {
@@ -11,10 +11,8 @@ export default class StoreProxyHandler<T extends object>
     //   `${target.constructor.name}.${propertyKey.toString()}`
     // );
 
-    let value = Reflect.get(target, propertyKey, receiver);
-
-    value = AdtProxyBuilder({
-      value,
+    const value = adtProxyBuilder({
+      value: Reflect.get(target, propertyKey, receiver),
       propertyKey,
       receiver,
       store: this.store,
@@ -50,9 +48,9 @@ export default class StoreProxyHandler<T extends object>
     //     "You can't change store state directly without calling any method"
     //   );
     // }
-    Reflect.set(target, propertyKey, value, receiver);
+    const res = Reflect.set(target, propertyKey, value, receiver);
 
     this.store.renderConsumers();
-    return true;
+    return res;
   }
 }
