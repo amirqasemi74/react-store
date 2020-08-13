@@ -1,5 +1,5 @@
 import { ClassType } from "src/types";
-import { getDepsConstructorType } from "src/utils/utils";
+import { getConstructorDepsType } from "src/utils/utils";
 
 class Container {
   private instances = new Map<Function, object>();
@@ -14,7 +14,7 @@ class Container {
   }
 
   resolveDependencies(someClass: ClassType) {
-    return getDepsConstructorType(someClass).map((d) => this.resolve(d));
+    return getConstructorDepsType(someClass).map((d) => this.resolve(d));
   }
 
   remove(someClass: ClassType) {
@@ -22,6 +22,7 @@ class Container {
   }
 
   clearContainer() {
+    // this.instances = new Map();
     this.instances.clear();
   }
 }

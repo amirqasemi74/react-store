@@ -9,7 +9,7 @@ const ToDoList = () => {
   return (
     <ToDoListWrapper>
       {vm.todos.map((item, i) => (
-        <ToDoItem key={i} itemIndex={i} />
+        <ToDoItem key={i.toString()} itemIndex={i} />
       ))}
     </ToDoListWrapper>
   );

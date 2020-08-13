@@ -12,6 +12,7 @@ const effectHandler = (store: Store) => {
       const effect = store.getEffect(effectKey);
       if (effect?.isCalledOnce) {
         const { isDepsEqual, depsValues } = getDepsValues(store, effectKey);
+
         if (!isDepsEqual) {
           effect.clearEffect?.();
           runEffect(store, effectKey, depsValues);

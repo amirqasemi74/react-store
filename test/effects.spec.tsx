@@ -1,9 +1,14 @@
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
-import { connectStore, ContextStore, Effect, useStore, dep } from "react-over";
+import { connectStore, ContextStore, dep, Effect, useStore } from "react-over";
+import { clearContainer } from "src/container";
 
 describe("Effects", () => {
+  beforeEach(() => {
+    clearContainer();
+  });
+
   it("must be called when dependecies are being changed", async () => {
     const usernameChangeCallback = jest.fn();
     @ContextStore()
@@ -58,7 +63,7 @@ describe("Effects", () => {
 
     // change username dep again
     await waitFor(() => {
-      fireEvent.change(input, { target: { value: "amir.qasemi74" } });
+      fireEvent.change(input, { target: { value: "amir.qasemi75" } });
     });
     expect(usernameChangeCallback).toBeCalledTimes(3);
   });
@@ -131,7 +136,7 @@ describe("Effects", () => {
 
     // change username dep again
     await waitFor(() => {
-      fireEvent.change(input, { target: { value: "amir.qasemi74" } });
+      fireEvent.change(input, { target: { value: "amir.qasemi75" } });
     });
     expect(usernameChangeCallback).toBeCalledTimes(3);
     expect(usernameChangeClearEffect).toBeCalledTimes(2);
@@ -216,7 +221,7 @@ describe("Effects", () => {
 
       // change username dep again
       await waitFor(() => {
-        fireEvent.change(input, { target: { value: "amir.qasemi74" } });
+        fireEvent.change(input, { target: { value: "amir.qasemi75" } });
       });
       expect(usernameChangeCallback).toBeCalledTimes(3);
       expect(usernameChangeClearEffect).toBeCalledTimes(2);

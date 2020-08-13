@@ -5,5 +5,5 @@ export const getType = (obj: object) => {
   return proto && proto.constructor;
 };
 
-export const getDepsConstructorType = (consructorType: Function): ClassType[] =>
+export const getConstructorDepsType = (consructorType: Function): ClassType[] =>
   Reflect.getMetadata("design:paramtypes", consructorType) || [];

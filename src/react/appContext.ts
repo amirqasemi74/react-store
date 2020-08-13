@@ -3,13 +3,13 @@ import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import Store from "./store";
-import { getDepsConstructorType } from "src/utils/utils";
+import { getConstructorDepsType } from "src/utils/utils";
 
 interface ResolveStoreArgs {
   StoreType: ClassType;
   id?: string;
   type?: "context";
-  storeDeps?: Map<Function, object>;
+  storeDeps?: Map<Function, Store>;
 }
 
 interface CurrentRunnigEffect {
@@ -29,8 +29,8 @@ export default class ReactAppContext {
       (s) => s.id === id && s.constructorType === StoreType
     );
 
-    const depsValue = getDepsConstructorType(StoreType).map(
-      (dep) => storeDeps?.get(dep) ?? getFromContainer(dep)
+    const depsValue = getConstructorDepsType(StoreType).map(
+      (dep) => storeDeps?.get(dep)?.instance ?? getFromContainer(dep)
     );
 
     if (!store) {

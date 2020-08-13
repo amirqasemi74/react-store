@@ -1,35 +1,61 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
-import ReactAppContext from "../appContext";
 import uid from "src/utils/uid";
+import ReactAppContext from "../appContext";
+import ComponentDepsDetector from "../setGetPathDetector/componentDepsDetector";
+import Store from "../store";
 
-const appContext = getFromContainer(ReactAppContext);
+export interface ComponentDeps {
+  paths: string[];
+  status: "RESOLVED" | "UNRESOLVED";
+}
 
 const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
-  let storeInstance: InstanceType<T> | null = null;
+  const componentDepsDetector = getFromContainer(ComponentDepsDetector);
+  const appContext = getFromContainer(ReactAppContext);
+  let store: Store | null = null;
   const [, setRenderKey] = useState(uid());
+  const deps = useRef<ComponentDeps>({
+    status: "UNRESOLVED",
+    paths: [],
+  });
 
   // check if it has context pointer
   const storeContext = appContext.findStoreContext(storeType);
 
   if (storeContext) {
-    const store = useContext(storeContext);
+    store = useContext(storeContext);
     if (!store) {
       throw new Error(
         `${storeType.name} haven't been connected to the component tree!`
       );
     }
-    storeInstance = store.instance;
 
     useEffect(() => {
-      const render = () => setRenderKey(uid());
-      store.consumers.push({ render });
+      const render = (setPaths: string[]) => {
+        // console.log(setPaths, deps.current);
+
+        loop1: for (const setPath of setPaths) {
+          for (const dep of [...deps.current.paths]) {
+            if (dep.includes(setPath)) {
+              setRenderKey(uid());
+              break loop1;
+            }
+          }
+        }
+      };
+
+      if (store) {
+        store.consumers.push({ render });
+      }
 
       return () => {
-        store.consumers = store.consumers.filter(
-          (cnsr) => cnsr.render !== render
-        );
+        if (store) {
+          store.consumers = store.consumers.filter(
+            (cnsr) => cnsr.render !== render
+          );
+        }
       };
     }, []);
   } else {
@@ -37,11 +63,18 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
     // globals
   }
 
-  if (!storeInstance) {
+  if (!store?.instance) {
     throw new Error(
       `${storeType.name} doesn't decorated with @ContextStore/@GlobalStore`
     );
   }
-  return storeInstance;
+
+  componentDepsDetector.saveDepsForPreAndExtractDepsForNextComponent(
+    store,
+    deps
+  );
+
+  return store.instance;
 };
+
 export default useStore;

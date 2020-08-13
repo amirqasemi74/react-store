@@ -11,8 +11,8 @@ export default class ThemeStore {
   }
 
   @Effect()
-  effect1() {
+  logPrimary() {
     console.log(this.primary);
-    return 2;
+    // return 2;
   }
 }

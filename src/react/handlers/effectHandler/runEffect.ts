@@ -4,37 +4,32 @@ import { getFromContainer } from "src/container";
 import ReactAppContext from "src/react/appContext";
 import Store from "src/react/store";
 import { depReturnValue } from "./dep";
-import dependeciesExtarctor from "./dependenciesExtractor";
+import dependecyExtarctor, {
+  GetSetLog,
+} from "../../setGetPathDetector/dependencyExtractor";
 import proxyDeep from "./proxyDeep";
-
-const appContext = getFromContainer(ReactAppContext);
-
-export interface GetSetStack {
-  type: "SET" | "GET";
-  target: any;
-  propertyKey: PropertyKey;
-  value: any;
-}
 
 const runEffect = (
   store: Store,
   effectKey: PropertyKey,
   depsValues?: any[]
 ) => {
-  const getSetStack: GetSetStack[] = [];
+  const appContext = getFromContainer(ReactAppContext);
+
+  const getSetLogs: GetSetLog[] = [];
   const context = proxyDeep({
     store,
-    getSetStack,
+    getSetLogs,
   });
   const res = Reflect.apply(store.pureInstance[effectKey], context, []);
   if (isPromise(res)) {
     throw new Error("Async function for effect is invalid!");
   }
   if (res === depReturnValue) {
-    getSetStack.length = 0;
+    getSetLogs.length = 0;
     appContext.currentRunningEffect.depsList();
   }
-  const deps = dependeciesExtarctor(getSetStack, store);
+  const deps = dependecyExtarctor(getSetLogs, store);
   store.storeEffet(effectKey, {
     deps,
     depsValues:

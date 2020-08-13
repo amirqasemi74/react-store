@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent } from "react";
+import React, { useState, KeyboardEvent, memo } from "react";
 import { useStore } from "react-over";
 import ToDoStore from "./toDo.store";
 import styled from "styled-components";
@@ -7,8 +7,13 @@ interface Props {
   itemIndex: number;
 }
 
-const ToDoItem: React.FC<Props> = ({ itemIndex }) => {
+const ToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
   const vm = useStore(ToDoStore);
+  console.log(`Render ${itemIndex}`);
+
+  if (itemIndex === 4) {
+    console.log(vm.theme.primary);
+  }
   const [isEditing, setIsEditing] = useState(false);
 
   const onInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -37,7 +42,7 @@ const ToDoItem: React.FC<Props> = ({ itemIndex }) => {
       </ActionWrapper>
     </ToDoItemWrapper>
   );
-};
+});
 
 export default ToDoItem;
 

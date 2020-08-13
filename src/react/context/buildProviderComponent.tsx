@@ -6,29 +6,51 @@ import ReactAppContext from "../appContext";
 import registerHandlers from "../handlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
 import Store from "../store";
+import { STORE_REF } from "../constant";
 
 interface ProviderComponentProps {
   props?: any;
 }
-
-const appContext = getFromContainer(ReactAppContext);
 
 const buildProviderComponent = (
   TheContext: Context<Store | null>,
   StoreType: ClassType
 ): React.FC<ProviderComponentProps> => ({ children, props }) => {
   const [, setRenderKey] = useState(uid());
-
   const id = useRef(uid()).current;
+  const appContext = getFromContainer(ReactAppContext);
 
+  // Inject Contextual Store which has been mounted before
+  const injectedStores = storeInjectionHandler(StoreType);
   const store = useRef(
     appContext.resolveStore({
       StoreType,
       id,
       type: "context",
-      storeDeps: storeInjectionHandler(StoreType),
+      storeDeps: injectedStores,
     })
   ).current;
+
+  // for example if we inject store A  in to other store B
+  // if then injected store A change all store b consumer must be
+  // notified to rerender base of their deps
+  // so here we save store B ref in store A
+  // to nofify B if A changed
+  if (injectedStores.size) {
+    store.turnOffRender();
+    injectedStores.forEach((inStore) => {
+      inStore.turnOffRender();
+      for (const [propertyKey, value] of Object.entries<any>(
+        store.pureInstance
+      )) {
+        if ((value[STORE_REF] as Store)?.id === inStore.id) {
+          inStore.addInjectedInto({ store, propertyKey });
+        }
+      }
+      inStore.turnOnRender();
+    });
+    store.turnOnRender();
+  }
 
   useEffect(() => {
     store.consumers.push({ render: () => setRenderKey(uid()) });
