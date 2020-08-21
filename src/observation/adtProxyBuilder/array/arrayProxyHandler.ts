@@ -1,6 +1,7 @@
-import Store from "src/react/store";
 import { getFromContainer } from "src/container";
 import ComponentDepsDetector from "src/react/setGetPathDetector/componentDepsDetector";
+import Store from "src/react/store";
+import adtProxyBuilder from "../adtProxyBuilder";
 
 export default class ArrayProxyHandler<T extends any[]>
   implements ProxyHandler<T> {
@@ -9,13 +10,16 @@ export default class ArrayProxyHandler<T extends any[]>
   get(target: T, propertyKey: PropertyKey, receiver: any): any {
     // console.log("Array::get", target, propertyKey);
     const value = Reflect.get(target, propertyKey, receiver);
+    if (Array.prototype[propertyKey]) {
+      return value;
+    }
     getFromContainer(ComponentDepsDetector).pushGetSetInfo(
       "GET",
       target,
       propertyKey,
       value
     );
-    return value;
+    return adtProxyBuilder({ propertyKey, receiver, store: this.store, value });
   }
 
   set(target: T, propertyKey: PropertyKey, value: any, receiver: any): boolean {

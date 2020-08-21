@@ -20,7 +20,13 @@ export default class ComponentDepsDetector {
   }
 
   extarctSetPaths(store: Store) {
-    return dependencyExtarctor(this.getSetLogs, store, "SET");
+    // console.log(
+    //   "Set pathes",
+    //   dependencyExtarctor(this.getSetLogs, store, "SET")
+    // );
+    const setPaths = dependencyExtarctor(this.getSetLogs, store, "SET");
+    this.resolveDeps();
+    return setPaths;
   }
 
   saveDepsForPreAndExtractDepsForNextComponent(

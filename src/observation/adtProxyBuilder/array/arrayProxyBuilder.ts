@@ -18,20 +18,10 @@ const arrayProxyBuilder = ({
   if (depth < 0) {
     return array;
   }
-  const proxiedArray = new Proxy<any[]>(
+  return new Proxy<any[]>(
     array,
     new ArrayProxyHandler(store, storePropertyKey)
   );
-  for (const arrElementIndex in array) {
-    array[arrElementIndex] = adtProxyBuilder({
-      store,
-      propertyKey: storePropertyKey,
-      value: array[arrElementIndex],
-      depth: depth - 1,
-      receiver: array,
-    });
-  }
-  return proxiedArray;
 };
 
 export default arrayProxyBuilder;

@@ -27,7 +27,7 @@ const runEffect = (
   }
   if (res === depReturnValue) {
     getSetLogs.length = 0;
-    appContext.currentRunningEffect.depsList();
+    appContext.currentRunningEffect.depsList?.();
   }
   const deps = dependecyExtarctor(getSetLogs, store);
   store.storeEffet(effectKey, {

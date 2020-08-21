@@ -8,13 +8,9 @@ interface Props {
 }
 
 const ToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const vm = useStore(ToDoStore);
   console.log(`Render ${itemIndex}`);
-
-  if (itemIndex === 4) {
-    console.log(vm.theme.primary);
-  }
-  const [isEditing, setIsEditing] = useState(false);
 
   const onInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {

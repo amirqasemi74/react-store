@@ -24,12 +24,15 @@ const adtProxyBuilder = ({
   try {
     switch (value.constructor) {
       case Object:
-        return objectProxyBuilder({
-          store,
-          storePropertyKey: propertyKey,
-          object: value,
-          depth: depth !== undefined ? depth : OBJECT_OBSERVABILITY_DEPTH,
-        });
+        // React props are frozen & mustn't be proxied
+        return !Object.isFrozen(value)
+          ? objectProxyBuilder({
+              store,
+              storePropertyKey: propertyKey,
+              object: value,
+              depth: depth !== undefined ? depth : OBJECT_OBSERVABILITY_DEPTH,
+            })
+          : value;
 
       case Array:
         return arrayProxyBuilder({

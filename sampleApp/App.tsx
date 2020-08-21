@@ -1,16 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 import ToDos from "./toDos";
 import { connectStore, useStore } from "react-over";
 import ThemeStore from "./theme.store";
+import FilePicker from "./filePicker";
+
+// const App = () => {
+//   const vm = useStore(ThemeStore);
+//   return (
+//     <>
+//       <button onClick={vm.changePrimary}>change theme</button>
+//       <ToDos />
+//     </>
+//   );
+// };
+
+// export default connectStore(App, ThemeStore);
 
 const App = () => {
-  const vm = useStore(ThemeStore);
+  const [fileIds, setFileIds] = useState<string[]>([]);
+
+  const initFileIDs = () => {
+    setFileIds(["1", "2", "3"]);
+  };
+  const upload = (
+    file: File,
+    onProgress: (value: number) => void,
+    onComplete: () => void
+  ) => {
+    let value = 0;
+    const id = setInterval(() => {
+      onProgress(value);
+      if (value >= 100) {
+        clearInterval(id);
+        onComplete();
+      }
+      value += 1;
+    }, 100);
+  };
   return (
     <>
-      <button onClick={vm.changePrimary}>change theme</button>
-      <ToDos />
+      <button onClick={initFileIDs}>Init File IDs</button>
+      <FilePicker fileIds={fileIds} onUpload={upload} />
     </>
   );
 };
 
-export default connectStore(App, ThemeStore);
+export default App;

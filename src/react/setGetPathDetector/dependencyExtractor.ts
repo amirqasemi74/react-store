@@ -1,5 +1,5 @@
-import Store from "src/react/store";
 import { STORE_REF } from "src/react/constant";
+import Store from "src/react/store";
 
 const dependencyExtarctor = (
   getSetLogs: GetSetLog[],
@@ -7,24 +7,14 @@ const dependencyExtarctor = (
   type: GetSet = "GET"
 ) => {
   getSetLogs = [...getSetLogs];
-
   if (!getSetLogs.length) {
     return [];
   }
+  const getSetItems: GetSetItem[] = [];
+  let i = -1;
 
-  // Final get or set path will save in getSetItem
-  const getSetItems: GetSetItem[] = [
-    {
-      path: `${getSetLogs[0].type}::${getSetLogs[0].propertyKey.toString()}`,
-      value: getSetLogs[0].value,
-    },
-  ];
-
-  let i = 0;
-  //first Log property key is always is direct store property key
-  let currentDirectStorePropertyKey = getSetLogs.shift()?.propertyKey;
-
-  for (const { propertyKey, target, value, type } of getSetLogs) {
+  for (const index in getSetLogs) {
+    const { propertyKey, target, value, type } = getSetLogs[index];
     switch (type) {
       case "GET": {
         // reaching direct store property key
@@ -33,14 +23,13 @@ const dependencyExtarctor = (
           value === store.pureInstance[propertyKey]
         ) {
           i++;
-          currentDirectStorePropertyKey = propertyKey;
           getSetItems.push({
             path: `GET::${propertyKey.toString()}`,
             value,
           });
         } else {
           // follow chain
-          // chain is contiuing
+          // chain is continuing
           if (
             getSetItems[i].value === target ||
             (!!target[STORE_REF] &&
@@ -53,8 +42,13 @@ const dependencyExtarctor = (
             };
           } else {
             // chain breaks
+            i++;
             getSetItems.push({
-              path: `GET::${currentDirectStorePropertyKey?.toString()}.${propertyKey.toString()}`,
+              path: `GET::${findChain({
+                getSetLogs,
+                target,
+                upToIndex: Number(index),
+              })?.toString()}.${propertyKey.toString()}`,
               value,
             });
           }
@@ -63,6 +57,8 @@ const dependencyExtarctor = (
       }
       case "SET": {
         const j = getSetItems.findIndex((t) => t.value === target);
+        const z = getSetLogs.findIndex((t) => t.value === target);
+
         if (j !== -1) {
           getSetItems[j] = {
             path: `${getSetItems[j].path}.${propertyKey.toString()}`.replace(
@@ -71,7 +67,15 @@ const dependencyExtarctor = (
             ),
             value,
           };
+        } else if (z !== -1) {
+          getSetItems[++i] = {
+            path: `SET::${getSetLogs[
+              z
+            ].propertyKey.toString()}.${propertyKey.toString()}`,
+            value,
+          };
         } else if (propertyKey in store.pureInstance) {
+          i++;
           getSetItems.push({
             path: `SET::${propertyKey.toString()}`,
             value,
@@ -91,6 +95,28 @@ const dependencyExtarctor = (
         .map(({ path }) => path.replace(`${type}::`, ""))
     )
   );
+};
+
+const findChain = ({
+  upToIndex,
+  getSetLogs,
+  target: initTarget,
+}: {
+  getSetLogs: GetSetLog[];
+  upToIndex: number;
+  target: any;
+}) => {
+  let chain = "";
+  let target = initTarget;
+  for (let i = upToIndex; i >= 0; i--) {
+    if (target === getSetLogs[i].value) {
+      chain = chain
+        ? `${getSetLogs[i].propertyKey.toString()}.${chain}`
+        : `${getSetLogs[i].propertyKey.toString()}`;
+      target = getSetLogs[i].target;
+    }
+  }
+  return chain;
 };
 
 export type GetSet = "GET" | "SET";

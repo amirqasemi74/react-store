@@ -10,9 +10,9 @@ export default class ThemeStore {
     this.primary = "green";
   }
 
-  @Effect()
+  // @Effect()
   logPrimary() {
-    console.log(this.primary);
+    // console.log(this.primary);
     // return 2;
   }
 }

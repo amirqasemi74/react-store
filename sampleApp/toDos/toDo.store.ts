@@ -1,7 +1,7 @@
 import { ChangeEvent, KeyboardEvent } from "react";
 import { ContextStore, Effect, dep } from "react-over";
 import ThemeStore from "../theme.store";
-import ToDoService from "sampleApp/services/todos.service";
+import ToDoService from "sampleApp/toDos/services/todos.service";
 
 @ContextStore()
 export default class ToDoStore {

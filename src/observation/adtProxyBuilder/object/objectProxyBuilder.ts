@@ -22,15 +22,6 @@ const objectProxyBuilder = ({
     object,
     new ObjectProxyHandler(store, storePropertyKey)
   );
-  for (const key in object) {
-    object[key] = adtProxyBuilder({
-      store,
-      propertyKey: storePropertyKey,
-      value: object[key],
-      depth: depth - 1,
-      receiver: object,
-    });
-  }
   return proxiedObject;
 };
 

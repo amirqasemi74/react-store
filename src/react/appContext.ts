@@ -13,8 +13,8 @@ interface ResolveStoreArgs {
 }
 
 interface CurrentRunnigEffect {
-  depsList: () => any[];
-  clearEffect: () => void;
+  depsList?: () => any[];
+  clearEffect?: () => void;
 }
 
 export default class ReactAppContext {

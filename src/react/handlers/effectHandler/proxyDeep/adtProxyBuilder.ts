@@ -10,18 +10,17 @@ interface AdtProxyBuilderArgs {
   store: Store;
 }
 
-const AdtProxyBuilder = ({
-  value,
-  getSetLogs,
-  store,
-}: AdtProxyBuilderArgs) => {
+const AdtProxyBuilder = ({ value, getSetLogs, store }: AdtProxyBuilderArgs) => {
   const constructorName: BaseJsConstructorsName = value.constructor.name;
 
   switch (constructorName) {
     case "Array":
       return arrayProxyBuilder({ array: value, getSetLogs, store });
     case "Object":
-      return objectProxyBuilder({ object: value, getSetLogs, store });
+      // React props are frozen and mustn't be proxied
+      return !Object.isFrozen(value)
+        ? objectProxyBuilder({ object: value, getSetLogs, store })
+        : value;
     case "Boolean":
     case "Number":
     case "RegExp":
