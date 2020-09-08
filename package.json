@@ -1,6 +1,6 @@
 {
-  "name": "@amir.qasemi/react-store",
-  "version": "0.1.1",
+  "name": "@react-store/core",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "repository": "https://github.com/amirqasemi74/react-store.git",
   "author": "Amir Hossein Qasemi Moqaddam <amir.qasemi74@gmail.com>",
