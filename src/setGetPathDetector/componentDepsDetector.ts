@@ -1,6 +1,6 @@
 import { MutableRefObject } from "react";
-import { ComponentDeps } from "../hooks/useStore";
-import Store from "../store";
+import { ComponentDeps } from "../react/hooks/useStore";
+import Store from "../react/store";
 import dependencyExtarctor, { GetSet, GetSetLog } from "./dependencyExtractor";
 
 export default class ComponentDepsDetector {
@@ -20,10 +20,6 @@ export default class ComponentDepsDetector {
   }
 
   extarctSetPaths(store: Store) {
-    // console.log(
-    //   "Set pathes",
-    //   dependencyExtarctor(this.getSetLogs, store, "SET")
-    // );
     const setPaths = dependencyExtarctor(this.getSetLogs, store, "SET");
     this.resolveDeps();
     return setPaths;

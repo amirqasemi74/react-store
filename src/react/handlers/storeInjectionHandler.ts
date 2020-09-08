@@ -19,12 +19,10 @@ const storeInjectionHandler = (storeType: ClassType) => {
         `You can't inject ${storeType.name} into ${storeType.name}!`
       );
     }
-
     const storeContext = appContext.findStoreContext(dep);
     if (!storeContext) {
       return;
     }
-
     const store = useContext(storeContext);
     if (!store) {
       throw new Error(

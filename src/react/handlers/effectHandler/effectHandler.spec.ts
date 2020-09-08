@@ -1,13 +1,13 @@
+import adtProxyBuilder from "src/observation/adtProxyBuilder";
 import { STORE_REF } from "src/react/constant";
 import Store from "src/react/store";
 import dependeciesExtarctor, {
   GetSetLog,
-} from "../../setGetPathDetector/dependencyExtractor";
-import proxyDeep from "./proxyDeep";
+} from "../../../setGetPathDetector/dependencyExtractor";
 
 describe("Effect handler", () => {
   describe("Dependecies Detector", () => {
-    it("detect dependecies correctly", () => {
+    it.only("detect dependecies correctly", () => {
       class UserStore {
         username = "amir.qasemi74";
         password = "12345678";
@@ -32,12 +32,14 @@ describe("Effect handler", () => {
       const store = new Store({ instance: target, id: "id" });
       target[STORE_REF] = store;
       const getSetLogs: GetSetLog[] = [];
-      const userStore = proxyDeep({
-        store,
+      const userStore = adtProxyBuilder({
         getSetLogs,
+        store,
+        value: target,
       });
       userStore.effect1();
       const dependecies = dependeciesExtarctor(getSetLogs, store);
+
       expect(dependecies).toEqual([
         "effect1",
         "username",

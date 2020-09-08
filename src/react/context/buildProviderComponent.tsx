@@ -3,10 +3,10 @@ import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import ReactAppContext from "../appContext";
+import { STORE_REF } from "../constant";
 import registerHandlers from "../handlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
 import Store from "../store";
-import { STORE_REF } from "../constant";
 
 interface ProviderComponentProps {
   props?: any;
@@ -38,16 +38,16 @@ const buildProviderComponent = (
   // to nofify B if A changed
   if (injectedStores.size) {
     store.turnOffRender();
-    injectedStores.forEach((inStore) => {
-      inStore.turnOffRender();
+    injectedStores.forEach((injectedStore) => {
+      injectedStore.turnOffRender();
       for (const [propertyKey, value] of Object.entries<any>(
         store.pureInstance
       )) {
-        if ((value[STORE_REF] as Store)?.id === inStore.id) {
-          inStore.addInjectedInto({ store, propertyKey });
+        if ((value[STORE_REF] as Store)?.id === injectedStore.id) {
+          injectedStore.addInjectedInto({ store, propertyKey });
         }
       }
-      inStore.turnOnRender();
+      injectedStore.turnOnRender();
     });
     store.turnOnRender();
   }

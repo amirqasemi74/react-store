@@ -1,11 +1,11 @@
 import { ChangeEvent, KeyboardEvent } from "react";
-import { ContextStore, Effect, dep } from "react-over";
-import ThemeStore from "../theme.store";
+import { ContextStore, Effect } from "react-over";
 import ToDoService from "sampleApp/toDos/services/todos.service";
+import ThemeStore from "../theme.store";
 
 @ContextStore()
 export default class ToDoStore {
-  todos: string[] = ["a", "b", "c"];
+  todos: ToDoItem[] = [];
 
   todoCount = 0;
 
@@ -15,7 +15,7 @@ export default class ToDoStore {
 
   @Effect()
   setTodoCount() {
-    this.todoCount = this.todos.length;
+    // this.todoCount = this.todos.length;
     return () => console.log("clear Effect from effect 1 in ToDo Store");
   }
 
@@ -27,18 +27,35 @@ export default class ToDoStore {
     if (
       e.key === "Enter" &&
       this.inputVal &&
-      !this.todos.includes(e.currentTarget.value)
+      !this.todos.find(({ value }) => value === e.currentTarget.value)
     ) {
-      this.todos.push(this.inputVal);
+      this.todos.push({ value: this.inputVal, isEditing: false });
       this.inputVal = "";
     }
+  }
+
+  onToDoItemInputKeyDown(
+    e: KeyboardEvent<HTMLInputElement>,
+    itemIndex: number
+  ) {
+    if (e.key === "Enter") {
+      this.todos[itemIndex] = {
+        value: e.currentTarget.value,
+        isEditing: false,
+      };
+    }
+  }
+
+  setToDoItemIsEditing(itemIndex: number) {
+    this.todos[itemIndex].isEditing = true;
   }
 
   removeTodo(id: number) {
     this.todos = this.todos.filter((item, i) => i !== id);
   }
+}
 
-  editTodo(id: number, value: string) {
-    this.todos[id] = value;
-  }
+interface ToDoItem {
+  value: string;
+  isEditing: boolean;
 }

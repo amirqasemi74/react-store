@@ -6,18 +6,26 @@ import styled from "styled-components";
 interface Props {
   fileId: string;
 }
-const FileItem: React.FC<Props> = memo(({ fileId }) => {
-  const { files } = useStore(FilePickerStore);
-  const fileInfo = files[Number(fileId)];
-  console.log("FileItem", fileId);
+const FileItem = memo<Props>(({ fileId }) => {
+  const { filesInfo, removeFileItem } = useStore(FilePickerStore);
+  const fileInfo = filesInfo.find((info) => info.id === fileId);
+
+  if (!fileInfo) {
+    return <FileItemWrapper>File info not found</FileItemWrapper>;
+  }
+  console.log("FileItem", fileInfo.file.name);
 
   return (
     <FileItemWrapper>
-      <p>name: {fileInfo.file.name}</p>
-      <p>size: {fileInfo.file.size} B</p>
-      <p>type: {fileInfo.file.type}</p>
-      <p>status: {fileInfo.status}</p>
-      <p>progress: {fileInfo.progress}</p>
+      <p>
+        Name: {fileInfo.file.name} ({fileInfo.file.size} B)
+      </p>
+      <p>
+        Status: {fileInfo.status} ({fileInfo.progress.toString()})
+      </p>
+      <button onClick={() => removeFileItem(fileInfo.id)}>
+        Remove File Item
+      </button>
     </FileItemWrapper>
   );
 });
@@ -31,4 +39,5 @@ const FileItemWrapper = styled.div`
   border: 1px solid;
   border-radius: 3px;
   box-sizing: border-box;
+  font-size: 14px;
 `;

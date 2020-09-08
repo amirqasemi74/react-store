@@ -1,40 +1,32 @@
-import React, { useState, KeyboardEvent, memo } from "react";
+import React, { memo } from "react";
 import { useStore } from "react-over";
-import ToDoStore from "./toDo.store";
 import styled from "styled-components";
+import ToDoStore from "./toDo.store";
 
 interface Props {
   itemIndex: number;
 }
 
 const ToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
-  const [isEditing, setIsEditing] = useState(false);
   const vm = useStore(ToDoStore);
   console.log(`Render ${itemIndex}`);
-
-  const onInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      setIsEditing((pre) => !pre);
-      vm.editTodo(itemIndex, e.currentTarget.value);
-    }
-  };
 
   return (
     <ToDoItemWrapper>
       <span>
         {itemIndex + 1}-
-        {isEditing ? (
+        {vm.todos[itemIndex].isEditing ? (
           <input
-            defaultValue={vm.todos[itemIndex]}
-            onKeyDown={onInputKeyDown}
+            defaultValue={vm.todos[itemIndex].value}
+            onKeyDown={(e) => vm.onToDoItemInputKeyDown(e,itemIndex)}
           />
         ) : (
-          " " + vm.todos[itemIndex]
+          " " + vm.todos[itemIndex].value
         )}
       </span>
       <ActionWrapper>
         <button onClick={() => vm.removeTodo(itemIndex)}>remove</button>
-        <button onClick={() => setIsEditing((pre) => !pre)}>edit</button>
+        <button onClick={() => vm.setToDoItemIsEditing(itemIndex)}>edit</button>
       </ActionWrapper>
     </ToDoItemWrapper>
   );

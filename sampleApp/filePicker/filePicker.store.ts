@@ -1,4 +1,4 @@
-import { ContextStore, Props, Effect, dep } from "react-over";
+import { ContextStore, Effect, Props } from "react-over";
 import { Props as FilePickerProps } from ".";
 
 @ContextStore()
@@ -6,7 +6,7 @@ export default class FilePickerStore {
   @Props
   props: FilePickerProps;
 
-  files: FileInfo[] = [];
+  filesInfo: FileInfo[] = [];
 
   @Effect()
   onNewFileIds() {
@@ -15,28 +15,39 @@ export default class FilePickerStore {
 
   onDrop(acceptedFiles: File[]) {
     acceptedFiles.forEach((file) => {
-      this.files.push({ file, status: "uploading", progress: 0 });
+      this.filesInfo.push({
+        id: Math.random().toString(),
+        file,
+        status: "uploading",
+        progress: 0,
+      });
       this.props.onUpload(file, this.onProgress(file), this.onComplete(file));
     });
   }
 
   onProgress(file: File) {
     return (progress: number) => {
-      const i = this.files.findIndex((fileInfo) => fileInfo.file === file);
-      this.files[i].progress = progress;
+      const i = this.filesInfo.findIndex((fileInfo) => fileInfo.file === file);
+      this.filesInfo[i].progress = progress;
     };
   }
 
   onComplete(file: File) {
     return () => {
-      const i = this.files.findIndex((fileInfo) => fileInfo.file === file);
+      const i = this.filesInfo.findIndex((fileInfo) => fileInfo.file === file);
       console.log("uploaded", i);
-      this.files[i].status = "uploaded";
+      this.filesInfo[i].status = "uploaded";
     };
+  }
+
+  removeFileItem(fileId: string) {
+    const i = this.filesInfo.findIndex((f) => f.id === fileId);
+    this.filesInfo.splice(i, 1);
   }
 }
 
-interface FileInfo {
+export interface FileInfo {
+  id: string;
   file: File;
   status: "uploading" | "uploaded" | "error";
   progress: number;

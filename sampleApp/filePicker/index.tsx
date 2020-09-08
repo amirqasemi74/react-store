@@ -15,7 +15,7 @@ export interface Props {
 }
 
 const FilePicker = connectStore<Props>(() => {
-  const { onDrop, files } = useStore(FilePickerStore);
+  const { onDrop, filesInfo } = useStore(FilePickerStore);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
   });
@@ -26,8 +26,8 @@ const FilePicker = connectStore<Props>(() => {
         <p>فایل را بکشید یا کلیک کنید</p>
         <input {...getInputProps()} />
       </DragAreaWrapper>
-      {files.map((file, i) => (
-        <FileItem key={i} fileId={i.toString()} />
+      {filesInfo.map((info) => (
+        <FileItem key={info.id} fileId={info.id} />
       ))}
     </Wrapper>
   );

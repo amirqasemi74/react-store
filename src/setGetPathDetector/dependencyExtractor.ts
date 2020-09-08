@@ -18,10 +18,8 @@ const dependencyExtarctor = (
     switch (type) {
       case "GET": {
         // reaching direct store property key
-        if (
-          propertyKey in store.pureInstance &&
-          value === store.pureInstance[propertyKey]
-        ) {
+
+        if (propertyKey in store.pureInstance) {
           i++;
           getSetItems.push({
             path: `GET::${propertyKey.toString()}`,

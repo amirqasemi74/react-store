@@ -1,6 +1,6 @@
-import observe from "src/observation";
 import { getType } from "src/utils/utils";
 import { STORE_REF } from "./constant";
+import adtProxyBuilder from "src/observation/adtProxyBuilder";
 
 export default class Store {
   id: string;
@@ -23,7 +23,12 @@ export default class Store {
     this.id = id;
     this.constructorType = getType(instance);
     this.pureInstance = instance;
-    this.instance = observe(instance, this);
+    instance[STORE_REF] = this;
+    this.instance = adtProxyBuilder({
+      value: instance,
+      store: this,
+      allowRender: true,
+    });
 
     // to access store in deep proxy for effects handler
     this.turnOffRender();
@@ -39,14 +44,10 @@ export default class Store {
     this.isRenderAllow = true;
   }
 
-  renderConsumers(setPaths: string[]) {
+  renderConsumers() {
     if (this.isRenderAllow) {
-      this.consumers.forEach((cnsr) => cnsr.render(setPaths));
-      this.injectedIntos.forEach(({ store, propertyKey }) =>
-        store.renderConsumers(
-          setPaths.map((path) => `${propertyKey.toString()}.${path}`)
-        )
-      );
+      this.consumers.forEach((cnsr) => cnsr.render());
+      this.injectedIntos.forEach(({ store }) => store.renderConsumers());
     }
   }
   /**
@@ -78,7 +79,7 @@ interface Effect {
 }
 
 interface StoreConsumer {
-  render: (setPaths: string[]) => void;
+  render: () => void;
 }
 
 interface StoreInjectedInto {

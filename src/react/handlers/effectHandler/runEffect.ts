@@ -1,13 +1,13 @@
 import isPromise from "is-promise";
 import objectPath from "object-path";
 import { getFromContainer } from "src/container";
+import adtProxyBuilder from "src/observation/adtProxyBuilder";
 import ReactAppContext from "src/react/appContext";
 import Store from "src/react/store";
-import { depReturnValue } from "./dep";
 import dependecyExtarctor, {
   GetSetLog,
-} from "../../setGetPathDetector/dependencyExtractor";
-import proxyDeep from "./proxyDeep";
+} from "../../../setGetPathDetector/dependencyExtractor";
+import { depReturnValue } from "./dep";
 
 const runEffect = (
   store: Store,
@@ -17,9 +17,11 @@ const runEffect = (
   const appContext = getFromContainer(ReactAppContext);
 
   const getSetLogs: GetSetLog[] = [];
-  const context = proxyDeep({
+  const context = adtProxyBuilder({
     store,
     getSetLogs,
+    value: store.pureInstance,
+    allowRender: false,
   });
   const res = Reflect.apply(store.pureInstance[effectKey], context, []);
   if (isPromise(res)) {

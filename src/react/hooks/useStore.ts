@@ -1,9 +1,8 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import ReactAppContext from "../appContext";
-import ComponentDepsDetector from "../setGetPathDetector/componentDepsDetector";
 import Store from "../store";
 
 export interface ComponentDeps {
@@ -12,14 +11,9 @@ export interface ComponentDeps {
 }
 
 const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
-  const componentDepsDetector = getFromContainer(ComponentDepsDetector);
-  const appContext = getFromContainer(ReactAppContext);
   let store: Store | null = null;
   const [, setRenderKey] = useState(uid());
-  const deps = useRef<ComponentDeps>({
-    status: "UNRESOLVED",
-    paths: [],
-  });
+  const appContext = getFromContainer(ReactAppContext);
 
   // check if it has context pointer
   const storeContext = appContext.findStoreContext(storeType);
@@ -33,22 +27,8 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
     }
 
     useEffect(() => {
-      const render = (setPaths: string[]) => {
-        // console.log(setPaths, deps.current);
-
-        loop1: for (const setPath of setPaths) {
-          for (const dep of [...deps.current.paths]) {
-            if (dep.includes(setPath)) {
-              setRenderKey(uid());
-              break loop1;
-            }
-          }
-        }
-      };
-
-      if (store) {
-        store.consumers.push({ render });
-      }
+      const render = () => setRenderKey(uid());
+      store?.consumers.push({ render });
 
       return () => {
         if (store) {
@@ -68,11 +48,6 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
       `${storeType.name} doesn't decorated with @ContextStore/@GlobalStore`
     );
   }
-
-  componentDepsDetector.saveDepsForPreAndExtractDepsForNextComponent(
-    store,
-    deps
-  );
 
   return store.instance;
 };
