@@ -1,4 +1,4 @@
-import { ContextStore, Effect, Props } from "react-over";
+import { ContextStore, Effect, Props } from "react-store";
 import { Props as FilePickerProps } from ".";
 
 @ContextStore()

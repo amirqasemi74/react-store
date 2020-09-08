@@ -1,3 +1,3 @@
-# react-over
+# react-store
 
-React-over is a library for better state managment in react hooks new world.
+React-store is a library for better state managment in react hooks new world.

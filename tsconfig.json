@@ -12,7 +12,7 @@
     "noImplicitAny": false,
     "jsx": "react",
     "paths": {
-      "react-over": ["src"],
+      "react-store": ["src"],
       "sampleApp": ["sampleApp"]
     },
     "sourceMap": true

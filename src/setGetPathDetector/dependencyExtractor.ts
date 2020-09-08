@@ -1,4 +1,4 @@
-import { STORE_REF } from "src/react/constant";
+import { STORE_REF } from "src/constant";
 import Store from "src/react/store";
 
 const dependencyExtarctor = (

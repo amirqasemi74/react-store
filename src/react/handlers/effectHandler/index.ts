@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { EFFECTS } from "src/react/constant";
+import { EFFECTS } from "src/constant";
 import Store from "src/react/store";
 import getDepsValues from "./getDepsValue";
 import runEffect from "./runEffect";

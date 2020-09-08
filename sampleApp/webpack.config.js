@@ -10,7 +10,7 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
-      "react-over": srcDir,
+      "react-store": srcDir,
       sampleApp: sampeAppDir,
       src: srcDir,
     },

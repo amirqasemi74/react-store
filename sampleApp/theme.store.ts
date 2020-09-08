@@ -1,4 +1,4 @@
-import { ContextStore, Effect } from "react-over";
+import { ContextStore, Effect } from "react-store";
 
 @ContextStore()
 export default class ThemeStore {

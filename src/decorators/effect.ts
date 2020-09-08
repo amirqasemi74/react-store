@@ -1,4 +1,4 @@
-import { EFFECTS } from "src/react/constant";
+import { EFFECTS } from "src/constant";
 
 const Effect = (): MethodDecorator => (target, propertyKey, descriptor) => {
   const effects: PropertyKey[] = Reflect.get(target.constructor, EFFECTS) || [];

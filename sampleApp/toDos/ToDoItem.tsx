@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { useStore } from "react-over";
+import { useStore } from "react-store";
 import styled from "styled-components";
 import ToDoStore from "./toDo.store";
 
@@ -18,7 +18,7 @@ const ToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
         {vm.todos[itemIndex].isEditing ? (
           <input
             defaultValue={vm.todos[itemIndex].value}
-            onKeyDown={(e) => vm.onToDoItemInputKeyDown(e,itemIndex)}
+            onKeyDown={(e) => vm.onToDoItemInputKeyDown(e, itemIndex)}
           />
         ) : (
           " " + vm.todos[itemIndex].value

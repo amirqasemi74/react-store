@@ -2,7 +2,7 @@ import {
   ARRAY_OBSERVABILITY_DEPTH,
   OBJECT_OBSERVABILITY_DEPTH,
   STORE_REF,
-} from "src/react/constant";
+} from "src/constant";
 import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
 import Store from "src/react/store";
 import arrayProxyBuilder from "./arrayProxyBuilder";

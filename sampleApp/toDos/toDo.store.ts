@@ -1,5 +1,5 @@
 import { ChangeEvent, KeyboardEvent } from "react";
-import { ContextStore, Effect } from "react-over";
+import { ContextStore, Effect } from "react-store";
 import ToDoService from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
 

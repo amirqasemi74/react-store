@@ -1,5 +1,6 @@
-import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
+import { ORIGINAL_TARGET } from "src/constant";
 import Store from "src/react/store";
+import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
 import adtProxyBuilder from "./adtProxyBuilder";
 
 interface ArrayProxyBuilderArgs {
@@ -29,6 +30,11 @@ const arrayProxyBuilder = ({
             propertyKey,
             value,
           });
+
+          if (propertyKey === ORIGINAL_TARGET) {
+            return target;
+          }
+
           return Array.prototype[propertyKey]
             ? value
             : adtProxyBuilder({

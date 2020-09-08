@@ -3,7 +3,7 @@ import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import ReactAppContext from "../appContext";
-import { STORE_REF } from "../constant";
+import { STORE_REF } from "../../constant";
 import registerHandlers from "../handlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
 import Store from "../store";

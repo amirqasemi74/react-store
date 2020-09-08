@@ -5,3 +5,4 @@ export const OBJECT_OBSERVABILITY_DEPTH = Infinity;
 export const EFFECTS = Symbol("EFFECTS");
 export const STORE_REF = Symbol("STORE_REF");
 export const IS_PROXY = Symbol("IS_PROXY");
+export const ORIGINAL_TARGET = Symbol("ORIGINAL_TARGET");

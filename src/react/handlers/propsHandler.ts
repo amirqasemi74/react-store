@@ -1,5 +1,5 @@
 import Store from "../store";
-import { PROPS_PROPERTY_KEY } from "../constant";
+import { PROPS_PROPERTY_KEY } from "../../constant";
 import { useEffect } from "react";
 
 export default function propsHandler(store: Store, props: object) {

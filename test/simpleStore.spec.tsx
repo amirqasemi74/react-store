@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import React from "react";
-import { connectStore, ContextStore, useStore } from "react-over";
+import { connectStore, ContextStore, useStore } from "react-store";
 
 describe("", () => {
   it("store hav value", () => {

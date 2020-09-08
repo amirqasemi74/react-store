@@ -1,5 +1,5 @@
 import React from "react";
-import { STORE_USED_CONTEXTES } from "src/react/constant";
+import { STORE_USED_CONTEXTES } from "src/constant";
 import { StoreUsedContext } from "src/react/handlers/contextHandler";
 
 export default function UseContext(

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ToDos from "./toDos";
-import { connectStore, useStore } from "react-over";
+import { connectStore, useStore } from "react-store";
 import ThemeStore from "./theme.store";
 import FilePicker from "./filePicker";
 

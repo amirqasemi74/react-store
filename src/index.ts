@@ -8,3 +8,4 @@ export { default as connectStore } from "./react/context/connectToStore";
 export { default as OnPropsChange } from "./decorators/onPropsChange";
 export { default as Effect } from "./decorators/effect";
 export { default as dep } from "./react/handlers/effectHandler/dep";
+export { default as fd } from "./utils/fd";

@@ -1,6 +1,7 @@
 import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
 import Store from "src/react/store";
 import adtProxyBuilder from "./adtProxyBuilder";
+import { ORIGINAL_TARGET } from "src/constant";
 
 interface ObjectProxyBuilderArgs {
   store: Store;
@@ -30,6 +31,10 @@ const objectProxyBuilder = ({
             propertyKey,
             value,
           });
+
+          if (propertyKey === ORIGINAL_TARGET) {
+            return target;
+          }
 
           return Object.prototype[propertyKey]
             ? value

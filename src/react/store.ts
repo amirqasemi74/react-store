@@ -1,5 +1,5 @@
 import { getType } from "src/utils/utils";
-import { STORE_REF } from "./constant";
+import { STORE_REF } from "../constant";
 import adtProxyBuilder from "src/observation/adtProxyBuilder";
 
 export default class Store {
