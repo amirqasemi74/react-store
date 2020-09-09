@@ -1,5 +1,5 @@
 import React from "react";
-import { useStore } from "react-store";
+import { useStore } from "@react-store/core";
 import styled from "styled-components";
 import ToDoStore from "./toDo.store";
 import ToDoItem from "./ToDoItem";

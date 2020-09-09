@@ -1,9 +1,10 @@
+import { ContextStore, Effect, Inject } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
-import { ContextStore, Effect } from "react-store";
 import ToDoService from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
 
 @ContextStore()
+@Inject(ThemeStore, ToDoService)
 export default class ToDoStore {
   todos: ToDoItem[] = [{ value: "amir", isEditing: false }];
 
@@ -11,7 +12,7 @@ export default class ToDoStore {
 
   inputVal = "";
 
-  constructor(public theme: ThemeStore, public service: ToDoService) {}
+  constructor(public service: ToDoService, public theme: ThemeStore) {}
 
   @Effect()
   setTodoCount() {

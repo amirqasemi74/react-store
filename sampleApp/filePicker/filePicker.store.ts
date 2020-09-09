@@ -1,4 +1,4 @@
-import { ContextStore, Effect, Props } from "react-store";
+import { ContextStore, Effect, Props } from "@react-store/core";
 import { Props as FilePickerProps } from ".";
 
 @ContextStore()

@@ -2,8 +2,8 @@ import React from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
+import { getStoreDependencies } from "src/utils/utils";
 import Store from "./store";
-import { getConstructorDepsType } from "src/utils/utils";
 
 interface ResolveStoreArgs {
   StoreType: ClassType;
@@ -29,8 +29,10 @@ export default class ReactAppContext {
       (s) => s.id === id && s.constructorType === StoreType
     );
 
-    const depsValue = getConstructorDepsType(StoreType).map(
-      (dep) => storeDeps?.get(dep)?.instance ?? getFromContainer(dep)
+    const allStoreDepsTypes = getStoreDependencies(StoreType);
+    const depsValue = allStoreDepsTypes.map(
+      (dep) =>
+        storeDeps?.get(dep)?.instance ?? getFromContainer(dep as ClassType)
     );
 
     if (!store) {

@@ -1,7 +1,13 @@
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
-import { connectStore, ContextStore, dep, Effect, useStore } from "react-store";
+import {
+  connectStore,
+  ContextStore,
+  dep,
+  Effect,
+  useStore,
+} from "@react-store/core";
 import { clearContainer } from "src/container";
 
 describe("Effects", () => {

@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import React from "react";
-import { connectStore, ContextStore, useStore } from "react-store";
+import { connectStore, ContextStore, useStore } from "@react-store/core";
 
 describe("Contextual store", () => {
   it("each component which use contextual store should have same instacnce of it", () => {

@@ -1,6 +1,6 @@
 import React from "react";
 import { useDropzone } from "react-dropzone";
-import { connectStore, useStore } from "react-store";
+import { connectStore, useStore } from "@react-store/core";
 import styled from "styled-components";
 import FilePickerStore from "./filePicker.store";
 import FileItem from "./fileItem";

@@ -1,4 +1,3 @@
-import { ORIGINAL_TARGET } from "src/constant";
 import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from ".";
 
 interface ArrayProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
@@ -24,10 +23,6 @@ const arrayProxyBuilder = ({
             propertyKey,
             value,
           });
-
-          if (propertyKey === ORIGINAL_TARGET) {
-            return target;
-          }
 
           return Array.prototype[propertyKey]
             ? value

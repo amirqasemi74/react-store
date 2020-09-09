@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { connectStore, useStore } from "react-store";
+import { connectStore, useStore } from "@react-store/core";
 import ToDoStore from "./toDo.store";
 import styled from "styled-components";
 import ToDoList from "./ToDoList";

@@ -1,4 +1,3 @@
-import { ORIGINAL_TARGET } from "src/constant";
 import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from ".";
 
 interface ObjectProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
@@ -26,10 +25,6 @@ const objectProxyBuilder = ({
             propertyKey,
             value,
           });
-
-          if (propertyKey === ORIGINAL_TARGET) {
-            return target;
-          }
 
           return Object.prototype[propertyKey]
             ? value

@@ -1,4 +1,4 @@
-import { Injectable } from "react-store";
+import { Injectable } from "@react-store/core";
 
 @Injectable
 export default class ToDoService {
