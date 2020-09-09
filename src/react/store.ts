@@ -1,6 +1,6 @@
+import adtProxyBuilder from "src/proxy/adtProxy";
 import { getType } from "src/utils/utils";
 import { STORE_REF } from "../constant";
-import adtProxyBuilder from "src/observation/adtProxyBuilder";
 
 export default class Store {
   id: string;
@@ -28,6 +28,7 @@ export default class Store {
       value: instance,
       store: this,
       allowRender: true,
+      proxyTypes: ["Array", "Object"],
     });
 
     // to access store in deep proxy for effects handler

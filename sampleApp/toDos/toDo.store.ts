@@ -5,7 +5,7 @@ import ThemeStore from "../theme.store";
 
 @ContextStore()
 export default class ToDoStore {
-  todos: ToDoItem[] = [];
+  todos: ToDoItem[] = [{ value: "amir", isEditing: false }];
 
   todoCount = 0;
 
@@ -15,7 +15,7 @@ export default class ToDoStore {
 
   @Effect()
   setTodoCount() {
-    // this.todoCount = this.todos.length;
+    this.todoCount = this.todos.length;
     return () => console.log("clear Effect from effect 1 in ToDo Store");
   }
 

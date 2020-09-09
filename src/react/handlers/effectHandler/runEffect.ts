@@ -1,7 +1,7 @@
 import isPromise from "is-promise";
 import objectPath from "object-path";
 import { getFromContainer } from "src/container";
-import adtProxyBuilder from "src/observation/adtProxyBuilder";
+import adtProxyBuilder from "src/proxy/adtProxy";
 import ReactAppContext from "src/react/appContext";
 import Store from "src/react/store";
 import dependecyExtarctor, {

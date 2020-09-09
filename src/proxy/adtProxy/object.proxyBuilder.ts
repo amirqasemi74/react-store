@@ -1,23 +1,18 @@
-import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
-import Store from "src/react/store";
-import adtProxyBuilder from "./adtProxyBuilder";
 import { ORIGINAL_TARGET } from "src/constant";
+import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from ".";
 
-interface ObjectProxyBuilderArgs {
-  store: Store;
+interface ObjectProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   object: object;
   depth: number;
-  getSetLogs?: GetSetLog[];
-  allowRender?: boolean;
 }
 
 const objectProxyBuilder = ({
-  store,
   object,
   depth,
-  getSetLogs,
-  allowRender,
+  ...restOfArgs
 }: ObjectProxyBuilderArgs): object => {
+  const { getSetLogs, allowRender, store } = restOfArgs;
+
   return depth < 0
     ? object
     : new Proxy(object, {
@@ -40,19 +35,24 @@ const objectProxyBuilder = ({
             ? value
             : adtProxyBuilder({
                 value,
-                store,
-                receiver,
-                allowRender,
-                depth,
-                getSetLogs,
+                context: receiver,
+                depth: depth - 1,
+                ...restOfArgs,
               });
         },
 
         set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {
           // console.log("Objct::set", target, propertyKey, value);
-          getSetLogs?.push({ type: "SET", target, propertyKey, value });
+          getSetLogs?.push({
+            type: "SET",
+            target,
+            propertyKey,
+            value,
+          });
           const res = Reflect.set(target, propertyKey, value, receiver);
-          allowRender && store.renderConsumers();
+          if (allowRender) {
+            store.renderConsumers();
+          }
           return res;
         },
       });

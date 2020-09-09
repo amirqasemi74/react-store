@@ -1,4 +1,4 @@
-import adtProxyBuilder from "src/observation/adtProxyBuilder";
+import adtProxyBuilder from "src/proxy/adtProxy";
 import { STORE_REF } from "src/constant";
 import Store from "src/react/store";
 import dependeciesExtarctor, {
