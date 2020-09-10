@@ -1,9 +1,9 @@
-import adtProxyBuilder from "src/proxy/adtProxy";
 import { STORE_REF } from "src/constant";
+import adtProxyBuilder from "src/proxy/adtProxy";
 import Store from "src/react/store";
 import dependeciesExtarctor, {
   GetSetLog,
-} from "../../../setGetPathDetector/dependencyExtractor";
+} from "src/setGetPathDetector/dependencyExtractor";
 
 describe("Effect handler", () => {
   describe("Dependecies Detector", () => {
@@ -34,7 +34,7 @@ describe("Effect handler", () => {
       const getSetLogs: GetSetLog[] = [];
       const userStore = adtProxyBuilder({
         getSetLogs,
-        store,
+        onSet: store.renderConsumers.bind(store),
         value: target,
       });
       userStore.effect1();

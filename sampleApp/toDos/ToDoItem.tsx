@@ -9,7 +9,6 @@ interface Props {
 
 const ToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
   const vm = useStore(ToDoStore);
-  console.log(`Render ${itemIndex}`);
 
   return (
     <ToDoItemWrapper>

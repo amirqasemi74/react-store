@@ -1,8 +1,11 @@
+import { isService } from "src/decorators/service";
 import adtProxyBuilder from "src/proxy/adtProxy";
 import { getType } from "src/utils/utils";
 import { STORE_REF } from "../constant";
+import EffectsContainer from "./handlers/effectHandler/effectContainer";
+import ServiceInfo from "./handlers/effectHandler/serviceInfo";
 
-export default class Store {
+export default class Store extends EffectsContainer {
   id: string;
 
   constructorType: Function;
@@ -17,24 +20,39 @@ export default class Store {
 
   private isRenderAllow = true;
 
-  private effects = new Map<PropertyKey, Effect>();
+  servicesInfo = new Map<PropertyKey, ServiceInfo>();
 
   constructor({ id, instance }: { id: string; instance: object }) {
+    super();
     this.id = id;
     this.constructorType = getType(instance);
     this.pureInstance = instance;
     instance[STORE_REF] = this;
     this.instance = adtProxyBuilder({
       value: instance,
-      store: this,
-      allowRender: true,
+      onSet: this.renderConsumers.bind(this),
       proxyTypes: ["Array", "Object"],
     });
 
     // to access store in deep proxy for effects handler
     this.turnOffRender();
     this.instance[STORE_REF] = this.pureInstance[STORE_REF] = this;
+    this.initServiceEffectContainers();
     this.turnOnRender();
+  }
+
+  private initServiceEffectContainers() {
+    Object.entries<any>(this.pureInstance).map(([propertyKey, value]) => {
+      if (isService(value.constructor) && !this.servicesInfo.has(propertyKey)) {
+        this.servicesInfo.set(
+          propertyKey,
+          new ServiceInfo({
+            pureContext: value,
+            context: this.instance[propertyKey],
+          })
+        );
+      }
+    });
   }
 
   turnOffRender() {
@@ -51,32 +69,15 @@ export default class Store {
       this.injectedIntos.forEach(({ store }) => store.renderConsumers());
     }
   }
-  /**
-   * ******************** Effect Deps ********************
-   */
-  storeEffet(effectKey: PropertyKey, effect: Effect) {
-    this.effects.set(effectKey, effect);
-  }
-
-  getEffect(effectKey: PropertyKey) {
-    return this.effects.get(effectKey);
-  }
 
   /**
-   * ******************** Injected into ********************
+   * ***************s***** Injected into ********************
    */
   addInjectedInto({ propertyKey, store }: StoreInjectedInto) {
     if (!this.injectedIntos.has(store.id)) {
       this.injectedIntos.set(store.id, { store, propertyKey });
     }
   }
-}
-
-interface Effect {
-  deps: string[];
-  depsValues: any[];
-  isCalledOnce: boolean;
-  clearEffect?: (() => void) | null;
 }
 
 interface StoreConsumer {

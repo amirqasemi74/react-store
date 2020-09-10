@@ -1,11 +1,11 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getFromContainer } from "src/container";
 import adtProxyBuilder from "src/proxy/adtProxy";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
+import useLazyRef from "src/utils/useLazyRef";
 import ReactAppContext from "../appContext";
 import Store from "../store";
-import useLazyRef from "src/utils/useLazyRef";
 
 export interface ComponentDeps {
   paths: string[];
@@ -62,7 +62,7 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
    */
   return useLazyRef(() =>
     adtProxyBuilder({
-      store: store!,
+      onSet: () => store?.renderConsumers(),
       value: store!.pureInstance,
       fixdeFuncContext: store!.instance,
       proxyTypes: ["Function"],

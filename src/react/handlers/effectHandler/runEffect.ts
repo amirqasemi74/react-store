@@ -3,40 +3,54 @@ import objectPath from "object-path";
 import { getFromContainer } from "src/container";
 import adtProxyBuilder from "src/proxy/adtProxy";
 import ReactAppContext from "src/react/appContext";
-import Store from "src/react/store";
-import dependecyExtarctor, {
+import dependencyExtarctor, {
   GetSetLog,
-} from "../../../setGetPathDetector/dependencyExtractor";
+} from "src/setGetPathDetector/dependencyExtractor";
 import { depReturnValue } from "./dep";
+import EffectsContainer from "./effectContainer";
 
-const runEffect = (
-  store: Store,
-  effectKey: PropertyKey,
-  depsValues?: any[]
-) => {
+interface RunEffectArgs {
+  container: EffectsContainer;
+  context: object;
+  pureContext: object;
+  effectKey: PropertyKey;
+  depsValues?: any[];
+}
+
+const runEffect = ({
+  container,
+  effectKey,
+  context: _context,
+  pureContext,
+  depsValues,
+}: RunEffectArgs) => {
   const appContext = getFromContainer(ReactAppContext);
 
   const getSetLogs: GetSetLog[] = [];
   const context = adtProxyBuilder({
-    store,
     getSetLogs,
-    value: store.pureInstance,
-    allowRender: false,
+    value: _context,
   });
-  const res = Reflect.apply(store.pureInstance[effectKey], context, []);
+
+  //run
+  const res = Reflect.apply(pureContext[effectKey], context, []);
+
   if (isPromise(res)) {
     throw new Error("Async function for effect is invalid!");
   }
+
+  // if effect return dep(...) fn
   if (res === depReturnValue) {
-    getSetLogs.length = 0;
+    getSetLogs.length = 0; //clear logs
     appContext.currentRunningEffect.depsList?.();
   }
-  const deps = dependecyExtarctor(getSetLogs, store);
-  store.storeEffet(effectKey, {
+
+  const deps = dependencyExtarctor(getSetLogs, pureContext);
+
+  container.storeEffet(effectKey, {
     deps,
     depsValues:
-      depsValues ||
-      deps.map((path) => objectPath.get(store.pureInstance, path)),
+      depsValues || deps.map((path) => objectPath.get(pureContext, path)),
     isCalledOnce: true,
     clearEffect:
       res === depReturnValue

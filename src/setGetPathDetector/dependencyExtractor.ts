@@ -1,9 +1,9 @@
 import { STORE_REF } from "src/constant";
-import Store from "src/react/store";
+import { isStore } from "src/utils/utils";
 
 const dependencyExtarctor = (
   getSetLogs: GetSetLog[],
-  store: Store,
+  pureContext: object,
   type: GetSet = "GET"
 ) => {
   getSetLogs = [...getSetLogs];
@@ -19,7 +19,7 @@ const dependencyExtarctor = (
       case "GET": {
         // reaching direct store property key
 
-        if (propertyKey in store.pureInstance) {
+        if (propertyKey in pureContext) {
           i++;
           getSetItems.push({
             path: `GET::${propertyKey.toString()}`,
@@ -30,8 +30,8 @@ const dependencyExtarctor = (
           // chain is continuing
           if (
             getSetItems[i].value === target ||
-            (!!target[STORE_REF] &&
-              !!getSetItems[i].value[STORE_REF] &&
+            (isStore(target) &&
+              isStore(getSetItems[i].value) &&
               target[STORE_REF] === getSetItems[i].value[STORE_REF])
           ) {
             getSetItems[i] = {
@@ -72,7 +72,7 @@ const dependencyExtarctor = (
             ].propertyKey.toString()}.${propertyKey.toString()}`,
             value,
           };
-        } else if (propertyKey in store.pureInstance) {
+        } else if (propertyKey in pureContext) {
           i++;
           getSetItems.push({
             path: `SET::${propertyKey.toString()}`,

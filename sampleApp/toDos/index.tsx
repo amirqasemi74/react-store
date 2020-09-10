@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
 import { connectStore, useStore } from "@react-store/core";
+import React from "react";
+import styled, { css } from "styled-components";
 import ToDoStore from "./toDo.store";
-import styled from "styled-components";
 import ToDoList from "./ToDoList";
 
 const ToDos: React.FC = () => {
@@ -11,10 +11,11 @@ const ToDos: React.FC = () => {
     <ToDoWrapper>
       <Title style={{ color: vm.theme.primary }}>To Do Application</Title>
       <TodoInput
-        placeholder="Enter To Do"
-        value={vm.inputVal}
+        invalid={vm.validator.hasAnyError}
+        value={vm.todo.value}
         onChange={vm.onInputChange}
         onKeyDown={vm.onInputKeyDown}
+        placeholder="Enter To Do"
       />
       <ToDoList />
       <ToDoCount>ToDo Count: {vm.todoCount}</ToDoCount>
@@ -40,11 +41,19 @@ const Title = styled.section`
   font-size: 40px;
 `;
 
-const TodoInput = styled.input`
+const TodoInput = styled.input<{ invalid: boolean }>`
   width: 100%;
   margin: 30px auto;
   line-height: 40px;
   font-size: 18px;
+  border: 1px solid;
+  border-radius: 5px;
+  ${(props) =>
+    props.invalid &&
+    css`
+      border-color: red;
+      outline-color: red;
+    `}
 `;
 
 const ToDoCount = styled.section`

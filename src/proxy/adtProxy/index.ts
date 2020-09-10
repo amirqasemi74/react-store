@@ -1,30 +1,24 @@
-import {
-  ARRAY_OBSERVABILITY_DEPTH,
-  OBJECT_OBSERVABILITY_DEPTH,
-  STORE_REF,
-} from "src/constant";
+import { isService } from "src/decorators/service";
 import Store from "src/react/store";
 import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
+import { isStore } from "src/utils/utils";
 import arrayProxyBuilder from "./array.proxyBuilder";
 import functionProxyBuilder from "./function.proxyBuilder";
 import objectProxyBuilder from "./object.proxyBuilder";
 
 export interface BaseAdtProxyBuilderArgs {
-  store: Store;
+  onSet?: () => void;
   getSetLogs?: GetSetLog[];
-  allowRender?: boolean;
   proxyTypes?: Array<"Function" | "Array" | "Object">;
 }
 
 interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   value: any;
-  depth?: number;
   context?: any;
   fixdeFuncContext?: any;
 }
 const adtProxyBuilder = ({
   value,
-  depth,
   context,
   ...restOfArgs
 }: AdtProxyBuilderArgs) => {
@@ -34,48 +28,31 @@ const adtProxyBuilder = ({
   const proxyFunction = proxyTypes?.includes("Function") ?? true;
 
   try {
-    switch (value.constructor) {
-      case Object:
-        // React props are frozen & mustn't be proxied
-        return !Object.isFrozen(value) && proxyObject
-          ? objectProxyBuilder({
-              object: value,
-              depth: depth !== undefined ? depth : OBJECT_OBSERVABILITY_DEPTH,
-              ...restOfArgs,
-            })
-          : value;
-
-      case Array:
-        return proxyArray
-          ? arrayProxyBuilder({
-              array: value,
-              depth: depth !== undefined ? depth : ARRAY_OBSERVABILITY_DEPTH,
-              ...restOfArgs,
-            })
-          : value;
-
-      case Function:
-        return proxyFunction
-          ? functionProxyBuilder({ func: value, context, fixdeFuncContext })
-          : value;
-      case Number:
-      case String:
-      case RegExp:
-      case Boolean:
-        return value;
-      default:
-        if (value instanceof Object && value[STORE_REF]) {
-          return objectProxyBuilder({
-            object: value,
-            depth: depth !== undefined ? depth : OBJECT_OBSERVABILITY_DEPTH,
-            ...restOfArgs,
-          });
-        }
-        return value;
+    if (
+      (value.constructor === Object &&
+        !Object.isFrozen(value) &&
+        proxyObject) ||
+      (value instanceof Object &&
+        (isStore(value) || isService(value.constructor)))
+    ) {
+      return objectProxyBuilder({
+        object: value,
+        ...restOfArgs,
+      });
     }
-  } catch (error) {
-    return value;
-  }
+
+    if (value.constructor === Array && proxyArray) {
+      return arrayProxyBuilder({
+        array: value,
+        ...restOfArgs,
+      });
+    }
+
+    if (value.constructor === Function && proxyFunction) {
+      return functionProxyBuilder({ func: value, context, fixdeFuncContext });
+    }
+  } catch (error) {}
+  return value;
 };
 
 export default adtProxyBuilder;

@@ -1,4 +1,4 @@
-import { STORE_DEPENDENCIES } from "src/constant";
+import { STORE_DEPENDENCIES, STORE_REF } from "src/constant";
 import { ClassType } from "src/types";
 
 export const getType = (obj: object) => {
@@ -11,3 +11,5 @@ export const getConstructorDepsType = (consructorType: Function): ClassType[] =>
 
 export const getStoreDependencies = (storeType: Function) =>
   (Reflect.get(storeType, STORE_DEPENDENCIES) as Function[]) || [];
+
+export const isStore = (target: object) => !!target[STORE_REF];

@@ -2,15 +2,18 @@ import { ContextStore, Effect, Inject } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 import ToDoService from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
+import FormValidator from "sampleApp/libs/formValidator";
 
 @ContextStore()
-@Inject(ThemeStore, ToDoService)
+@Inject(ToDoService, ThemeStore)
 export default class ToDoStore {
   todos: ToDoItem[] = [{ value: "amir", isEditing: false }];
 
   todoCount = 0;
 
-  inputVal = "";
+  todo = { value: "" };
+
+  validator = new FormValidator(this.todo);
 
   constructor(public service: ToDoService, public theme: ThemeStore) {}
 
@@ -21,17 +24,18 @@ export default class ToDoStore {
   }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
-    this.inputVal = e.target.value;
+    this.todo.value = e.target.value;
+    this.validator.validate();
   }
 
   onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (
       e.key === "Enter" &&
-      this.inputVal &&
+      this.todo.value &&
       !this.todos.find(({ value }) => value === e.currentTarget.value)
     ) {
-      this.todos.push({ value: this.inputVal, isEditing: false });
-      this.inputVal = "";
+      this.todos.push({ value: this.todo.value, isEditing: false });
+      this.todo.value = "";
     }
   }
 
