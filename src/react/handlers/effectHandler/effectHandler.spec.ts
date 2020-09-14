@@ -34,11 +34,10 @@ describe("Effect handler", () => {
       const getSetLogs: GetSetLog[] = [];
       const userStore = adtProxyBuilder({
         getSetLogs,
-        onSet: store.renderConsumers.bind(store),
         value: target,
       });
       userStore.effect1();
-      const dependecies = dependeciesExtarctor(getSetLogs, store);
+      const dependecies = dependeciesExtarctor(getSetLogs, store.pureInstance);
 
       expect(dependecies).toEqual([
         "effect1",

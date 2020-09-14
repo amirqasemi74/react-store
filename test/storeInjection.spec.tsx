@@ -1,10 +1,15 @@
 import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import React from "react";
-import { connectStore, ContextStore, useStore } from "@react-store/core";
+import {
+  connectStore,
+  ContextStore,
+  Inject,
+  useStore,
+} from "@react-store/core";
 
 describe("Store Injection", () => {
-  it("Upper store should inject into lower store", () => {
+  it.only("Upper store should inject into lower store", () => {
     let appStoreRef: AppStore | null = null,
       appStoreRefInUserStore: AppStore | null = null;
 
@@ -14,6 +19,7 @@ describe("Store Injection", () => {
     }
 
     @ContextStore()
+    @Inject(AppStore)
     class UserStore {
       username = "amir.qasemi74";
       password = "123456";
@@ -48,8 +54,6 @@ describe("Store Injection", () => {
 
     expect(appStoreRef).not.toBe(null);
     expect(appStoreRefInUserStore).not.toBe(null);
-
-    expect(appStoreRef).toBe(appStoreRefInUserStore);
 
     expect(getByText(/amir.qasemi74/i)).toBeInTheDocument();
     expect(getByText(/123456/i)).toBeInTheDocument();

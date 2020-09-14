@@ -16,11 +16,11 @@ export default class Store extends EffectsContainer {
 
   consumers: StoreConsumer[] = [];
 
+  servicesInfo = new Map<PropertyKey, ServiceInfo>();
+
   private injectedIntos = new Map<string, StoreInjectedInto>();
 
   private isRenderAllow = true;
-
-  servicesInfo = new Map<PropertyKey, ServiceInfo>();
 
   constructor({ id, instance }: { id: string; instance: object }) {
     super();
@@ -43,7 +43,11 @@ export default class Store extends EffectsContainer {
 
   private initServiceEffectContainers() {
     Object.entries<any>(this.pureInstance).map(([propertyKey, value]) => {
-      if (isService(value.constructor) && !this.servicesInfo.has(propertyKey)) {
+      if (
+        value &&
+        isService(value.constructor) &&
+        !this.servicesInfo.has(propertyKey)
+      ) {
         this.servicesInfo.set(
           propertyKey,
           new ServiceInfo({
