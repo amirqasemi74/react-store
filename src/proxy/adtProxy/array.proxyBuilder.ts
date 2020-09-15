@@ -1,4 +1,5 @@
-import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from ".";
+import { BaseAdtProxyBuilderArgs } from ".";
+import proxyValueAndSaveIt from "../proxyValueAndSaveIt";
 
 interface ArrayProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   array: any[];
@@ -12,21 +13,21 @@ const arrayProxyBuilder = ({
   return new Proxy(array, {
     get(target: any, propertyKey: PropertyKey, receiver: any): any {
       // console.log("Array::get", target, propertyKey);
-      const value = Reflect.get(target, propertyKey, receiver);
+      const { pureValue, value } = proxyValueAndSaveIt(
+        target,
+        propertyKey,
+        receiver,
+        restOfArgs
+      );
+
       getSetLogs?.push({
         type: "GET",
         target,
         propertyKey,
-        value,
+        value: pureValue,
       });
 
-      return Array.prototype[propertyKey]
-        ? value
-        : adtProxyBuilder({
-            value,
-            context: receiver,
-            ...restOfArgs,
-          });
+      return value;
     },
 
     set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {

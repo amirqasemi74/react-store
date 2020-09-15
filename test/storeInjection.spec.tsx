@@ -55,6 +55,8 @@ describe("Store Injection", () => {
     expect(appStoreRef).not.toBe(null);
     expect(appStoreRefInUserStore).not.toBe(null);
 
+    expect(appStoreRef).toBe(appStoreRefInUserStore);
+
     expect(getByText(/amir.qasemi74/i)).toBeInTheDocument();
     expect(getByText(/123456/i)).toBeInTheDocument();
     expect(getByText(/black/i)).toBeInTheDocument();

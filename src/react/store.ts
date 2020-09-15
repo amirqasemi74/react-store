@@ -31,7 +31,6 @@ export default class Store extends EffectsContainer {
     this.instance = adtProxyBuilder({
       value: instance,
       onSet: this.renderConsumers.bind(this),
-      proxyTypes: ["Array", "Object"],
     });
 
     // to access store in deep proxy for effects handler

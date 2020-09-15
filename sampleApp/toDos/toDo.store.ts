@@ -44,10 +44,8 @@ export default class ToDoStore {
     itemIndex: number
   ) {
     if (e.key === "Enter") {
-      this.todos[itemIndex] = {
-        value: e.currentTarget.value,
-        isEditing: false,
-      };
+      this.todos[itemIndex].value = e.currentTarget.value;
+      this.todos[itemIndex].isEditing = false;
     }
   }
 

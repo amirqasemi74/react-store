@@ -1,4 +1,5 @@
-import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from ".";
+import { BaseAdtProxyBuilderArgs } from ".";
+import proxyValueAndSaveIt from "../proxyValueAndSaveIt";
 
 interface ObjectProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   object: object;
@@ -13,22 +14,21 @@ const objectProxyBuilder = ({
   return new Proxy(object, {
     get(target: any, propertyKey: PropertyKey, receiver: any) {
       // console.log("Object::get", target, propertyKey);
-      const value = Reflect.get(target, propertyKey, receiver);
+      const { pureValue, value } = proxyValueAndSaveIt(
+        target,
+        propertyKey,
+        receiver,
+        restOfArgs
+      );
 
       getSetLogs?.push({
         type: "GET",
         target,
         propertyKey,
-        value,
+        value: pureValue,
       });
 
-      return Object.prototype[propertyKey]
-        ? value
-        : adtProxyBuilder({
-            value,
-            context: receiver,
-            ...restOfArgs,
-          });
+      return value;
     },
 
     set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {

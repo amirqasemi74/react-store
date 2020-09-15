@@ -45,6 +45,9 @@ describe("Contextual store", () => {
     expect(passwordStoreRef).not.toBe(null);
     expect(usernameStoreRef).not.toBe(null);
 
+    expect(appStoreRef).toBe(passwordStoreRef);
+    expect(appStoreRef).toBe(usernameStoreRef);
+
     expect(getByText(/amir.qasemi74/i)).toBeInTheDocument();
     expect(getByText(/123456/i)).toBeInTheDocument();
     expect(getByText(/User store/i)).toBeInTheDocument();

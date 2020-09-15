@@ -1,9 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { getFromContainer } from "src/container";
-import adtProxyBuilder from "src/proxy/adtProxy";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
-import useLazyRef from "src/utils/useLazyRef";
 import ReactAppContext from "../appContext";
 import Store from "../store";
 
@@ -31,7 +29,7 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
     useEffect(() => {
       const render = () => setRenderKey(uid());
       store?.consumers.push({ render });
-
+      
       return () => {
         if (store) {
           store.consumers = store.consumers.filter(
@@ -51,23 +49,7 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
     );
   }
 
-  /**
-   * the store instance which useStore returns must be always the pure instance of
-   * store.
-   * - if we return store.instance, it's a proxy which change it's reference in every render
-   *   so developer can't use store properties in useEffect or ... for dependencies
-   * - if we return store.pureInstace, reference is okay but stores methods is auto binded.
-   * - SO HERE we proxy ONLY store properties not deep for properties value and for methods
-   *   we bind store.instance to render for store state changes
-   */
-  return useLazyRef(() =>
-    adtProxyBuilder({
-      onSet: () => store?.renderConsumers(),
-      value: store!.pureInstance,
-      fixdeFuncContext: store!.instance,
-      proxyTypes: ["Function"],
-    })
-  ).current;
+  return store.instance;
 };
 
 export default useStore;
