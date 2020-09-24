@@ -1,5 +1,4 @@
 import { isService } from "src/decorators/service";
-import Store from "src/react/store";
 import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
 import { isStore } from "src/utils/utils";
 import arrayProxyBuilder from "./array.proxyBuilder";
@@ -48,8 +47,12 @@ const adtProxyBuilder = ({
       });
     }
 
-    if (value.constructor === Function && proxyFunction) {
-      return functionProxyBuilder({ func: value, context, fixdeFuncContext });
+    if (value instanceof Function && proxyFunction) {
+      return functionProxyBuilder({
+        func: value,
+        context,
+        fixdeFuncContext,
+      });
     }
   } catch (error) {}
   return value;
