@@ -1,4 +1,5 @@
-import { ClassType } from "src/types";
 import "reflect-metadata";
 
-export const Injectable = (target: ClassType) => {};
+export function Injectable(options?: {}): ClassDecorator {
+  return function (target: Function) {};
+}

@@ -9,7 +9,7 @@ import {
 } from "@react-store/core";
 
 describe("Store Injection", () => {
-  it.only("Upper store should inject into lower store", () => {
+  it("Upper store should inject into lower store", () => {
     let appStoreRef: AppStore | null = null,
       appStoreRefInUserStore: AppStore | null = null;
 

@@ -7,7 +7,7 @@ describe("Container", () => {
   });
 
   it("should return singleton instance", () => {
-    @Injectable
+    @Injectable()
     class App {
       p1 = Math.random();
     }
@@ -17,13 +17,13 @@ describe("Container", () => {
   });
 
   it("should resolve dependencies automatically", () => {
-    @Injectable
+    @Injectable()
     class UserInfo {
       username = "amir.qasemi74";
       password = "123456";
     }
 
-    @Injectable
+    @Injectable()
     class App {
       constructor(public user: UserInfo) {}
     }
@@ -35,7 +35,7 @@ describe("Container", () => {
   });
 
   it("should remove singleton instance", () => {
-    @Injectable
+    @Injectable()
     class App {
       username = "test";
     }

@@ -5,7 +5,7 @@ import { useRef, MutableRefObject } from "react";
  * @param initialValFunc
  */
 const useLazyRef = <T>(initialValFunc: () => T) => {
-  const ref: MutableRefObject<T | null> = useRef(null);
+  const ref: MutableRefObject<T> = useRef(null) as any;
   if (ref.current === null) {
     ref.current = initialValFunc();
   }

@@ -7,6 +7,7 @@ import { STORE_REF } from "../../constant";
 import registerHandlers from "../handlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
 import Store from "../store";
+import useLazyRef from "src/utils/useLazyRef";
 
 interface ProviderComponentProps {
   props?: any;
@@ -22,7 +23,7 @@ const buildProviderComponent = (
 
   // Inject Contextual Store which has been mounted before
   const injectedStores = storeInjectionHandler(StoreType);
-  const store = useRef(
+  const store = useLazyRef(() =>
     appContext.resolveStore({
       StoreType,
       id,
