@@ -36,7 +36,7 @@ export default function proxyValueAndSaveIt(
     value &&
     (value.constructor === Object ||
       value.constructor === Array ||
-      value.constructor === Function) &&
+      value instanceof Function) &&
     !value[STORE_REF]
   ) {
     return {

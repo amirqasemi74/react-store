@@ -7,3 +7,4 @@ babel*
 jest*
 .vscode
 _config.yml
+rollup*
