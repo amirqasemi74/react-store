@@ -1,4 +1,5 @@
 import { STORE_REF } from "src/constant";
+import { isService } from "src/decorators/service";
 import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxy";
 
 /**
@@ -21,22 +22,13 @@ export default function proxyValueAndSaveIt(
     };
   }
 
-  // Not proxy Object or Array methods
   if (
-    (target.constructor === Object && Object.prototype[propertyKey]) ||
-    (target.constructor === Array && Array.prototype[propertyKey])
-  ) {
-    return {
-      pureValue: value,
-      value,
-    };
-  }
-
-  if (
+    !isInArrayOrObjectPrototype(target, propertyKey) &&
     value &&
     (value.constructor === Object ||
       value.constructor === Array ||
-      value instanceof Function) &&
+      value instanceof Function ||
+      (value instanceof Object && isService(value.constructor))) &&
     !value[STORE_REF]
   ) {
     return {
@@ -55,3 +47,7 @@ export default function proxyValueAndSaveIt(
 }
 
 const PROXYED_VALUE = Symbol("PROXYED_VALUE");
+
+const isInArrayOrObjectPrototype = (target: any, propertyKey: PropertyKey) =>
+  (target.constructor === Object && Object.prototype[propertyKey]) ||
+  (target.constructor === Array && Array.prototype[propertyKey]);
