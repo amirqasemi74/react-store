@@ -55,6 +55,9 @@ const buildProviderComponent = (
 
   useEffect(() => {
     store.consumers.push({ render: () => setRenderKey(uid()) });
+    return () => {
+      store.onUnMount();
+    };
   }, []);
 
   registerHandlers(store, props);

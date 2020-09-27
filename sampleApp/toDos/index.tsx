@@ -6,6 +6,7 @@ import ToDoList from "./ToDoList";
 
 const ToDos: React.FC = () => {
   const vm = useStore(ToDoStore);
+  console.count("render");
 
   return (
     <ToDoWrapper>

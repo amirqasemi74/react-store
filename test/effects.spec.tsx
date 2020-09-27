@@ -1,6 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
-import { fireEvent, render, waitFor } from "@testing-library/react";
-import React, { ChangeEvent } from "react";
 import {
   connectStore,
   ContextStore,
@@ -8,6 +5,9 @@ import {
   Effect,
   useStore,
 } from "@react-store/core";
+import "@testing-library/jest-dom/extend-expect";
+import { fireEvent, render, waitFor } from "@testing-library/react";
+import React, { ChangeEvent } from "react";
 import { clearContainer } from "src/container";
 
 describe("Effects", () => {
@@ -59,19 +59,18 @@ describe("Effects", () => {
     await waitFor(() => {
       fireEvent.change(input, { target: { value: "amir.qasemi70" } });
     });
-    expect(usernameChangeCallback).toBeCalledTimes(2);
+    await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(2));
 
     // no change
     await waitFor(() => {
       fireEvent.change(input, { target: { value: "amir.qasemi70" } });
     });
-    expect(usernameChangeCallback).toBeCalledTimes(2);
-
+    await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(2));
     // change username dep again
     await waitFor(() => {
       fireEvent.change(input, { target: { value: "amir.qasemi75" } });
     });
-    expect(usernameChangeCallback).toBeCalledTimes(3);
+    await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(3));
   });
 
   it("clear Effect must be called before running new effect", async () => {
@@ -128,7 +127,7 @@ describe("Effects", () => {
     await waitFor(() => {
       fireEvent.change(input, { target: { value: "amir.qasemi70" } });
     });
-    expect(usernameChangeCallback).toBeCalledTimes(2);
+    await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(2));
     expect(usernameChangeClearEffect).toBeCalledTimes(1);
     expect(callStack).toEqual(["effect", "clear-effect", "effect"]);
 
@@ -144,7 +143,7 @@ describe("Effects", () => {
     await waitFor(() => {
       fireEvent.change(input, { target: { value: "amir.qasemi75" } });
     });
-    expect(usernameChangeCallback).toBeCalledTimes(3);
+    await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(3));
     expect(usernameChangeClearEffect).toBeCalledTimes(2);
     expect(callStack).toEqual([
       "effect",
@@ -213,7 +212,7 @@ describe("Effects", () => {
       await waitFor(() => {
         fireEvent.change(input, { target: { value: "amir.qasemi70" } });
       });
-      expect(usernameChangeCallback).toBeCalledTimes(2);
+      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(2));
       expect(usernameChangeClearEffect).toBeCalledTimes(1);
       expect(callStack).toEqual(["effect", "clear-effect", "effect"]);
 
@@ -221,7 +220,7 @@ describe("Effects", () => {
       await waitFor(() => {
         fireEvent.change(input, { target: { value: "amir.qasemi70" } });
       });
-      expect(usernameChangeCallback).toBeCalledTimes(2);
+      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(2));
       expect(usernameChangeClearEffect).toBeCalledTimes(1);
       expect(callStack).toEqual(["effect", "clear-effect", "effect"]);
 
@@ -229,7 +228,7 @@ describe("Effects", () => {
       await waitFor(() => {
         fireEvent.change(input, { target: { value: "amir.qasemi75" } });
       });
-      expect(usernameChangeCallback).toBeCalledTimes(3);
+      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(3));
       expect(usernameChangeClearEffect).toBeCalledTimes(2);
       expect(callStack).toEqual([
         "effect",
@@ -297,7 +296,7 @@ describe("Effects", () => {
       await waitFor(() => {
         fireEvent.change(input, { target: { value: "amir.qasemi70" } });
       });
-      expect(usernameChangeCallback).toBeCalledTimes(1);
+      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(1));
       expect(usernameChangeClearEffect).toBeCalledTimes(0);
       expect(callStack).toEqual(["effect"]);
 
@@ -305,7 +304,7 @@ describe("Effects", () => {
       await waitFor(() => {
         fireEvent.change(input, { target: { value: "amir.qasemi70" } });
       });
-      expect(usernameChangeCallback).toBeCalledTimes(1);
+      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(1));
       expect(usernameChangeClearEffect).toBeCalledTimes(0);
       expect(callStack).toEqual(["effect"]);
 
@@ -313,7 +312,7 @@ describe("Effects", () => {
       await waitFor(() => {
         fireEvent.change(input, { target: { value: "amir.qasemi74" } });
       });
-      expect(usernameChangeCallback).toBeCalledTimes(1);
+      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(1));
       expect(usernameChangeClearEffect).toBeCalledTimes(0);
       expect(callStack).toEqual(["effect"]);
     });

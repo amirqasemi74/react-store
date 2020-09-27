@@ -25,6 +25,8 @@ export default class ToDoStore {
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.todo.value = e.target.value;
+    this.todo.value = e.target.value;
+    this.todo.value = e.target.value;
     this.validator.validate();
   }
 

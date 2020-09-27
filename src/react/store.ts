@@ -20,7 +20,7 @@ export default class Store extends EffectsContainer {
 
   private injectedIntos = new Map<string, StoreInjectedInto>();
 
-  private isRenderAllow = true;
+  private render = { isAllow: true, lastAt: Date.now(), pendingTimeoutId: -1 };
 
   constructor({ id, instance }: { id: string; instance: object }) {
     super();
@@ -59,17 +59,26 @@ export default class Store extends EffectsContainer {
   }
 
   turnOffRender() {
-    this.isRenderAllow = false;
+    this.render.isAllow = false;
   }
 
   turnOnRender() {
-    this.isRenderAllow = true;
+    this.render.isAllow = true;
   }
 
   renderConsumers() {
-    if (this.isRenderAllow) {
+    if (!this.render.isAllow) return;
+
+    if (Date.now() - this.render.lastAt >= 10) {
       this.consumers.forEach((cnsr) => cnsr.render());
       this.injectedIntos.forEach(({ store }) => store.renderConsumers());
+      this.render.lastAt = Date.now();
+    } else {
+      clearTimeout(this.render.pendingTimeoutId);
+      this.render.pendingTimeoutId = setTimeout(
+        this.renderConsumers.bind(this),
+        10
+      );
     }
   }
 
@@ -80,6 +89,10 @@ export default class Store extends EffectsContainer {
     if (!this.injectedIntos.has(store.id)) {
       this.injectedIntos.set(store.id, { store, propertyKey });
     }
+  }
+
+  onUnMount() {
+    clearTimeout(this.render.pendingTimeoutId);
   }
 }
 

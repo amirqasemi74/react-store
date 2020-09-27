@@ -10,7 +10,8 @@ export default class FormValidator {
   onErrorChange() {
     console.log("Changed", this.hasAnyError);
   }
-  validate() {
+  async validate() {
+    await new Promise((res) => res());
     this.hasAnyError = !this.form.value;
   }
 }
