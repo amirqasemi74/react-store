@@ -1,5 +1,6 @@
 import { getFromContainer, clearContainer } from ".";
 import { Injectable } from "src/decorators/Injectable";
+import { Inject } from "..";
 
 describe("Container", () => {
   beforeEach(() => {
@@ -25,7 +26,7 @@ describe("Container", () => {
 
     @Injectable()
     class App {
-      constructor(public user: UserInfo) {}
+      constructor(@Inject(UserInfo) public user: UserInfo) {}
     }
 
     getFromContainer(UserInfo);

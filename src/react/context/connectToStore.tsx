@@ -20,12 +20,11 @@ const connectStore = <T extends object>(
 
   const ContextProvider = buildProviderComponent(storeContext, storeType);
 
-  return (props: any) => {
-    return (
-      <ContextProvider props={props}>
-        <Component {...props} />
-      </ContextProvider>
-    );
-  };
+  return (props: any) => (
+    <ContextProvider props={props}>
+      <Component {...props} />
+    </ContextProvider>
+  );
+
 };
 export default connectStore;

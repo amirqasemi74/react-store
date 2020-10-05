@@ -1,5 +1,5 @@
+import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
-import { getConstructorDepsType } from "src/utils/utils";
 
 class Container {
   private instances = new Map<Function, object>();
@@ -14,7 +14,34 @@ class Container {
   }
 
   resolveDependencies(someClass: ClassType) {
-    return getConstructorDepsType(someClass).map((d) => this.resolve(d));
+    return getConstructorDependencyTypes(someClass).map((dep) =>
+      this.resolve(dep.type as ClassType)
+    );
+  }
+
+  private hasCircularDependency(SomeClass: ClassType) {
+    const detectCircularDependency = (
+      SomeClass: ClassType,
+      depsPath: ClassType[]
+    ) => {
+      const deps = getConstructorDependencyTypes(SomeClass);
+      console.log(SomeClass.name, deps);
+
+      for (const { type } of deps) {
+        if (type === SomeClass) {
+          throw new Error(
+            `Circular Dependency Detected: ${[...depsPath, type as ClassType]
+              .map((d) => d.name)
+              .join(" -> ")}`
+          );
+        }
+        detectCircularDependency(type as ClassType, [
+          ...depsPath,
+          type as ClassType,
+        ]);
+      }
+    };
+    detectCircularDependency(SomeClass, [SomeClass]);
   }
 
   remove(someClass: ClassType) {
@@ -22,7 +49,6 @@ class Container {
   }
 
   clearContainer() {
-    // this.instances = new Map();
     this.instances.clear();
   }
 }

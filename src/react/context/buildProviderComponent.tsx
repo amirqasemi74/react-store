@@ -17,8 +17,8 @@ const buildProviderComponent = (
   TheContext: Context<Store | null>,
   StoreType: ClassType
 ): React.FC<ProviderComponentProps> => ({ children, props }) => {
-  const [, setRenderKey] = useState(uid());
-  const id = useRef(uid()).current;
+  const [, setRenderKey] = useState(() => uid());
+  const id = useLazyRef(() => uid()).current;
   const appContext = getFromContainer(ReactAppContext);
 
   // Inject Contextual Store which has been mounted before

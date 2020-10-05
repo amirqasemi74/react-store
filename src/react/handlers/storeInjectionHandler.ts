@@ -1,12 +1,12 @@
 import { useContext } from "react";
 import { getFromContainer } from "src/container";
+import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
-import { getStoreDependencies } from "src/utils/utils";
 import ReactAppContext from "../appContext";
 import Store from "../store";
 
 const storeInjectionHandler = (storeType: ClassType) => {
-  const storeDeps = getStoreDependencies(storeType);
+  const storeDeps = getConstructorDependencyTypes(storeType);
   const storeDepsValue = new Map<Function, Store>();
   const appContext = getFromContainer(ReactAppContext);
 
@@ -14,22 +14,22 @@ const storeInjectionHandler = (storeType: ClassType) => {
   // then resolve them from context
   //TODO: for global stores
   storeDeps.forEach((dep) => {
-    if (dep === storeType) {
+    if (dep.type === storeType) {
       throw new Error(
         `You can't inject ${storeType.name} into ${storeType.name}!`
       );
     }
-    const storeContext = appContext.findStoreContext(dep);
+    const storeContext = appContext.findStoreContext(dep.type);
     if (!storeContext) {
       return;
     }
     const store = useContext(storeContext);
     if (!store) {
       throw new Error(
-        `${dep.name} haven't been connected to the component tree!`
+        `${dep.type.name} haven't been connected to the component tree!`
       );
     }
-    storeDepsValue.set(dep, store);
+    storeDepsValue.set(dep.type, store);
   });
 
   return storeDepsValue;

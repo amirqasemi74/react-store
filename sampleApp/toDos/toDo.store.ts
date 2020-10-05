@@ -5,7 +5,6 @@ import ThemeStore from "../theme.store";
 import FormValidator from "sampleApp/libs/formValidator";
 
 @ContextStore()
-@Inject(ToDoService, ThemeStore)
 export default class ToDoStore {
   todos: ToDoItem[] = [{ value: "amir", isEditing: false }];
 
@@ -15,7 +14,10 @@ export default class ToDoStore {
 
   validator = new FormValidator(this.todo);
 
-  constructor(public service: ToDoService, public theme: ThemeStore) {}
+  constructor(
+    @Inject(ToDoService) private service: ToDoService,
+    @Inject(ThemeStore) public theme: ThemeStore
+  ) {}
 
   @Effect()
   setTodoCount() {
