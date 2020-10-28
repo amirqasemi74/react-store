@@ -1,12 +1,9 @@
 import Store from "../store";
-import { PROPS_PROPERTY_KEY } from "../../constant";
 import { useEffect } from "react";
+import { getStorePropsPropertyKey } from "src/decorators/props";
 
 export default function propsHandler(store: Store, props: object) {
-  const propsPropertyKey: string | undefined = Reflect.get(
-    store.constructorType,
-    PROPS_PROPERTY_KEY
-  );
+  const propsPropertyKey = getStorePropsPropertyKey(store.constructorType);
   useEffect(() => {
     if (propsPropertyKey) {
       store.turnOffRender();

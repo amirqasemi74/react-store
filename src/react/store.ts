@@ -68,18 +68,19 @@ export default class Store extends EffectsContainer {
 
   renderConsumers() {
     if (!this.render.isAllow) return;
+    this.consumers.forEach((cnsr) => cnsr.render());
+    this.injectedIntos.forEach(({ store }) => store.renderConsumers());
 
-    if (Date.now() - this.render.lastAt >= 10) {
-      this.consumers.forEach((cnsr) => cnsr.render());
-      this.injectedIntos.forEach(({ store }) => store.renderConsumers());
-      this.render.lastAt = Date.now();
-    } else {
-      clearTimeout(this.render.pendingTimeoutId);
-      this.render.pendingTimeoutId = setTimeout(
-        this.renderConsumers.bind(this),
-        10
-      );
-    }
+    // if (Date.now() - this.render.lastAt >= 5) {
+
+    //   this.render.lastAt = Date.now();
+    // } else {
+    //   clearTimeout(this.render.pendingTimeoutId);
+    //   this.render.pendingTimeoutId = setTimeout(
+    //     this.renderConsumers.bind(this),
+    //     5
+    //   );
+    // }
   }
 
   /**

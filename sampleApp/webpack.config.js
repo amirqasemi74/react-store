@@ -7,6 +7,7 @@ const sampeAppDir = resolve(__dirname);
 module.exports = {
   devtool: "source-map",
   entry: resolve(sampeAppDir, "index.tsx"),
+  mode: "development",
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
@@ -28,4 +29,9 @@ module.exports = {
       template: resolve(sampeAppDir, "index.html"),
     }),
   ],
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000,
+  },
 };

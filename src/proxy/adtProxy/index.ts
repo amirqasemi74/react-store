@@ -9,6 +9,7 @@ export interface BaseAdtProxyBuilderArgs {
   onSet?: () => void;
   getSetLogs?: GetSetLog[];
   proxyTypes?: Array<"Function" | "Array" | "Object">;
+  cacheProxied?: boolean;
 }
 
 interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
@@ -21,6 +22,10 @@ const adtProxyBuilder = ({
   context,
   ...restOfArgs
 }: AdtProxyBuilderArgs) => {
+  restOfArgs = {
+    ...restOfArgs,
+    cacheProxied: restOfArgs.cacheProxied ?? true,
+  };
   const { proxyTypes, fixdeFuncContext } = restOfArgs;
   const proxyObject = proxyTypes?.includes("Object") ?? true;
   const proxyArray = proxyTypes?.includes("Array") ?? true;

@@ -19,16 +19,16 @@ describe("Effects", () => {
     const usernameChangeCallback = jest.fn();
     @ContextStore()
     class UserStore {
-      username = "amir.qasemi74";
+      user = { name: "amir.qasemi74" };
       password = "123456";
 
       changeUsername(e: ChangeEvent<HTMLInputElement>) {
-        this.username = e.target.value;
+        this.user.name = e.target.value;
       }
 
       @Effect()
       onUsernameChange() {
-        const username = this.username;
+        const username = this.user.name;
         usernameChangeCallback();
       }
     }
@@ -37,11 +37,11 @@ describe("Effects", () => {
       const vm = useStore(UserStore);
       return (
         <>
-          {vm.username}
+          {vm.user.name}
           {vm.password}
           <input
             data-testid="username-input"
-            value={vm.username}
+            value={vm.user.name}
             onChange={vm.changeUsername}
           />
         </>

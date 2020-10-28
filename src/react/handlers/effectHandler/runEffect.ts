@@ -30,6 +30,7 @@ const runEffect = ({
   const context = adtProxyBuilder({
     getSetLogs,
     value: _context,
+    cacheProxied: false,
   });
 
   //run

@@ -1,4 +1,4 @@
-import { ContextStore, Effect, Inject } from "@react-store/core";
+import { ContextStore, Effect, Inject, Props } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 import ToDoService from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
@@ -14,14 +14,23 @@ export default class ToDoStore {
 
   validator = new FormValidator(this.todo);
 
+  @Props
+  props: any;
+
   constructor(
     @Inject(ToDoService) private service: ToDoService,
     @Inject(ThemeStore) public theme: ThemeStore
-  ) {}
+  ) {
+    for (let i = 0; i < 120; i++) {
+      this.todos.push({ value: i.toString(), isEditing: false });
+    }
+  }
 
   @Effect()
   setTodoCount() {
     this.todoCount = this.todos.length;
+    console.log(this.props);
+
     return () => console.log("clear Effect from effect 1 in ToDo Store");
   }
 
@@ -58,6 +67,8 @@ export default class ToDoStore {
   }
 
   removeTodo(id: number) {
+    console.log(id);
+
     this.todos = this.todos.filter((item, i) => i !== id);
   }
 }

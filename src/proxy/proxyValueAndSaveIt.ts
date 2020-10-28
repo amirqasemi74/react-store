@@ -1,4 +1,5 @@
 import { STORE_REF } from "src/constant";
+import { isPropsPropertyKey } from "src/decorators/props";
 import { isService } from "src/decorators/service";
 import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxy";
 
@@ -23,23 +24,27 @@ export default function proxyValueAndSaveIt(
   }
 
   if (
+    !isPropsPropertyKey(target.constructor, propertyKey) &&
     !isInArrayOrObjectPrototype(target, propertyKey) &&
     value &&
+    !value[STORE_REF] &&
     (value.constructor === Object ||
       value.constructor === Array ||
       value instanceof Function ||
-      (value instanceof Object && isService(value.constructor))) &&
-    !value[STORE_REF]
+      (value instanceof Object && isService(value.constructor)))
   ) {
+    const proxiedValue = () =>
+      adtProxyBuilder({
+        value,
+        context: receiver,
+        ...adtProxyBuilderArgs,
+      });
+
     return {
       pureValue: value,
-      value:
-        value[PROXYED_VALUE] ||
-        (value[PROXYED_VALUE] = adtProxyBuilder({
-          value,
-          context: receiver,
-          ...adtProxyBuilderArgs,
-        })),
+      value: adtProxyBuilderArgs.cacheProxied
+        ? value[PROXYED_VALUE] || (value[PROXYED_VALUE] = proxiedValue())
+        : proxiedValue(),
     };
   }
 
