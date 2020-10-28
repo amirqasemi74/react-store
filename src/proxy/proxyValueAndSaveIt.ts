@@ -24,6 +24,7 @@ export default function proxyValueAndSaveIt(
   }
 
   if (
+    !Object.isFrozen(value) &&
     !isPropsPropertyKey(target.constructor, propertyKey) &&
     !isInArrayOrObjectPrototype(target, propertyKey) &&
     value &&
