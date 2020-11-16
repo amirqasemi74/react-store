@@ -3,10 +3,10 @@ import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import ReactAppContext from "../appContext";
-import { STORE_REF } from "../../constant";
+import { STORE_ADMINISTRATION } from "../../constant";
 import registerHandlers from "../handlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
-import Store from "../store";
+import StoreAdministration from "../storeAdministration";
 import useLazyRef from "src/utils/useLazyRef";
 
 interface ProviderComponentProps {
@@ -14,7 +14,7 @@ interface ProviderComponentProps {
 }
 
 const buildProviderComponent = (
-  TheContext: Context<Store | null>,
+  TheContext: Context<StoreAdministration | null>,
   StoreType: ClassType
 ): React.FC<ProviderComponentProps> => ({ children, props }) => {
   const [, setRenderKey] = useState(() => uid());
@@ -23,7 +23,8 @@ const buildProviderComponent = (
 
   // Inject Contextual Store which has been mounted before
   const injectedStores = storeInjectionHandler(StoreType);
-  const store = useLazyRef(() =>
+
+  const storeAdministration = useLazyRef(() =>
     appContext.resolveStore({
       StoreType,
       id,
@@ -38,31 +39,35 @@ const buildProviderComponent = (
   // so here we save store B ref in store A
   // to nofify B if A changed
   if (injectedStores.size) {
-    store.turnOffRender();
+    storeAdministration.turnOffRender();
     injectedStores.forEach((injectedStore) => {
       injectedStore.turnOffRender();
       for (const [propertyKey, value] of Object.entries<any>(
-        store.pureInstance
+        storeAdministration.pureInstance
       )) {
-        if ((value[STORE_REF] as Store)?.id === injectedStore.id) {
-          injectedStore.addInjectedInto({ store, propertyKey });
+        if (
+          (value?.[STORE_ADMINISTRATION] as StoreAdministration)?.id ===
+          injectedStore.id
+        ) {
+          injectedStore.addInjectedInto({ storeAdministration, propertyKey });
         }
       }
       injectedStore.turnOnRender();
     });
-    store.turnOnRender();
+    storeAdministration.turnOnRender();
   }
 
   useEffect(() => {
-    store.consumers.push({ render: () => setRenderKey(uid()) });
-    return () => {
-      store.onUnMount();
-    };
+    storeAdministration.consumers.push({ render: () => setRenderKey(uid()) });
   }, []);
 
-  registerHandlers(store, props);
+  registerHandlers(storeAdministration, props);
 
-  return <TheContext.Provider value={store}>{children}</TheContext.Provider>;
+  return (
+    <TheContext.Provider value={storeAdministration}>
+      {children}
+    </TheContext.Provider>
+  );
 };
 
 export default buildProviderComponent;

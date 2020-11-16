@@ -1,10 +1,14 @@
-import { STORE_REF } from "src/constant";
-import { CONSTRUCTOR_DEPENDENCY_TYPES } from "src/decorators/inject";
+import { STORE_ADMINISTRATION } from "src/constant";
+import StoreAdministration from "src/react/storeAdministration";
 
 export const getType = (obj: object) => {
   const proto = Reflect.getPrototypeOf(obj);
   return proto && proto.constructor;
 };
 
+export const isStore = (target: object) => !!target[STORE_ADMINISTRATION];
 
-export const isStore = (target: object) => !!target[STORE_REF];
+export const getStoreAdministration = (
+  target: object
+): StoreAdministration | null =>
+  (target[STORE_ADMINISTRATION] as StoreAdministration) || null;

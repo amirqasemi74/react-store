@@ -20,10 +20,9 @@ const cofingEffectRunner = ({
   metaData.forEach(({ propertyKey: effectKey, options }) => {
     const getDepsValues = (effectKey: PropertyKey) => {
       const effect = container.getEffect(effectKey)!;
-      const depsValues = effect.deps.map((path) =>
-        objectPath.get(pureContext, path)
+      return effect.deps.map((path) =>
+        objectPath.withInheritedProps.get(pureContext, path)
       );
-      return depsValues;
     };
 
     useEffect(() => {

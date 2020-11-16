@@ -21,22 +21,23 @@ export default class ToDoStore {
     @Inject(ToDoService) private service: ToDoService,
     @Inject(ThemeStore) public theme: ThemeStore
   ) {
-    for (let i = 0; i < 120; i++) {
-      this.todos.push({ value: i.toString(), isEditing: false });
-    }
+    this.init();
+  }
+
+  init() {
+    setTimeout(() => {
+      this.todos.push({ value: "123", isEditing: false });
+      this.todos.push({ value: "124", isEditing: false });
+    });
   }
 
   @Effect()
   setTodoCount() {
     this.todoCount = this.todos.length;
-    console.log(this.props);
-
     return () => console.log("clear Effect from effect 1 in ToDo Store");
   }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
-    this.todo.value = e.target.value;
-    this.todo.value = e.target.value;
     this.todo.value = e.target.value;
     this.validator.validate();
   }
@@ -67,8 +68,6 @@ export default class ToDoStore {
   }
 
   removeTodo(id: number) {
-    console.log(id);
-
     this.todos = this.todos.filter((item, i) => i !== id);
   }
 }

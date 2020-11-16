@@ -1,4 +1,4 @@
-import { STORE_REF } from "src/constant";
+import { STORE_ADMINISTRATION } from "src/constant";
 import { isStore } from "src/utils/utils";
 
 const dependencyExtarctor = (
@@ -32,7 +32,8 @@ const dependencyExtarctor = (
             getSetItems[i].value === target ||
             (isStore(target) &&
               isStore(getSetItems[i].value) &&
-              target[STORE_REF] === getSetItems[i].value[STORE_REF])
+              target[STORE_ADMINISTRATION] ===
+                getSetItems[i].value[STORE_ADMINISTRATION])
           ) {
             getSetItems[i] = {
               path: `${getSetItems[i].path}.${propertyKey.toString()}`,

@@ -51,7 +51,8 @@ const runEffect = ({
   container.storeEffet(effectKey, {
     deps,
     depsValues:
-      depsValues || deps.map((path) => objectPath.get(pureContext, path)),
+      depsValues ||
+      deps.map((path) => objectPath.withInheritedProps.get(pureContext, path)),
     isCalledOnce: true,
     clearEffect:
       res === depReturnValue

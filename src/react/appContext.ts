@@ -3,13 +3,14 @@ import { getFromContainer } from "src/container";
 import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
-import Store from "./store";
+import { getStoreAdministration } from "src/utils/utils";
+import StoreAdministration from "./storeAdministration";
 
 interface ResolveStoreArgs {
   StoreType: ClassType;
   id?: string;
   type?: "context";
-  storeDeps?: Map<Function, Store>;
+  storeDeps?: Map<Function, StoreAdministration>;
 }
 
 interface CurrentRunnigEffect {
@@ -18,14 +19,21 @@ interface CurrentRunnigEffect {
 }
 
 export default class ReactAppContext {
-  private stores: Store[] = [];
+  private storeAdministrations: StoreAdministration[] = [];
 
-  private storeContexts = new Map<Function, React.Context<Store | null>>();
+  private storeAdministrationContexts = new Map<
+    Function,
+    React.Context<StoreAdministration | null>
+  >();
 
   currentRunningEffect: CurrentRunnigEffect;
 
-  resolveStore({ StoreType, id, storeDeps }: ResolveStoreArgs): Store {
-    let store = this.stores.find(
+  resolveStore({
+    StoreType,
+    id,
+    storeDeps,
+  }: ResolveStoreArgs): StoreAdministration {
+    let storeAdministration = this.storeAdministrations.find(
       (s) => s.id === id && s.constructorType === StoreType
     );
 
@@ -37,24 +45,28 @@ export default class ReactAppContext {
         getFromContainer(dep.type as ClassType)
     );
 
-    if (!store) {
-      store = new Store({
+    if (!storeAdministration) {
+      const store = new StoreType(...depsValue);
+      storeAdministration =
+        getStoreAdministration(store) || new StoreAdministration();
+      storeAdministration.init({
         id: id || uid(),
-        instance: new StoreType(...depsValue),
+        instance: store,
       });
-      this.stores.push(store);
+      this.storeAdministrations.push(storeAdministration);
     }
-    return store;
+
+    return storeAdministration;
   }
 
   registerStoreContext(
     storeType: Function,
-    context: React.Context<Store | null>
+    context: React.Context<StoreAdministration | null>
   ) {
-    this.storeContexts.set(storeType, context);
+    this.storeAdministrationContexts.set(storeType, context);
   }
 
   findStoreContext(storeType: Function) {
-    return this.storeContexts.get(storeType);
+    return this.storeAdministrationContexts.get(storeType);
   }
 }

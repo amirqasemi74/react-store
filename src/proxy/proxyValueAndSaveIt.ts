@@ -1,5 +1,4 @@
-import { STORE_REF } from "src/constant";
-import { isPropsPropertyKey } from "src/decorators/props";
+import { STORE_ADMINISTRATION } from "src/constant";
 import { isService } from "src/decorators/service";
 import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxy";
 
@@ -24,11 +23,11 @@ export default function proxyValueAndSaveIt(
   }
 
   if (
-    !Object.isFrozen(value) &&
-    !isPropsPropertyKey(target.constructor, propertyKey) &&
-    !isInArrayOrObjectPrototype(target, propertyKey) &&
     value &&
-    !value[STORE_REF] &&
+    !value[STORE_ADMINISTRATION] &&
+    // Frozen Object does not need to be proxied (observable) like React Props
+    !Object.isFrozen(value) &&
+    !isInArrayOrObjectPrototype(target, propertyKey) &&
     (value.constructor === Object ||
       value.constructor === Array ||
       value instanceof Function ||
@@ -52,7 +51,7 @@ export default function proxyValueAndSaveIt(
   return { pureValue: value, value };
 }
 
-const PROXYED_VALUE = Symbol("PROXYED_VALUE");
+export const PROXYED_VALUE = Symbol("PROXYED_VALUE");
 
 const isInArrayOrObjectPrototype = (target: any, propertyKey: PropertyKey) =>
   (target.constructor === Object && Object.prototype[propertyKey]) ||

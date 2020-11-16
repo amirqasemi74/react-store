@@ -15,7 +15,6 @@ export interface BaseAdtProxyBuilderArgs {
 interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   value: any;
   context?: any;
-  fixdeFuncContext?: any;
 }
 const adtProxyBuilder = ({
   value,
@@ -26,16 +25,16 @@ const adtProxyBuilder = ({
     ...restOfArgs,
     cacheProxied: restOfArgs.cacheProxied ?? true,
   };
-  const { proxyTypes, fixdeFuncContext } = restOfArgs;
-  const proxyObject = proxyTypes?.includes("Object") ?? true;
-  const proxyArray = proxyTypes?.includes("Array") ?? true;
-  const proxyFunction = proxyTypes?.includes("Function") ?? true;
+  const { proxyTypes } = restOfArgs;
+  const doObjectProxy = proxyTypes?.includes("Object") ?? true;
+  const doArrayProxy = proxyTypes?.includes("Array") ?? true;
+  const doFucntionProxy = proxyTypes?.includes("Function") ?? true;
 
   try {
     if (
       (value.constructor === Object &&
         !Object.isFrozen(value) &&
-        proxyObject) ||
+        doObjectProxy) ||
       (value instanceof Object &&
         (isStore(value) || isService(value.constructor)))
     ) {
@@ -45,18 +44,17 @@ const adtProxyBuilder = ({
       });
     }
 
-    if (value.constructor === Array && proxyArray) {
+    if (value.constructor === Array && doArrayProxy) {
       return arrayProxyBuilder({
         array: value,
         ...restOfArgs,
       });
     }
 
-    if (value instanceof Function && proxyFunction) {
+    if (value instanceof Function && doFucntionProxy) {
       return functionProxyBuilder({
         func: value,
         context,
-        fixdeFuncContext,
       });
     }
   } catch (error) {}

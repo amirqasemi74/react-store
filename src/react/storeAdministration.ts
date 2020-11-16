@@ -1,11 +1,11 @@
 import { isService } from "src/decorators/service";
 import adtProxyBuilder from "src/proxy/adtProxy";
 import { getType } from "src/utils/utils";
-import { STORE_REF } from "../constant";
+import { STORE_ADMINISTRATION } from "../constant";
 import EffectsContainer from "./handlers/effectHandler/effectContainer";
 import ServiceInfo from "./handlers/effectHandler/serviceInfo";
 
-export default class Store extends EffectsContainer {
+export default class StoreAdministration extends EffectsContainer {
   id: string;
 
   constructorType: Function;
@@ -14,20 +14,21 @@ export default class Store extends EffectsContainer {
 
   instance: any;
 
+  instancePropsValue = new Map<PropertyKey, any>();
+
   consumers: StoreConsumer[] = [];
 
   servicesInfo = new Map<PropertyKey, ServiceInfo>();
 
   private injectedIntos = new Map<string, StoreInjectedInto>();
 
-  private render = { isAllow: true, lastAt: Date.now(), pendingTimeoutId: -1 };
+  private isRenderAllow = true;
 
-  constructor({ id, instance }: { id: string; instance: object }) {
-    super();
+  init({ id, instance }: { id: string; instance: object }) {
     this.id = id;
     this.constructorType = getType(instance);
     this.pureInstance = instance;
-    instance[STORE_REF] = this;
+    instance[STORE_ADMINISTRATION] = this;
     this.instance = adtProxyBuilder({
       value: instance,
       onSet: this.renderConsumers.bind(this),
@@ -35,11 +36,12 @@ export default class Store extends EffectsContainer {
 
     // to access store in deep proxy for effects handler
     this.turnOffRender();
-    this.instance[STORE_REF] = this.pureInstance[STORE_REF] = this;
+    this.instance[STORE_ADMINISTRATION] = this.pureInstance[
+      STORE_ADMINISTRATION
+    ] = this;
     this.initServiceEffectContainers();
     this.turnOnRender();
   }
-
   private initServiceEffectContainers() {
     Object.entries<any>(this.pureInstance).map(([propertyKey, value]) => {
       if (
@@ -59,41 +61,32 @@ export default class Store extends EffectsContainer {
   }
 
   turnOffRender() {
-    this.render.isAllow = false;
+    this.isRenderAllow = false;
   }
 
   turnOnRender() {
-    this.render.isAllow = true;
+    this.isRenderAllow = true;
   }
 
   renderConsumers() {
-    if (!this.render.isAllow) return;
-    this.consumers.forEach((cnsr) => cnsr.render());
-    this.injectedIntos.forEach(({ store }) => store.renderConsumers());
-
-    // if (Date.now() - this.render.lastAt >= 5) {
-
-    //   this.render.lastAt = Date.now();
-    // } else {
-    //   clearTimeout(this.render.pendingTimeoutId);
-    //   this.render.pendingTimeoutId = setTimeout(
-    //     this.renderConsumers.bind(this),
-    //     5
-    //   );
-    // }
+    if (this.isRenderAllow) {
+      this.consumers.forEach((cnsr) => cnsr.render());
+      this.injectedIntos.forEach(({ storeAdministration }) =>
+        storeAdministration.renderConsumers()
+      );
+    }
   }
 
   /**
    * ***************s***** Injected into ********************
    */
-  addInjectedInto({ propertyKey, store }: StoreInjectedInto) {
-    if (!this.injectedIntos.has(store.id)) {
-      this.injectedIntos.set(store.id, { store, propertyKey });
+  addInjectedInto({ propertyKey, storeAdministration }: StoreInjectedInto) {
+    if (!this.injectedIntos.has(storeAdministration.id)) {
+      this.injectedIntos.set(storeAdministration.id, {
+        storeAdministration,
+        propertyKey,
+      });
     }
-  }
-
-  onUnMount() {
-    clearTimeout(this.render.pendingTimeoutId);
   }
 }
 
@@ -102,6 +95,6 @@ interface StoreConsumer {
 }
 
 interface StoreInjectedInto {
-  store: Store;
+  storeAdministration: StoreAdministration;
   propertyKey: PropertyKey;
 }

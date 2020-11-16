@@ -1,6 +1,6 @@
-import { STORE_REF } from "src/constant";
+import { STORE_ADMINISTRATION } from "src/constant";
 import adtProxyBuilder from "src/proxy/adtProxy";
-import Store from "src/react/store";
+import StoreAdministration from "src/react/storeAdministration";
 import dependeciesExtarctor, {
   GetSetLog,
 } from "src/setGetPathDetector/dependencyExtractor";
@@ -29,15 +29,19 @@ describe("Effect handler", () => {
       }
 
       const target = new UserStore();
-      const store = new Store({ instance: target, id: "id" });
-      target[STORE_REF] = store;
+      const storeAdministration = new StoreAdministration();
+      storeAdministration.init({ instance: target, id: "id" });
+      target[STORE_ADMINISTRATION] = storeAdministration;
       const getSetLogs: GetSetLog[] = [];
       const userStore = adtProxyBuilder({
         getSetLogs,
         value: target,
       });
       userStore.effect1();
-      const dependecies = dependeciesExtarctor(getSetLogs, store.pureInstance);
+      const dependecies = dependeciesExtarctor(
+        getSetLogs,
+        storeAdministration.pureInstance
+      );
 
       expect(dependecies).toEqual([
         "effect1",
