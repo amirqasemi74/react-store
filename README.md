@@ -13,10 +13,8 @@ then enable decorators in typescript:
 ```json
 {
   "compilerOptions": {
-   ...
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-	...
+  	"emitDecoratorMetadata": true,
+  	"experimentalDecorators": true,
 }
 ```
 
