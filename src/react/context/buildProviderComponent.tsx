@@ -58,7 +58,13 @@ const buildProviderComponent = (
   }
 
   useEffect(() => {
-    storeAdministration.consumers.push({ render: () => setRenderKey(uid()) });
+    const render = () => setRenderKey(uid());
+    storeAdministration.consumers.push({ render });
+    return () => {
+      storeAdministration.consumers = storeAdministration.consumers.filter(
+        (cnsr) => cnsr.render !== render
+      );
+    };
   }, []);
 
   registerHandlers(storeAdministration, props);
