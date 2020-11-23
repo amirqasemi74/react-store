@@ -12,7 +12,7 @@ export default class FormValidator {
   }
 
   async validate() {
-    await new Promise((res) => res());
+    await new Promise((res) => res(1));
     this.hasAnyError = !this.form.value;
   }
 }

@@ -27,7 +27,11 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
     }
 
     useEffect(() => {
-      const render = () => setRenderKey(uid());
+      const render = () => {
+        console.log("render");
+
+        setRenderKey(uid());
+      };
       storeAdministration?.consumers.push({ render });
 
       return () => {

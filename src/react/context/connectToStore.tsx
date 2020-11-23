@@ -11,13 +11,11 @@ const connectStore = <T extends object>(
   const storeContext = getFromContainer(ReactAppContext).findStoreContext(
     storeType
   );
-
   if (!storeContext) {
     throw new Error(
       `${storeType.name} doesn't decorated with @ContextStore/@GlobalStore`
     );
   }
-
   const ContextProvider = buildProviderComponent(storeContext, storeType);
 
   return (props: any) => (
@@ -25,6 +23,5 @@ const connectStore = <T extends object>(
       <Component {...props} />
     </ContextProvider>
   );
-
 };
 export default connectStore;

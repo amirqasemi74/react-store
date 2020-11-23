@@ -40,6 +40,13 @@ export default function proxyValueAndSaveIt(
         ...adtProxyBuilderArgs,
       });
 
+    // Function must not saved proxied value
+    // because saving proxied value will store in prototype
+    // and will store permenantly
+    if (value instanceof Function) {
+      return { pureValue: value, value: proxiedValue() };
+    }
+
     return {
       pureValue: value,
       value: adtProxyBuilderArgs.cacheProxied

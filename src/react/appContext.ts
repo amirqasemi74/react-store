@@ -28,11 +28,7 @@ export default class ReactAppContext {
 
   currentRunningEffect: CurrentRunnigEffect;
 
-  resolveStore({
-    StoreType,
-    id,
-    storeDeps,
-  }: ResolveStoreArgs): StoreAdministration {
+  resolveStoreAdmin({ StoreType, id, storeDeps }: ResolveStoreArgs) {
     let storeAdministration = this.storeAdministrations.find(
       (s) => s.id === id && s.constructorType === StoreType
     );
@@ -55,10 +51,14 @@ export default class ReactAppContext {
       });
       this.storeAdministrations.push(storeAdministration);
     }
-
     return storeAdministration;
   }
 
+  removeStoreAdmin(id: string) {
+    this.storeAdministrations = this.storeAdministrations.filter(
+      (admin) => admin.id !== id
+    );
+  }
   registerStoreContext(
     storeType: Function,
     context: React.Context<StoreAdministration | null>

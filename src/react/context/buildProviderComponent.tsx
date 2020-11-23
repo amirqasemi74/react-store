@@ -25,7 +25,7 @@ const buildProviderComponent = (
   const injectedStores = storeInjectionHandler(StoreType);
 
   const storeAdministration = useLazyRef(() =>
-    appContext.resolveStore({
+    appContext.resolveStoreAdmin({
       StoreType,
       id,
       type: "context",
@@ -61,6 +61,7 @@ const buildProviderComponent = (
     const render = () => setRenderKey(uid());
     storeAdministration.consumers.push({ render });
     return () => {
+      appContext.removeStoreAdmin(id);
       storeAdministration.consumers = storeAdministration.consumers.filter(
         (cnsr) => cnsr.render !== render
       );
