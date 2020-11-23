@@ -6,6 +6,7 @@
   "author": "Amir Hossein Qasemi Moqaddam <amir.qasemi74@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "clone-deep": "^4.0.1",
     "dequal": "^2.0.2",
     "is-promise": "^4.0.0",
     "reflect-metadata": "^0.1.13"

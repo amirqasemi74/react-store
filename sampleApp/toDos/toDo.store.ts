@@ -26,8 +26,9 @@ export default class ToDoStore {
 
   init() {
     setTimeout(() => {
-      this.todos.push({ value: "123", isEditing: false });
-      this.todos.push({ value: "124", isEditing: false });
+      for (let i = 0; i < 150; i++) {
+        this.todos.push({ value: i.toString(), isEditing: false });
+      }
     });
   }
 
