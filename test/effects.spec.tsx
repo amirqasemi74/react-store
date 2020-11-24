@@ -1,10 +1,4 @@
-import {
-  connectStore,
-  ContextStore,
-  dep,
-  Effect,
-  useStore,
-} from "@react-store/core";
+import { connectStore, Store, dep, Effect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
@@ -17,7 +11,7 @@ describe("Effects", () => {
 
   it("must be called when dependecies are being changed", async () => {
     const usernameChangeCallback = jest.fn();
-    @ContextStore()
+    @Store()
     class UserStore {
       user = { name: "amir.qasemi74" };
       password = "123456";
@@ -78,7 +72,7 @@ describe("Effects", () => {
     const usernameChangeClearEffect = jest.fn();
     const callStack: Array<"effect" | "clear-effect"> = [];
 
-    @ContextStore()
+    @Store()
     class UserStore {
       username = "amir.qasemi74";
       password = "123456";
@@ -160,7 +154,7 @@ describe("Effects", () => {
       const usernameChangeClearEffect = jest.fn();
       const callStack: Array<"effect" | "clear-effect"> = [];
 
-      @ContextStore()
+      @Store()
       class UserStore {
         username = "amir.qasemi74";
         password = "123456";
@@ -244,7 +238,7 @@ describe("Effects", () => {
       const usernameChangeClearEffect = jest.fn();
       const callStack: Array<"effect" | "clear-effect"> = [];
 
-      @ContextStore()
+      @Store()
       class UserStore {
         username = "amir.qasemi74";
         password = "123456";

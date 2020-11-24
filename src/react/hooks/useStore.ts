@@ -43,7 +43,7 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
 
   if (!storeAdministration?.instance) {
     throw new Error(
-      `${storeType.name} doesn't decorated with @ContextStore/@GlobalStore`
+      `${storeType.name} doesn't decorated with @Store/@GlobalStore`
     );
   }
 

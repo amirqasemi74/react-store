@@ -1,7 +1,7 @@
-import { ContextStore, Effect, Props } from "@react-store/core";
+import { Store, Effect, Props } from "@react-store/core";
 import { Props as FilePickerProps } from ".";
 
-@ContextStore()
+@Store()
 export default class FilePickerStore {
   @Props
   props: FilePickerProps;

@@ -1,24 +1,19 @@
 import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import React from "react";
-import {
-  connectStore,
-  ContextStore,
-  Inject,
-  useStore,
-} from "@react-store/core";
+import { connectStore, Store, Inject, useStore } from "@react-store/core";
 
 describe("Store Injection", () => {
   it("Upper store should inject into lower store", () => {
     let appStoreRef: AppStore | null = null,
       appStoreRefInUserStore: AppStore | null = null;
 
-    @ContextStore()
+    @Store()
     class AppStore {
       theme = "black";
     }
 
-    @ContextStore()
+    @Store()
     @Inject(AppStore)
     class UserStore {
       username = "amir.qasemi74";

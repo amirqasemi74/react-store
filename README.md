@@ -1,30 +1,36 @@
 # React Store
 
-React Store is a library for better state managment in react hooks new world.
+**React Store** is a library for better state managment in react hooks new world.
 
-It facilitates to share `states` between components. This library uses react Context API and typescript decorators to make a better react application.
+It facilitates to split components into smaller and maintainable ones then share `States` between them.
+Also it covers shortcomings of react hooks (believe me!) and let developers to use `class`es to manage their components logic, use it's IOC container and ...
 
-## Usage
+This library uses react `Context API` and typescript decorators to make a better react applications.
 
-First install it:
-`yarn add @react-store/core`
-then enable decorators in typescript:
+#### Usage
+
+First install core library:
+
+`yarn add @react-store/core` or `npm i @react-store/core`
+
+then enable **decorators** in typescript:
 
 ```json
 {
   "compilerOptions": {
-  	"emitDecoratorMetadata": true,
-  	"experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
 }
 ```
 
-now it's ready. first create a `store`:
+Now it's ready. First create a `store`:
 
-```javascript
-import { ContextStore } from "@react-store/core";
+```ts
+// user.store.ts
+import { Store } from "@react-store/core";
 
-@ContextStore()
-class UserStore {
+@Store()
+export class UserStore {
   name: string;
 
   onNameChange(e: ChangeEvent) {
@@ -33,28 +39,70 @@ class UserStore {
 }
 ```
 
-then connect it component:
+Then connect it to the component **tree** by using `connectStore`:
 
-```javascript
-import { connectToStore, useStore } from "@react-store/core"
+```tsx
+// App.tsx
+import { connectToStore, useStore } from "@react-store/core";
 
-fucntion App() {
-	const vm = useStore(UserStore);
-	return (<div>
-		{vm.name}
-		<Input/>
-	</div>);
+interface Props {
+  p1: string;
+}
+
+function App(props: Props) {
+  const st = useStore(UserStore);
+  return (
+    <div>
+      {st.name}
+      <Input />
+    </div>
+  );
 }
 export default connectToStore(App, UserStore);
 ```
 
-and use store in childrens:
+And enjoye to use store in child components by `useStore` hook. pass it **store class** as first parameter:
 
-```javascript
-import { useStore  } from "@react-store/core"
+```jsx
+import { useStore } from "@react-store/core";
 
-export default fucntion Input() {
-	const vm = useStore(UserStore);
-	return <input onChange={vm.onNameChange} />;
+export default function Input() {
+  const st = useStore(UserStore);
+  return (
+    <div>
+      <span>Name is: </span>
+      <input onChange={st.onNameChange} />
+    </div>
+  );
+}
+```
+
+#### Store property & method
+
+- _Property_: Each store property can act like piece of component state and mutating their values will rerender _all_ store users as react context API works. Also in more precise way you can declare _dependencies_ for each user of store to prevent additional rendering and optimization purposes. we will talk about more.
+
+- _Method_: Store methods like Redux actions uses for state mutations. A good practice is to write logics and state mutation codes inside store class methods and use them in components. as you will guess directly mutating state from components will be a bad practice.
+Store methods are bound to store class instance by default. feel free to use them like below:
+
+```tsx
+function Input() {
+  const st = useStore(UserStore);
+  return <input onChange={st.onNameChange} />;
+}
+```
+
+#### Props in store
+
+To have parent component props (the component directly connected to store by using `connectStore` function) inside store class use `@Props`:
+
+```ts
+// user.store.ts
+import { Store, Props } from "@react-store/core";
+import { Props as AppProps } from "./App";
+
+@Store()
+export class UserStore {
+  @Props()
+  props: AppProps;
 }
 ```

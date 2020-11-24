@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import React from "react";
 import {
   connectStore,
-  ContextStore,
+  Store,
   Inject,
   Injectable,
   useStore,
@@ -17,7 +17,7 @@ describe("Dependency injection", () => {
     @Injectable()
     class PostService {}
 
-    @ContextStore()
+    @Store()
     @Inject(PostService, UserService)
     class UserStore {
       username = "amir.qasemi74";
@@ -30,7 +30,7 @@ describe("Dependency injection", () => {
       }
     }
 
-    @ContextStore()
+    @Store()
     @Inject(PostService, UserService)
     class PostStore {
       constructor(postService: PostService, userService: UserService) {

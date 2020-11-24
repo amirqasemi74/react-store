@@ -42,6 +42,7 @@ export default class StoreAdministration extends EffectsContainer {
     this.initServiceEffectContainers();
     this.turnOnRender();
   }
+
   private initServiceEffectContainers() {
     Object.entries<any>(this.pureInstance).map(([propertyKey, value]) => {
       if (

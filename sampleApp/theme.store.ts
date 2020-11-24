@@ -1,6 +1,6 @@
-import { ContextStore, Effect } from "@react-store/core";
+import { Store, Effect } from "@react-store/core";
 
-@ContextStore()
+@Store()
 export default class ThemeStore {
   primary = "black";
 

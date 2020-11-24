@@ -1,3 +1,4 @@
+import { getStoreAdministration, isStore } from "src/utils/utils";
 import { BaseAdtProxyBuilderArgs } from ".";
 import proxyValueAndSaveIt from "../proxyValueAndSaveIt";
 
@@ -39,9 +40,10 @@ const objectProxyBuilder = ({
         propertyKey,
         value,
       });
-
       const res = Reflect.set(target, propertyKey, value, receiver);
-      onSet?.();
+      if (!isStore(target)) {
+        onSet?.();
+      }
       return res;
     },
   });

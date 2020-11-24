@@ -8,3 +8,4 @@ jest*
 .vscode
 _config.yml
 rollup*
+coverage

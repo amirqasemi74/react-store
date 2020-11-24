@@ -13,7 +13,7 @@ const connectStore = <T extends object>(
   );
   if (!storeContext) {
     throw new Error(
-      `${storeType.name} doesn't decorated with @ContextStore/@GlobalStore`
+      `${storeType.name} doesn't decorated with @Store/@GlobalStore`
     );
   }
   const ContextProvider = buildProviderComponent(storeContext, storeType);

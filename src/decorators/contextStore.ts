@@ -1,12 +1,12 @@
 import React from "react";
 import { STORE_ADMINISTRATION } from "src/constant";
 import { getFromContainer } from "src/container";
-import { PROXYED_VALUE } from "src/proxy/proxyValueAndSaveIt";
+import { PROXIED_VALUE } from "src/proxy/proxyValueAndSaveIt";
 import ReactAppContext from "src/react/appContext";
 import StoreAdministration from "src/react/storeAdministration";
 import { getStoreAdministration } from "src/utils/utils";
 
-export default function ContextStore(): ClassDecorator {
+export function Store(): ClassDecorator {
   return function (StoreType: any) {
     // Override Store class to
     // 1. make class properties observable
@@ -30,13 +30,12 @@ export default function ContextStore(): ClassDecorator {
             get() {
               const storeAdmin = getStoreAdministration(this);
               const value = storeAdmin?.instancePropsValue.get(propertyKey);
-              return value?.[PROXYED_VALUE] || value;
+              return value?.[PROXIED_VALUE] || value;
             },
             set(value: any) {
-              getStoreAdministration(this)?.instancePropsValue.set(
-                propertyKey,
-                value
-              );
+              const storeAdmin = getStoreAdministration(this);
+              storeAdmin?.instancePropsValue.set(propertyKey, value);
+              storeAdmin?.renderConsumers();
             },
           });
         });

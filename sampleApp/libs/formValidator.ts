@@ -1,4 +1,4 @@
-import { Service, Effect } from "@react-store/core";
+import { Service } from "@react-store/core";
 
 @Service()
 export default class FormValidator {

@@ -1,11 +1,14 @@
-import { ContextStore, Effect, Inject, Props } from "@react-store/core";
+import { Store, Effect, Inject, Props } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 import ToDoService from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
 import FormValidator from "sampleApp/libs/formValidator";
 
-@ContextStore()
+@Store()
 export default class ToDoStore {
+  @Props
+  props: any;
+
   todos: ToDoItem[] = [{ value: "amir", isEditing: false }];
 
   todoCount = 0;
@@ -14,12 +17,9 @@ export default class ToDoStore {
 
   validator = new FormValidator(this.todo);
 
-  @Props
-  props: any;
-
   constructor(
-    @Inject(ToDoService) private service: ToDoService,
-    @Inject(ThemeStore) public theme: ThemeStore
+    @Inject(ThemeStore) public theme: ThemeStore,
+    @Inject(ToDoService) private service: ToDoService
   ) {
     this.init();
   }
