@@ -6,6 +6,7 @@ import ToDoList from "./ToDoList";
 
 const ToDos: React.FC = () => {
   const vm = useStore(ToDoStore);
+
   return (
     <ToDoWrapper>
       <Title style={{ color: vm.theme.primary }}>To Do Application</Title>

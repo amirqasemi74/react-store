@@ -25,8 +25,6 @@ class Container {
       depsPath: ClassType[]
     ) => {
       const deps = getConstructorDependencyTypes(SomeClass);
-      console.log(SomeClass.name, deps);
-
       for (const { type } of deps) {
         if (type === SomeClass) {
           throw new Error(

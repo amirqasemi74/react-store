@@ -27,11 +27,8 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
     }
 
     useEffect(() => {
-      const render = () => {
-        console.log("render");
+      const render = () => setRenderKey(uid());
 
-        setRenderKey(uid());
-      };
       storeAdministration?.consumers.push({ render });
 
       return () => {
@@ -42,9 +39,6 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
         }
       };
     }, []);
-  } else {
-    // TODO
-    // globals
   }
 
   if (!storeAdministration?.instance) {

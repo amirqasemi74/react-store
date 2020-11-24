@@ -1,5 +1,6 @@
 import { STORE_ADMINISTRATION } from "src/constant";
 import { isService } from "src/decorators/service";
+import { getStoreAdministration } from "src/utils/utils";
 import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxy";
 
 /**
@@ -40,11 +41,20 @@ export default function proxyValueAndSaveIt(
         ...adtProxyBuilderArgs,
       });
 
-    // Function must not saved proxied value
-    // because saving proxied value will store in prototype
-    // and will store permenantly
+    // Storing bound method in it self
+    // cause to store it for store type not
+    // store instance
     if (value instanceof Function) {
-      return { pureValue: value, value: proxiedValue() };
+      const propertyKeysValue = getStoreAdministration(target)
+        ?.instancePropsValue;
+
+      return {
+        pureValue: value,
+        value: propertyKeysValue
+          ? propertyKeysValue.get(propertyKey) ||
+            propertyKeysValue.set(propertyKey, proxiedValue()).get(propertyKey)
+          : value,
+      };
     }
 
     return {
