@@ -4,16 +4,16 @@ import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import ReactAppContext from "../appContext";
 import { STORE_ADMINISTRATION } from "../../constant";
-import registerHandlers from "../handlers";
+import { registerHandlers } from "../handlers/registerHandlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
-import StoreAdministration from "../storeAdministration";
+import StoreAdministration from "./storeAdministration";
 import useLazyRef from "src/utils/useLazyRef";
 
 interface ProviderComponentProps {
   props?: any;
 }
 
-const buildProviderComponent = (
+export const buildStoreContextProvider = (
   TheContext: Context<StoreAdministration | null>,
   StoreType: ClassType
 ): React.FC<ProviderComponentProps> => ({ children, props }) => {
@@ -76,5 +76,3 @@ const buildProviderComponent = (
     </TheContext.Provider>
   );
 };
-
-export default buildProviderComponent;

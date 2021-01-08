@@ -1,6 +1,6 @@
 import { STORE_USED_CONTEXTES } from "../../constant";
 import { useContext } from "react";
-import StoreAdministration from "../storeAdministration";
+import StoreAdministration from "../store/storeAdministration";
 
 export interface StoreUsedContext {
   propertyKey: PropertyKey;
@@ -8,9 +8,11 @@ export interface StoreUsedContext {
   value?: any;
 }
 
-const usedContextesHandler = (storeAdministration: StoreAdministration) => {
+export const usedContextesHandler = (
+  storeAdministration: StoreAdministration
+) => {
   const storeUsedContextes: StoreUsedContext[] =
-    storeAdministration.constructorType[STORE_USED_CONTEXTES] || [];
+    storeAdministration.type[STORE_USED_CONTEXTES] || [];
 
   storeAdministration.turnOffRender();
 
@@ -28,5 +30,3 @@ const usedContextesHandler = (storeAdministration: StoreAdministration) => {
     });
   storeAdministration.turnOnRender();
 };
-
-export default usedContextesHandler;

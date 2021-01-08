@@ -3,7 +3,7 @@
  * Store and ServiceEffectContainer class extends from this
  * because store and service container
  */
-export default abstract class EffectsContainer {
+export abstract class EffectsContainer {
   private effects = new Map<PropertyKey, Effect>();
 
   storeEffet(effectKey: PropertyKey, effect: Effect) {
@@ -15,8 +15,6 @@ export default abstract class EffectsContainer {
   }
 }
 interface Effect {
-  deps: string[];
-  depsValues: any[];
-  isCalledOnce: boolean;
+  deps?: () => any[];
   clearEffect?: (() => void) | null;
 }

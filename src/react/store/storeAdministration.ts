@@ -1,14 +1,14 @@
 import { isService } from "src/decorators/service";
 import adtProxyBuilder from "src/proxy/adtProxy";
 import { getType } from "src/utils/utils";
-import { STORE_ADMINISTRATION } from "../constant";
-import EffectsContainer from "./handlers/effectHandler/effectContainer";
-import ServiceInfo from "./handlers/effectHandler/serviceInfo";
+import { STORE_ADMINISTRATION } from "../../constant";
+import { EffectsContainer } from "../handlers/effects/effectContainer";
+import ServiceInfo from "../handlers/effects/serviceInfo";
 
 export default class StoreAdministration extends EffectsContainer {
   id: string;
 
-  constructorType: Function;
+  type: Function;
 
   pureInstance: any;
 
@@ -26,7 +26,7 @@ export default class StoreAdministration extends EffectsContainer {
 
   init({ id, instance }: { id: string; instance: object }) {
     this.id = id;
-    this.constructorType = getType(instance);
+    this.type = getType(instance);
     this.pureInstance = instance;
     instance[STORE_ADMINISTRATION] = this;
     this.instance = adtProxyBuilder({

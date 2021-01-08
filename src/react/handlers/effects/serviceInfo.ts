@@ -1,4 +1,4 @@
-import EffectsContainer from "./effectContainer";
+import { EffectsContainer } from "./effectContainer";
 
 export default class ServiceInfo extends EffectsContainer {
   context: object;

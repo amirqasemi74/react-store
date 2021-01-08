@@ -1,4 +1,4 @@
-import StoreAdministration from "../storeAdministration";
+import StoreAdministration from "../store/storeAdministration";
 import { useEffect } from "react";
 import { getStorePropsPropertyKey } from "src/decorators/props";
 
@@ -6,9 +6,7 @@ export default function propsHandler(
   storeAdministration: StoreAdministration,
   props: object
 ) {
-  const propsPropertyKey = getStorePropsPropertyKey(
-    storeAdministration.constructorType
-  );
+  const propsPropertyKey = getStorePropsPropertyKey(storeAdministration.type);
   useEffect(() => {
     if (propsPropertyKey) {
       storeAdministration.turnOffRender();

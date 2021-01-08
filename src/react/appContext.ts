@@ -4,18 +4,13 @@ import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import { getStoreAdministration } from "src/utils/utils";
-import StoreAdministration from "./storeAdministration";
+import StoreAdministration from "./store/storeAdministration";
 
 interface ResolveStoreArgs {
   StoreType: ClassType;
   id?: string;
   type?: "context";
   storeDeps?: Map<Function, StoreAdministration>;
-}
-
-interface CurrentRunnigEffect {
-  depsList?: () => any[];
-  clearEffect?: () => void;
 }
 
 export default class ReactAppContext {
@@ -26,11 +21,9 @@ export default class ReactAppContext {
     React.Context<StoreAdministration | null>
   >();
 
-  currentRunningEffect: CurrentRunnigEffect;
-
   resolveStoreAdmin({ StoreType, id, storeDeps }: ResolveStoreArgs) {
     let storeAdministration = this.storeAdministrations.find(
-      (s) => s.id === id && s.constructorType === StoreType
+      (s) => s.id === id && s.type === StoreType
     );
 
     const allStoreDepTypes = getConstructorDependencyTypes(StoreType);

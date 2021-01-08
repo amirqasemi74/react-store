@@ -1,13 +1,11 @@
-import StoreAdministration from "../storeAdministration";
-import usedContextesHandler from "./contextHandler";
-import effectHandler from "./effectHandler";
+import StoreAdministration from "../store/storeAdministration";
+import { usedContextesHandler } from "./usedContextesHandler";
+import { effectHandler } from "./effects/effectHandler";
 import propsHandler from "./propsHandler";
 
 const handlers = [usedContextesHandler, propsHandler, effectHandler];
 
-const registerHandlers = (
+export const registerHandlers = (
   storeAdministration: StoreAdministration,
   props: object
 ) => handlers.forEach((handler) => handler(storeAdministration, props));
-
-export default registerHandlers;

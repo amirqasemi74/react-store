@@ -1,6 +1,6 @@
 import { STORE_ADMINISTRATION } from "src/constant";
 import adtProxyBuilder from "src/proxy/adtProxy";
-import StoreAdministration from "src/react/storeAdministration";
+import StoreAdministration from "src/react/store/storeAdministration";
 import dependeciesExtarctor, {
   GetSetLog,
 } from "src/setGetPathDetector/dependencyExtractor";

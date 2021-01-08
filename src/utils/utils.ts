@@ -1,5 +1,5 @@
 import { STORE_ADMINISTRATION } from "src/constant";
-import StoreAdministration from "src/react/storeAdministration";
+import StoreAdministration from "src/react/store/storeAdministration";
 
 export const getType = (obj: object) => {
   const proto = Reflect.getPrototypeOf(obj);

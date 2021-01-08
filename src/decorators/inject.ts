@@ -1,4 +1,4 @@
-export default function (...deps: any[]): any {
+export function Inject(...deps: any[]): any {
   return function (...decoArgs: any[]) {
     const isClassDecorator = decoArgs.length === 1;
     const isParameterDecorator =

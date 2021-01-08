@@ -3,14 +3,16 @@ import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import ReactAppContext from "../appContext";
-import StoreAdministration from "../storeAdministration";
+import StoreAdministration from "../store/storeAdministration";
 
 export interface ComponentDeps {
   paths: string[];
   status: "RESOLVED" | "UNRESOLVED";
 }
 
-const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
+export const useStore = <T extends ClassType = any>(
+  storeType: T
+): InstanceType<T> => {
   let storeAdministration: StoreAdministration | null = null;
   const [, setRenderKey] = useState(uid());
   const appContext = getFromContainer(ReactAppContext);
@@ -49,5 +51,3 @@ const useStore = <T extends ClassType = any>(storeType: T): InstanceType<T> => {
 
   return storeAdministration.instance;
 };
-
-export default useStore;

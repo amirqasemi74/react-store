@@ -3,7 +3,7 @@ import { STORE_ADMINISTRATION } from "src/constant";
 import { getFromContainer } from "src/container";
 import { PROXIED_VALUE } from "src/proxy/proxyValueAndSaveIt";
 import ReactAppContext from "src/react/appContext";
-import StoreAdministration from "src/react/storeAdministration";
+import StoreAdministration from "src/react/store/storeAdministration";
 import { getStoreAdministration } from "src/utils/utils";
 
 export function Store(): ClassDecorator {

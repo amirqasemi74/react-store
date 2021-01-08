@@ -3,7 +3,7 @@ import { getFromContainer } from "src/container";
 import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
 import ReactAppContext from "../appContext";
-import StoreAdministration from "../storeAdministration";
+import StoreAdministration from "../store/storeAdministration";
 
 const storeInjectionHandler = (storeType: ClassType) => {
   const storeDeps = getConstructorDependencyTypes(storeType);
