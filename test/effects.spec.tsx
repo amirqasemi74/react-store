@@ -20,7 +20,7 @@ describe("Effects", () => {
         this.user.name = e.target.value;
       }
 
-      @Effect()
+      @Effect<UserStore>((_) => [_.user.name])
       onUsernameChange() {
         const username = this.user.name;
         usernameChangeCallback();
@@ -42,9 +42,7 @@ describe("Effects", () => {
       );
     }, UserStore);
 
-    const App = () => <User />;
-
-    const { findByTestId } = render(<App />);
+    const { findByTestId } = render(<User />);
     const input = await findByTestId("username-input");
 
     expect(usernameChangeCallback).toBeCalledTimes(1);
@@ -81,7 +79,7 @@ describe("Effects", () => {
         this.username = e.target.value;
       }
 
-      @Effect()
+      @Effect<UserStore>((_) => [_.username])
       onUsernameChange() {
         const username = this.username;
         usernameChangeCallback();
@@ -108,9 +106,7 @@ describe("Effects", () => {
       );
     }, UserStore);
 
-    const App = () => <User />;
-
-    const { findByTestId } = render(<App />);
+    const { findByTestId } = render(<User />);
     const input = await findByTestId("username-input");
 
     expect(usernameChangeCallback).toBeCalledTimes(1);
@@ -146,163 +142,5 @@ describe("Effects", () => {
       "clear-effect",
       "effect",
     ]);
-  });
-
-  describe("Custom dependecies", () => {
-    it("must be called when custom dependecies are being changed", async () => {
-      const usernameChangeCallback = jest.fn();
-      const usernameChangeClearEffect = jest.fn();
-      const callStack: Array<"effect" | "clear-effect"> = [];
-
-      @Store()
-      class UserStore {
-        username = "amir.qasemi74";
-        password = "123456";
-
-        changeUsername(e: ChangeEvent<HTMLInputElement>) {
-          this.username = e.target.value;
-        }
-
-        @Effect((_: UserStore) => [_.username])
-        onUsernameChange() {
-          const username = this.username;
-          usernameChangeCallback();
-          callStack.push("effect");
-          return () => {
-            callStack.push("clear-effect");
-            usernameChangeClearEffect();
-          };
-        }
-      }
-
-      const User = connectStore(() => {
-        const vm = useStore(UserStore);
-        return (
-          <>
-            {vm.username}
-            {vm.password}
-            <input
-              data-testid="username-input"
-              value={vm.username}
-              onChange={vm.changeUsername}
-            />
-          </>
-        );
-      }, UserStore);
-
-      const App = () => <User />;
-
-      const { findByTestId } = render(<App />);
-      const input = await findByTestId("username-input");
-
-      expect(usernameChangeCallback).toBeCalledTimes(1);
-      expect(usernameChangeClearEffect).toBeCalledTimes(0);
-      expect(callStack).toEqual(["effect"]);
-
-      // change username dep
-      await waitFor(() => {
-        fireEvent.change(input, { target: { value: "amir.qasemi70" } });
-      });
-      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(2));
-      expect(usernameChangeClearEffect).toBeCalledTimes(1);
-      expect(callStack).toEqual(["effect", "clear-effect", "effect"]);
-
-      // no change
-      await waitFor(() => {
-        fireEvent.change(input, { target: { value: "amir.qasemi70" } });
-      });
-      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(2));
-      expect(usernameChangeClearEffect).toBeCalledTimes(1);
-      expect(callStack).toEqual(["effect", "clear-effect", "effect"]);
-
-      // change username dep again
-      await waitFor(() => {
-        fireEvent.change(input, { target: { value: "amir.qasemi75" } });
-      });
-      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(3));
-      expect(usernameChangeClearEffect).toBeCalledTimes(2);
-      expect(callStack).toEqual([
-        "effect",
-        "clear-effect",
-        "effect",
-        "clear-effect",
-        "effect",
-      ]);
-    });
-
-    it("effect must be called one time", async () => {
-      const usernameChangeCallback = jest.fn();
-      const usernameChangeClearEffect = jest.fn();
-      const callStack: Array<"effect" | "clear-effect"> = [];
-
-      @Store()
-      class UserStore {
-        username = "amir.qasemi74";
-        password = "123456";
-
-        changeUsername(e: ChangeEvent<HTMLInputElement>) {
-          this.username = e.target.value;
-        }
-
-        @Effect(() => [])
-        onUsernameChange() {
-          const username = this.username;
-          usernameChangeCallback();
-          callStack.push("effect");
-          return () => {
-            callStack.push("clear-effect");
-            usernameChangeClearEffect();
-          };
-        }
-      }
-
-      const User = connectStore(() => {
-        const vm = useStore(UserStore);
-        return (
-          <>
-            {vm.username}
-            {vm.password}
-            <input
-              data-testid="username-input"
-              value={vm.username}
-              onChange={vm.changeUsername}
-            />
-          </>
-        );
-      }, UserStore);
-
-      const App = () => <User />;
-
-      const { findByTestId } = render(<App />);
-      const input = await findByTestId("username-input");
-
-      expect(usernameChangeCallback).toBeCalledTimes(1);
-      expect(usernameChangeClearEffect).toBeCalledTimes(0);
-      expect(callStack).toEqual(["effect"]);
-
-      // change username dep
-      await waitFor(() => {
-        fireEvent.change(input, { target: { value: "amir.qasemi70" } });
-      });
-      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(1));
-      expect(usernameChangeClearEffect).toBeCalledTimes(0);
-      expect(callStack).toEqual(["effect"]);
-
-      // no change
-      await waitFor(() => {
-        fireEvent.change(input, { target: { value: "amir.qasemi70" } });
-      });
-      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(1));
-      expect(usernameChangeClearEffect).toBeCalledTimes(0);
-      expect(callStack).toEqual(["effect"]);
-
-      // change username dep again
-      await waitFor(() => {
-        fireEvent.change(input, { target: { value: "amir.qasemi74" } });
-      });
-      await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(1));
-      expect(usernameChangeClearEffect).toBeCalledTimes(0);
-      expect(callStack).toEqual(["effect"]);
-    });
   });
 });

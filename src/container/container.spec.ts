@@ -19,20 +19,39 @@ describe("Container", () => {
 
   it("should resolve dependencies automatically", () => {
     @Injectable()
-    class UserInfo {
-      username = "amir.qasemi74";
-      password = "123456";
+    class UserInfo1 {
+      username = "user1";
+      password = "1";
     }
 
     @Injectable()
-    class App {
-      constructor(@Inject(UserInfo) public user: UserInfo) {}
+    class UserInfo2 {
+      username = "user2";
+      password = "2";
     }
 
-    getFromContainer(UserInfo);
-    expect(getFromContainer(App).user).toBeDefined();
-    expect(getFromContainer(App).user).toBe(getFromContainer(App).user);
-    expect(getFromContainer(App).user.username).toBe("amir.qasemi74");
+    @Injectable()
+    class App1 {
+      constructor(
+        @Inject(UserInfo1) public user1: UserInfo1,
+        @Inject(UserInfo2) public user2: UserInfo2
+      ) {}
+    }
+
+    @Injectable()
+    @Inject(UserInfo1, UserInfo2)
+    class App2 {
+      constructor(public user1: UserInfo1, public user2: UserInfo2) {}
+    }
+
+    expect(getFromContainer(App1).user1).toBeDefined();
+    expect(getFromContainer(App1).user2).toBeDefined();
+    expect(getFromContainer(App1).user1).toBe(getFromContainer(App1).user1);
+    expect(getFromContainer(App1).user2).toBe(getFromContainer(App1).user2);
+    expect(getFromContainer(App1).user1.username).toBe("user1");
+    expect(getFromContainer(App1).user2.username).toBe("user2");
+    expect(getFromContainer(App2).user1.username).toBe("user1");
+    expect(getFromContainer(App2).user2.username).toBe("user2");
   });
 
   it("should remove singleton instance", () => {

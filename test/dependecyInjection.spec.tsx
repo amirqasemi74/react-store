@@ -10,6 +10,7 @@ import {
 
 describe("Dependency injection", () => {
   it("should inject injectables into store", () => {
+    expect.assertions(5);
     let userServiceRef;
     @Injectable()
     class UserService {}
@@ -19,24 +20,24 @@ describe("Dependency injection", () => {
 
     @Store()
     @Inject(PostService, UserService)
-    class UserStore {
-      username = "amir.qasemi74";
-      password = "123456";
-
-      constructor(postService: PostService, userService: UserService) {
-        expect(postService).toBeInstanceOf(PostService);
-        expect(userService).toBeInstanceOf(UserService);
-        expect(userServiceRef).toBe(userService);
-      }
-    }
-
-    @Store()
-    @Inject(PostService, UserService)
     class PostStore {
       constructor(postService: PostService, userService: UserService) {
         expect(postService).toBeInstanceOf(PostService);
         expect(userService).toBeInstanceOf(UserService);
         userServiceRef = userService;
+      }
+    }
+
+    @Store()
+    @Inject(PostStore, UserService)
+    class UserStore {
+      username = "amir.qasemi74";
+      password = "123456";
+
+      constructor(postStore: PostStore, userService: UserService) {
+        expect(postStore).toBeInstanceOf(PostStore);
+        expect(userService).toBeInstanceOf(UserService);
+        expect(userServiceRef).toBe(userService);
       }
     }
 
@@ -51,6 +52,6 @@ describe("Dependency injection", () => {
       );
     };
     const AppWithStore = connectStore(connectStore(App, UserStore), PostStore);
-    const { debug } = render(<AppWithStore />);
+    render(<AppWithStore />);
   });
 });

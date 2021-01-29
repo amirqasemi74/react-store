@@ -3,8 +3,8 @@ import { render } from "@testing-library/react";
 import React from "react";
 import { connectStore, Store, useStore } from "@react-store/core";
 
-describe("Contextual store", () => {
-  it("each component which use contextual store should have same instacnce of it", () => {
+describe("Store", () => {
+  it("each component which use store should have same instacnce of it", () => {
     @Store()
     class UserStore {
       title = "User store";
