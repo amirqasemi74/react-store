@@ -2,7 +2,7 @@ import React from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import useLazyRef from "src/utils/useLazyRef";
-import ReactAppContext from "../appContext";
+import { ReactApplicationContext } from "../appContext";
 import { buildStoreContextProvider } from "./buildStoreContextProvider";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 export const StoreProvider: React.FC<Props> = ({ type, children, props }) => {
   const storeContext = useLazyRef(() =>
-    getFromContainer(ReactAppContext).findStoreContext(type)
+    getFromContainer(ReactApplicationContext).findStoreContext(type)
   ).current;
 
   if (!storeContext) {

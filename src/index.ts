@@ -7,6 +7,5 @@ export { UseContext } from "./decorators/useContext";
 export { connectStore } from "./react/store/connectStore";
 export { StoreProvider } from "./react/store/StoreProvider";
 export { Effect } from "./decorators/effect";
-export { dep } from "./react/handlers/effects/dep";
 export { Inject } from "./decorators/inject";
 export { Service } from "./decorators/service";

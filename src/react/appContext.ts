@@ -13,7 +13,7 @@ interface ResolveStoreArgs {
   storeDeps?: Map<Function, StoreAdministration>;
 }
 
-export default class ReactAppContext {
+export class ReactApplicationContext {
   private storeAdministrations: StoreAdministration[] = [];
 
   private storeAdministrationContexts = new Map<

@@ -2,7 +2,7 @@ import React from "react";
 import { STORE_ADMINISTRATION } from "src/constant";
 import { getFromContainer } from "src/container";
 import { PROXIED_VALUE } from "src/proxy/proxyValueAndSaveIt";
-import ReactAppContext from "src/react/appContext";
+import { ReactApplicationContext } from "src/react/appContext";
 import StoreAdministration from "src/react/store/storeAdministration";
 import { getStoreAdministration } from "src/utils/utils";
 
@@ -52,7 +52,7 @@ export function Store(): ClassDecorator {
     context.displayName = `${StoreType.name}`;
     // store context provider in app container
     // to use context ref in useStore to get context value
-    getFromContainer(ReactAppContext).registerStoreContext(
+    getFromContainer(ReactApplicationContext).registerStoreContext(
       ImprovedStoreType,
       context
     );

@@ -8,7 +8,7 @@ export const effectHandler = (storeAdministration: StoreAdministration) => {
     container: storeAdministration,
     context: storeAdministration.instance,
     pureContext: storeAdministration.pureInstance,
-    metaData: getEffectsMetaData(storeAdministration.type),
+    effects: getEffectsMetaData(storeAdministration.type),
   });
 
   Array.from(storeAdministration.servicesInfo.values()).map((serviceInfo) => {
@@ -18,7 +18,7 @@ export const effectHandler = (storeAdministration: StoreAdministration) => {
       context,
       pureContext,
       container: serviceInfo,
-      metaData: getEffectsMetaData(pureContext.constructor),
+      effects: getEffectsMetaData(pureContext.constructor),
     });
   });
 };

@@ -1,4 +1,4 @@
-import { connectStore, Store, dep, Effect, useStore } from "@react-store/core";
+import { connectStore, Store, Effect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
@@ -163,18 +163,15 @@ describe("Effects", () => {
           this.username = e.target.value;
         }
 
-        @Effect()
+        @Effect((_: UserStore) => [_.username])
         onUsernameChange() {
           const username = this.username;
           usernameChangeCallback();
           callStack.push("effect");
-          return dep(
-            () => [this.username],
-            () => {
-              callStack.push("clear-effect");
-              usernameChangeClearEffect();
-            }
-          );
+          return () => {
+            callStack.push("clear-effect");
+            usernameChangeClearEffect();
+          };
         }
       }
 
@@ -247,18 +244,15 @@ describe("Effects", () => {
           this.username = e.target.value;
         }
 
-        @Effect()
+        @Effect(() => [])
         onUsernameChange() {
           const username = this.username;
           usernameChangeCallback();
           callStack.push("effect");
-          return dep(
-            () => [],
-            () => {
-              callStack.push("clear-effect");
-              usernameChangeClearEffect();
-            }
-          );
+          return () => {
+            callStack.push("clear-effect");
+            usernameChangeClearEffect();
+          };
         }
       }
 

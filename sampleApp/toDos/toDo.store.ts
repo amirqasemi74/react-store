@@ -31,9 +31,11 @@ export default class ToDoStore {
     });
   }
 
-  @Effect()
+  @Effect((_: ToDoStore) => [_.todos.length])
   setTodoCount() {
     this.todoCount = this.todos.length;
+    console.log("count:", this.todos.length);
+
     return () => console.log("clear Effect from effect 1 in ToDo Store");
   }
 

@@ -1,10 +1,6 @@
 import isPromise from "is-promise";
-import objectPath from "object-path";
 import adtProxyBuilder from "src/proxy/adtProxy";
-import dependencyExtarctor, {
-  GetSetLog,
-} from "src/setGetPathDetector/dependencyExtractor";
-import { dep, DEP_RETURN_VALUE } from "./dep";
+import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
 import { EffectsContainer } from "./effectContainer";
 
 interface RunEffectArgs {
@@ -14,7 +10,7 @@ interface RunEffectArgs {
   container: EffectsContainer;
 }
 
-type DepReturnType = ReturnType<typeof dep>;
+type Func<T = void> = () => T;
 
 export const runEffect = ({
   container,
@@ -31,32 +27,21 @@ export const runEffect = ({
   });
 
   //run ...
-  const result:
-    | DepReturnType
-    | DepReturnType["clearEffect"]
-    | undefined = Reflect.apply(pureContext[effectKey], context, []);
+  const clearEffect: Func | undefined = Reflect.apply(
+    pureContext[effectKey],
+    context,
+    []
+  );
 
-  if (isPromise(result)) {
+  if (isPromise(clearEffect)) {
     throw new Error("Async function for effect is invalid!");
   }
 
-  let deps: DepReturnType["deps"];
-  let clearEffect: DepReturnType["clearEffect"] | undefined;
-
-  if (typeof result === "object" && result?.[DEP_RETURN_VALUE]) {
-    deps = () => result.deps?.() || [];
-    clearEffect = result.clearEffect;
-  } else if (typeof result === "function" || !result) {
-    const depsPath = dependencyExtarctor(getSetLogs, pureContext);
-    deps = () =>
-      depsPath.map((path) =>
-        objectPath.withInheritedProps.get(pureContext, path)
-      );
-    clearEffect = result;
+  if (clearEffect && typeof clearEffect !== "function") {
+    throw new Error("Only return function from effect as it's clearEffect");
   }
 
   container.storeEffet(effectKey, {
-    deps,
     clearEffect,
   });
 };

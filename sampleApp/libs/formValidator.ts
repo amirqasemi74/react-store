@@ -1,4 +1,4 @@
-import { Service } from "@react-store/core";
+import { Effect, Service } from "@react-store/core";
 
 @Service()
 export default class FormValidator {
@@ -6,9 +6,9 @@ export default class FormValidator {
 
   constructor(private form: any) {}
 
-  // @Effect()
+  @Effect()
   onErrorChange() {
-    // console.log("Changed", this.hasAnyError);
+    console.log("Changed", this.hasAnyError);
   }
 
   async validate() {

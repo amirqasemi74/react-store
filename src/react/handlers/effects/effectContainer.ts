@@ -15,6 +15,5 @@ export abstract class EffectsContainer {
   }
 }
 interface Effect {
-  deps?: () => any[];
   clearEffect?: (() => void) | null;
 }

@@ -1,6 +1,6 @@
 import { STORE_ADMINISTRATION } from "src/constant";
 import { isStore } from "src/utils/utils";
-
+//TODO: will remove
 const dependencyExtarctor = (
   getSetLogs: GetSetLog[],
   pureContext: object,

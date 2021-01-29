@@ -2,13 +2,13 @@ import { useContext } from "react";
 import { getFromContainer } from "src/container";
 import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
-import ReactAppContext from "../appContext";
+import { ReactApplicationContext } from "../appContext";
 import StoreAdministration from "../store/storeAdministration";
 
 const storeInjectionHandler = (storeType: ClassType) => {
   const storeDeps = getConstructorDependencyTypes(storeType);
   const storeDepsValue = new Map<Function, StoreAdministration>();
-  const appContext = getFromContainer(ReactAppContext);
+  const appContext = getFromContainer(ReactApplicationContext);
 
   // Find dependecies which is store type
   // then resolve them from context

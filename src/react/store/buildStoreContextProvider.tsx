@@ -2,7 +2,7 @@ import React, { Context, useEffect, useRef, useState } from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
-import ReactAppContext from "../appContext";
+import { ReactApplicationContext } from "../appContext";
 import { STORE_ADMINISTRATION } from "../../constant";
 import { registerHandlers } from "../handlers/registerHandlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
@@ -19,7 +19,7 @@ export const buildStoreContextProvider = (
 ): React.FC<ProviderComponentProps> => ({ children, props }) => {
   const id = useLazyRef(() => uid()).current;
   const [, setRenderKey] = useState(() => uid());
-  const appContext = getFromContainer(ReactAppContext);
+  const appContext = getFromContainer(ReactApplicationContext);
 
   // Inject Contextual Store which has been mounted before
   const injectedStores = storeInjectionHandler(StoreType);

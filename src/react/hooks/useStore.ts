@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { getFromContainer } from "src/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
-import ReactAppContext from "../appContext";
+import { ReactApplicationContext } from "../appContext";
 import StoreAdministration from "../store/storeAdministration";
 
 export interface ComponentDeps {
@@ -15,7 +15,7 @@ export const useStore = <T extends ClassType = any>(
 ): InstanceType<T> => {
   let storeAdministration: StoreAdministration | null = null;
   const [, setRenderKey] = useState(uid());
-  const appContext = getFromContainer(ReactAppContext);
+  const appContext = getFromContainer(ReactApplicationContext);
 
   // check if it has context pointer
   const storeAdministrationContext = appContext.findStoreContext(storeType);
