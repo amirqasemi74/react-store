@@ -1,6 +1,6 @@
-import { Effect, Service } from "@react-store/core";
+import { Effect, StorePart } from "@react-store/core";
 
-@Service()
+@StorePart()
 export default class FormValidator {
   hasAnyError = false;
 

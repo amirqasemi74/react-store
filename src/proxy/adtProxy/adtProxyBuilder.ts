@@ -1,5 +1,4 @@
-import { isService } from "src/decorators/service";
-import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
+import { isStorePart } from "src/decorators/storePart";
 import { isStore } from "src/utils/utils";
 import arrayProxyBuilder from "./array.proxyBuilder";
 import functionProxyBuilder from "./function.proxyBuilder";
@@ -7,9 +6,7 @@ import objectProxyBuilder from "./object.proxyBuilder";
 
 export interface BaseAdtProxyBuilderArgs {
   onSet?: () => void;
-  getSetLogs?: GetSetLog[];
   proxyTypes?: Array<"Function" | "Array" | "Object">;
-  cacheProxied?: boolean;
 }
 
 interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
@@ -21,10 +18,6 @@ const adtProxyBuilder = ({
   context,
   ...restOfArgs
 }: AdtProxyBuilderArgs) => {
-  restOfArgs = {
-    ...restOfArgs,
-    cacheProxied: restOfArgs.cacheProxied ?? true,
-  };
   const { proxyTypes } = restOfArgs;
   const doObjectProxy = proxyTypes?.includes("Object") ?? true;
   const doArrayProxy = proxyTypes?.includes("Array") ?? true;
@@ -36,7 +29,7 @@ const adtProxyBuilder = ({
         !Object.isFrozen(value) &&
         doObjectProxy) ||
       (value instanceof Object &&
-        (isStore(value) || isService(value.constructor)))
+        (isStore(value) || isStorePart(value.constructor)))
     ) {
       return objectProxyBuilder({
         object: value,

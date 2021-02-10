@@ -9,7 +9,7 @@ interface Props {
 
 const ToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
   const vm = useStore(ToDoStore);
-  
+
   return (
     <ToDoItemWrapper>
       <span>

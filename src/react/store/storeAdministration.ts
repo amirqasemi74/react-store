@@ -1,5 +1,5 @@
-import { isService } from "src/decorators/service";
-import adtProxyBuilder from "src/proxy/adtProxy";
+import { isStorePart } from "src/decorators/storePart";
+import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { getType } from "src/utils/utils";
 import { STORE_ADMINISTRATION } from "../../constant";
 import { EffectsContainer } from "../handlers/effects/effectContainer";
@@ -47,7 +47,7 @@ export default class StoreAdministration extends EffectsContainer {
     Object.entries<any>(this.pureInstance).map(([propertyKey, value]) => {
       if (
         value &&
-        isService(value.constructor) &&
+        isStorePart(value.constructor) &&
         !this.servicesInfo.has(propertyKey)
       ) {
         this.servicesInfo.set(

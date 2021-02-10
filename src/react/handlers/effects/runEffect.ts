@@ -1,6 +1,5 @@
 import isPromise from "is-promise";
-import adtProxyBuilder from "src/proxy/adtProxy";
-import { GetSetLog } from "src/setGetPathDetector/dependencyExtractor";
+import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { EffectsContainer } from "./effectContainer";
 
 interface RunEffectArgs {
@@ -18,12 +17,8 @@ export const runEffect = ({
   pureContext,
   context: _context,
 }: RunEffectArgs) => {
-  const getSetLogs: GetSetLog[] = [];
-
   const context = adtProxyBuilder({
-    getSetLogs,
     value: _context,
-    cacheProxied: false,
   });
 
   //run ...

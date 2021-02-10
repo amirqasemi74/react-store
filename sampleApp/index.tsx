@@ -11,4 +11,5 @@ function AppWrapper() {
     </div>
   );
 }
+
 ReactDOM.render(<AppWrapper />, document.querySelector("#root"));

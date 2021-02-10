@@ -1,7 +1,9 @@
 import { STORE_ADMINISTRATION } from "src/constant";
-import { isService } from "src/decorators/service";
+import { isStorePart } from "src/decorators/storePart";
 import { getStoreAdministration } from "src/utils/utils";
-import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxy";
+import adtProxyBuilder, {
+  BaseAdtProxyBuilderArgs,
+} from "./adtProxy/adtProxyBuilder";
 
 /**
  * Proxy value if need and then proxied value for next usage
@@ -13,14 +15,11 @@ export default function proxyValueAndSaveIt(
   propertyKey: PropertyKey,
   receiver: any,
   adtProxyBuilderArgs: BaseAdtProxyBuilderArgs
-): { value: any; pureValue: any } {
+) {
   const value = Reflect.get(target, propertyKey, receiver);
 
   if (propertyKey === PROXIED_VALUE) {
-    return {
-      pureValue: value,
-      value,
-    };
+    return value;
   }
 
   if (
@@ -32,7 +31,7 @@ export default function proxyValueAndSaveIt(
     (value.constructor === Object ||
       value.constructor === Array ||
       value instanceof Function ||
-      (value instanceof Object && isService(value.constructor)))
+      (value instanceof Object && isStorePart(value.constructor)))
   ) {
     const proxiedValue = () =>
       adtProxyBuilder({
@@ -48,24 +47,16 @@ export default function proxyValueAndSaveIt(
       const propertyKeysValue = getStoreAdministration(target)
         ?.instancePropsValue;
 
-      return {
-        pureValue: value,
-        value: propertyKeysValue
-          ? propertyKeysValue.get(propertyKey) ||
+      return propertyKeysValue
+        ? propertyKeysValue.get(propertyKey) ||
             propertyKeysValue.set(propertyKey, proxiedValue()).get(propertyKey)
-          : value,
-      };
+        : value;
     }
 
-    return {
-      pureValue: value,
-      value: adtProxyBuilderArgs.cacheProxied
-        ? value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue())
-        : proxiedValue(),
-    };
+    return value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue());
   }
 
-  return { pureValue: value, value };
+  return value;
 }
 
 export const PROXIED_VALUE = Symbol("PROXIED_VALUE");

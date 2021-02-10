@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ToDos from "./toDos";
+import ToDos from "./toDos/ToDos";
 import { connectStore, useStore } from "@react-store/core";
 import ThemeStore from "./theme.store";
 import FilePicker from "./filePicker";
