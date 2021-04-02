@@ -2,7 +2,7 @@ import { connectStore, Store, Effect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
-import { clearContainer } from "src/container";
+import { clearContainer } from "src/container/container";
 
 describe("Effects", () => {
   beforeEach(() => {

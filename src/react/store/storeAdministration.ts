@@ -3,9 +3,9 @@ import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { getType } from "src/utils/utils";
 import { STORE_ADMINISTRATION } from "../../constant";
 import { EffectsContainer } from "../handlers/effects/effectContainer";
-import ServiceInfo from "../handlers/effects/serviceInfo";
+import ServiceInfo from "../handlers/effects/storePartInfo";
 
-export default class StoreAdministration extends EffectsContainer {
+export class StoreAdministration extends EffectsContainer {
   id: string;
 
   type: Function;
@@ -26,7 +26,7 @@ export default class StoreAdministration extends EffectsContainer {
 
   init({ id, instance }: { id: string; instance: object }) {
     this.id = id;
-    this.type = getType(instance);
+    this.type = getType(instance)!;
     this.pureInstance = instance;
     instance[STORE_ADMINISTRATION] = this;
     this.instance = adtProxyBuilder({
@@ -39,11 +39,11 @@ export default class StoreAdministration extends EffectsContainer {
     this.instance[STORE_ADMINISTRATION] = this.pureInstance[
       STORE_ADMINISTRATION
     ] = this;
-    this.initServiceEffectContainers();
+    this.initStorePartsEffectsContainers();
     this.turnOnRender();
   }
 
-  private initServiceEffectContainers() {
+  private initStorePartsEffectsContainers() {
     Object.entries<any>(this.pureInstance).map(([propertyKey, value]) => {
       if (
         value &&

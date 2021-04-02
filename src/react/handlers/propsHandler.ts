@@ -1,4 +1,4 @@
-import StoreAdministration from "../store/storeAdministration";
+import { StoreAdministration } from "../store/storeAdministration";
 import { useEffect } from "react";
 import { getStorePropsPropertyKey } from "src/decorators/props";
 

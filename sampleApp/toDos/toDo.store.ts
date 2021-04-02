@@ -17,10 +17,7 @@ export default class ToDoStore {
 
   validator = new FormValidator(this.todo);
 
-  constructor(
-    @Inject(ThemeStore) public theme: ThemeStore,
-    @Inject(ToDoService) private service: ToDoService
-  ) {
+  constructor(@Inject(ThemeStore) public theme: ThemeStore) {
     this.init();
   }
 
@@ -35,9 +32,6 @@ export default class ToDoStore {
   @Effect((_: ToDoStore) => [_.todos.length])
   setTodoCount() {
     this.todoCount = this.todos.length;
-    console.log("count:", this.todos.length);
-
-    return () => console.log("clear Effect from effect 1 in ToDo Store");
   }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {

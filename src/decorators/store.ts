@@ -1,9 +1,9 @@
 import React from "react";
 import { STORE_ADMINISTRATION } from "src/constant";
-import { getFromContainer } from "src/container";
+import { getFromContainer } from "src/container/container";
 import { PROXIED_VALUE } from "src/proxy/proxyValueAndSaveIt";
 import { ReactApplicationContext } from "src/react/appContext";
-import StoreAdministration from "src/react/store/storeAdministration";
+import { StoreAdministration } from "src/react/store/storeAdministration";
 import { getStoreAdministration } from "src/utils/utils";
 
 export function Store(): ClassDecorator {
@@ -14,11 +14,12 @@ export function Store(): ClassDecorator {
       constructor(...args: any) {
         super(...args);
 
+        // first set default values to store admin
+        const storeAdmin =
+          getStoreAdministration(this) ||
+          ((this as any)[STORE_ADMINISTRATION] = new StoreAdministration());
+
         Object.keys(this).map((propertyKey) => {
-          // first set default values to store admin
-          const storeAdmin =
-            getStoreAdministration(this) ||
-            ((this as any)[STORE_ADMINISTRATION] = new StoreAdministration());
           storeAdmin.instancePropsValue.set(propertyKey, this[propertyKey]);
 
           // Define setter and getter

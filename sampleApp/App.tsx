@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import ToDos from "./toDos/ToDos";
-import { connectStore, useStore } from "@react-store/core";
+import { connectStore, StoreProvider, useStore } from "@react-store/core";
 import ThemeStore from "./theme.store";
 import FilePicker from "./filePicker";
+import ToDoStore from "./toDos/toDo.store";
 
 const App = () => {
   const vm = useStore(ThemeStore);
   return (
     <>
       <button onClick={vm.changePrimary}>change theme</button>
-      <ToDos />
+      <StoreProvider type={ToDoStore}>
+        <ToDos />
+      </StoreProvider>
     </>
   );
 };

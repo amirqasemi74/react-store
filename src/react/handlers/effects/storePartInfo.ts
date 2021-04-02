@@ -1,6 +1,6 @@
 import { EffectsContainer } from "./effectContainer";
 
-export default class ServiceInfo extends EffectsContainer {
+export default class StorePartInfo extends EffectsContainer {
   context: object;
 
   pureContext: object;

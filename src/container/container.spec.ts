@@ -1,4 +1,4 @@
-import { getFromContainer, clearContainer } from ".";
+import { getFromContainer, clearContainer } from "./container";
 import { Injectable } from "src/decorators/Injectable";
 import { Inject } from "..";
 

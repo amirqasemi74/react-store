@@ -1,6 +1,6 @@
 import { STORE_USED_CONTEXTES } from "../../constant";
 import { useContext } from "react";
-import StoreAdministration from "../store/storeAdministration";
+import { StoreAdministration } from "../store/storeAdministration";
 
 export interface StoreUsedContext {
   propertyKey: PropertyKey;

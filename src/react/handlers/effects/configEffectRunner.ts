@@ -9,7 +9,7 @@ interface EffectRunnerOptions {
   context: object;
   pureContext: object;
 }
-export const cofingEffectRunner = ({
+export const configEffectRunner = ({
   effects,
   context,
   container,

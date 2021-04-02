@@ -1,9 +1,9 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { getFromContainer } from "src/container";
+import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import { ReactApplicationContext } from "../appContext";
-import StoreAdministration from "../store/storeAdministration";
+import { StoreAdministration } from "../store/storeAdministration";
 import { dequal } from "dequal";
 import cloneDeep from "clone-deep";
 
@@ -11,13 +11,13 @@ interface UseStoreOptions<T extends ClassType> {
   deps?: (vm: InstanceType<T>) => any[];
 }
 
-type UserStoreOptsArg<T extends ClassType> =
+type UseStoreOptsArg<T extends ClassType> =
   | UseStoreOptions<T>
   | UseStoreOptions<T>["deps"];
 
-const useStore = <T extends ClassType = any>(
+export const useStore = <T extends ClassType = any>(
   storeType: T,
-  opts?: UserStoreOptsArg<T>
+  opts?: UseStoreOptsArg<T>
 ): InstanceType<T> => {
   const componentDeps = useRef<any[]>([]);
   const options = getUseStoreOptions(opts);
@@ -26,7 +26,7 @@ const useStore = <T extends ClassType = any>(
   const appContext = getFromContainer(ReactApplicationContext);
 
   // check if it has context pointer
-  const storeAdministrationContext = appContext.findStoreContext(storeType);
+  const storeAdministrationContext = appContext.getStoreReactContext(storeType);
 
   if (storeAdministrationContext) {
     storeAdministration = useContext(storeAdministrationContext);
@@ -83,8 +83,6 @@ const useStore = <T extends ClassType = any>(
 };
 
 const getUseStoreOptions = <T extends ClassType>(
-  opts: UserStoreOptsArg<T>
+  opts: UseStoreOptsArg<T>
 ): UseStoreOptions<T> =>
   typeof opts === "function" ? { deps: opts } : opts || {};
-
-export default useStore;

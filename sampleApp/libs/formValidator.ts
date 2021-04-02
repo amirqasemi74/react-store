@@ -7,9 +7,7 @@ export default class FormValidator {
   constructor(private form: any) {}
 
   @Effect()
-  onErrorChange() {
-    console.log("Changed", this.hasAnyError);
-  }
+  onErrorChange() {}
 
   async validate() {
     await new Promise((res) => res(1));

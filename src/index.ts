@@ -1,7 +1,7 @@
-export { getFromContainer } from "./container";
+export { getFromContainer } from "./container/container";
 export { Injectable } from "./decorators/Injectable";
 export { useStore } from "./react/hooks/useStore";
-export { Store } from "./decorators/contextStore";
+export { Store } from "./decorators/store";
 export { Props } from "./decorators/props";
 export { UseContext } from "./decorators/useContext";
 export { connectStore } from "./react/store/connectStore";

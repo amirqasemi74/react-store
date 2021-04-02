@@ -1,4 +1,4 @@
-import StoreAdministration from "../store/storeAdministration";
+import { StoreAdministration } from "../store/storeAdministration";
 import { usedContextesHandler } from "./usedContextesHandler";
 import { effectHandler } from "./effects/effectHandler";
 import propsHandler from "./propsHandler";

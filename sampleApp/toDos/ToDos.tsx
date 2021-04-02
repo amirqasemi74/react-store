@@ -1,4 +1,4 @@
-import { connectStore, useStore } from "@react-store/core";
+import { useStore } from "@react-store/core";
 import React from "react";
 import styled, { css } from "styled-components";
 import ToDoStore from "./toDo.store";
@@ -23,7 +23,7 @@ const ToDos: React.FC = () => {
   );
 };
 
-export default connectStore(ToDos, ToDoStore);
+export default ToDos;
 
 const ToDoWrapper = styled.section`
   display: flex;

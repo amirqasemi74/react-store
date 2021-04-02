@@ -1,12 +1,12 @@
 import React, { Context, useEffect, useRef, useState } from "react";
-import { getFromContainer } from "src/container";
+import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import { ReactApplicationContext } from "../appContext";
 import { STORE_ADMINISTRATION } from "../../constant";
 import { registerHandlers } from "../handlers/registerHandlers";
 import storeInjectionHandler from "../handlers/storeInjectionHandler";
-import StoreAdministration from "./storeAdministration";
+import { StoreAdministration } from "./storeAdministration";
 import useLazyRef from "src/utils/useLazyRef";
 
 interface ProviderComponentProps {
@@ -26,9 +26,8 @@ export const buildStoreContextProvider = (
 
   const storeAdministration = useLazyRef(() =>
     appContext.resolveStoreAdmin({
-      StoreType,
       id,
-      type: "context",
+      StoreType,
       storeDeps: injectedStores,
     })
   ).current;

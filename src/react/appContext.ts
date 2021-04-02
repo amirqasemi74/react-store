@@ -1,15 +1,14 @@
 import React from "react";
-import { getFromContainer } from "src/container";
+import { getFromContainer } from "src/container/container";
 import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
 import uid from "src/utils/uid";
 import { getStoreAdministration } from "src/utils/utils";
-import StoreAdministration from "./store/storeAdministration";
+import { StoreAdministration } from "./store/storeAdministration";
 
 interface ResolveStoreArgs {
-  StoreType: ClassType;
   id?: string;
-  type?: "context";
+  StoreType: ClassType;
   storeDeps?: Map<Function, StoreAdministration>;
 }
 
@@ -21,10 +20,11 @@ export class ReactApplicationContext {
     React.Context<StoreAdministration | null>
   >();
 
-  resolveStoreAdmin({ StoreType, id, storeDeps }: ResolveStoreArgs) {
-    let storeAdministration = this.storeAdministrations.find(
-      (s) => s.id === id && s.type === StoreType
-    );
+  resolveStoreAdmin({ id, StoreType, storeDeps }: ResolveStoreArgs) {
+    let storeAdministration =
+      this.storeAdministrations.find(
+        (s) => s.id === id && s.type === StoreType
+      ) || null;
 
     const allStoreDepTypes = getConstructorDependencyTypes(StoreType);
 
@@ -36,9 +36,8 @@ export class ReactApplicationContext {
 
     if (!storeAdministration) {
       const store = new StoreType(...depsValue);
-      storeAdministration =
-        getStoreAdministration(store) || new StoreAdministration();
-      storeAdministration.init({
+      storeAdministration = getStoreAdministration(store)!;
+      storeAdministration?.init({
         id: id || uid(),
         instance: store,
       });
@@ -59,7 +58,7 @@ export class ReactApplicationContext {
     this.storeAdministrationContexts.set(storeType, context);
   }
 
-  findStoreContext(storeType: Function) {
+  getStoreReactContext(storeType: Function) {
     return this.storeAdministrationContexts.get(storeType);
   }
 }

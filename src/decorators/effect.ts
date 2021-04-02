@@ -18,6 +18,7 @@ export function Effect<T extends {} = any>(
 ): MethodDecorator {
   return function (target, propertyKey, descriptor) {
     let options: EffectOptions;
+
     switch (typeof arg) {
       case "function":
         options = { deps: arg };
@@ -28,6 +29,7 @@ export function Effect<T extends {} = any>(
       default:
         throw new Error("Invalid Effect argument");
     }
+
     const effects: EffectMetaData[] =
       Reflect.getMetadata(EFFECTS, target.constructor) || [];
     effects.push({ options, propertyKey });
@@ -35,10 +37,6 @@ export function Effect<T extends {} = any>(
     return descriptor;
   };
 }
-
-/**
- * ********************* Effects **********************
- */
 
 export const getEffectsMetaData = (target: Function): EffectMetaData[] =>
   Reflect.getMetadata(EFFECTS, target) || [];

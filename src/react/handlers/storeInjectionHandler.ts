@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { getFromContainer } from "src/container";
+import { getFromContainer } from "src/container/container";
 import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
 import { ReactApplicationContext } from "../appContext";
-import StoreAdministration from "../store/storeAdministration";
+import { StoreAdministration } from "../store/storeAdministration";
 
 const storeInjectionHandler = (storeType: ClassType) => {
   const storeDeps = getConstructorDependencyTypes(storeType);
@@ -19,7 +19,7 @@ const storeInjectionHandler = (storeType: ClassType) => {
         `You can't inject ${storeType.name} into ${storeType.name}!`
       );
     }
-    const storeContext = appContext.findStoreContext(dep.type);
+    const storeContext = appContext.getStoreReactContext(dep.type);
     if (!storeContext) {
       return;
     }
