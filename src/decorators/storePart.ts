@@ -1,12 +1,16 @@
+import { createEnhancedStoreType } from "./store";
+
 const STORE_PART_OPTIONS = Symbol("STORE_PART_OPTIONS");
 
 /**
  * ******************* Decorator *********************
  */
 export function StorePart(): ClassDecorator {
-  return function (target: Function) {
-    Reflect.defineMetadata(STORE_PART_OPTIONS, {}, target);
-  };
+  return function (StoreType: any) {
+    const EnhancedStoreType = createEnhancedStoreType(StoreType);
+    Reflect.defineMetadata(STORE_PART_OPTIONS, {}, EnhancedStoreType);
+    return EnhancedStoreType;
+  } as any;
 }
 
 /**

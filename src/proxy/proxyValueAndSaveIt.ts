@@ -1,6 +1,6 @@
 import { STORE_ADMINISTRATION } from "src/constant";
 import { isStorePart } from "src/decorators/storePart";
-import { getStoreAdministration } from "src/utils/utils";
+import { getStoreAdministrator } from "src/utils/utils";
 import adtProxyBuilder, {
   BaseAdtProxyBuilderArgs,
 } from "./adtProxy/adtProxyBuilder";
@@ -44,8 +44,8 @@ export default function proxyValueAndSaveIt(
     // cause to store it for store type not
     // store instance
     if (value instanceof Function) {
-      const propertyKeysValue = getStoreAdministration(target)
-        ?.instancePropsValue;
+      const propertyKeysValue =
+        getStoreAdministrator(target)?.propertyKeysValue;
 
       return propertyKeysValue
         ? propertyKeysValue.get(propertyKey) ||

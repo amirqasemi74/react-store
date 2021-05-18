@@ -1,17 +1,17 @@
-import { StoreAdministration } from "../store/storeAdministration";
+import { StoreAdministrator } from "../store/StoreAdministrator";
 import { useEffect } from "react";
 import { getStorePropsPropertyKey } from "src/decorators/props";
 
 export default function propsHandler(
-  storeAdministration: StoreAdministration,
+  storeAdministrator: StoreAdministrator,
   props: object
 ) {
-  const propsPropertyKey = getStorePropsPropertyKey(storeAdministration.type);
+  const propsPropertyKey = getStorePropsPropertyKey(storeAdministrator.type);
   useEffect(() => {
     if (propsPropertyKey) {
-      storeAdministration.turnOffRender();
-      Reflect.set(storeAdministration.instance, propsPropertyKey, props);
-      storeAdministration.turnOnRender();
+      storeAdministrator.turnOffRender();
+      Reflect.set(storeAdministrator.instance, propsPropertyKey, props);
+      storeAdministrator.turnOnRender();
     }
   }, [props]);
 }

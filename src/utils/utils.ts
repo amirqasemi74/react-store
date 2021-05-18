@@ -1,5 +1,5 @@
 import { STORE_ADMINISTRATION } from "src/constant";
-import { StoreAdministration } from "src/react/store/storeAdministration";
+import { StoreAdministrator } from "src/react/store/StoreAdministrator";
 
 export const getType = (obj: object) => {
   const proto = Reflect.getPrototypeOf(obj);
@@ -8,7 +8,7 @@ export const getType = (obj: object) => {
 
 export const isStore = (target: object) => !!target[STORE_ADMINISTRATION];
 
-export const getStoreAdministration = (
+export const getStoreAdministrator = (
   target: object
-): StoreAdministration | null =>
-  (target[STORE_ADMINISTRATION] as StoreAdministration) || null;
+): StoreAdministrator | null =>
+  (target[STORE_ADMINISTRATION] as StoreAdministrator) || null;

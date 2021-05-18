@@ -1,11 +1,11 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import cloneDeep from "clone-deep";
+import { dequal } from "dequal";
+import { useContext, useEffect, useRef } from "react";
 import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
-import uid from "src/utils/uid";
+import { useForceUpdate } from "src/utils/useForceUpdate";
 import { ReactApplicationContext } from "../appContext";
-import { StoreAdministration } from "../store/storeAdministration";
-import { dequal } from "dequal";
-import cloneDeep from "clone-deep";
+import { StoreAdministrator } from "../store/StoreAdministrator";
 
 interface UseStoreOptions<T extends ClassType> {
   deps?: (vm: InstanceType<T>) => any[];
@@ -19,18 +19,18 @@ export const useStore = <T extends ClassType = any>(
   storeType: T,
   opts?: UseStoreOptsArg<T>
 ): InstanceType<T> => {
+  const forceUpdate = useForceUpdate();
   const componentDeps = useRef<any[]>([]);
   const options = getUseStoreOptions(opts);
-  const [, setRenderKey] = useState(uid());
-  let storeAdministration: StoreAdministration | null = null;
+  let storeAdministrator: StoreAdministrator | null = null;
   const appContext = getFromContainer(ReactApplicationContext);
 
   // check if it has context pointer
-  const storeAdministrationContext = appContext.getStoreReactContext(storeType);
+  const storeAdministratorContext = appContext.getStoreReactContext(storeType);
 
-  if (storeAdministrationContext) {
-    storeAdministration = useContext(storeAdministrationContext);
-    if (!storeAdministration) {
+  if (storeAdministratorContext) {
+    storeAdministrator = useContext(storeAdministratorContext);
+    if (!storeAdministrator) {
       throw new Error(
         `${storeType.name} haven't been connected to the component tree!`
       );
@@ -40,7 +40,7 @@ export const useStore = <T extends ClassType = any>(
       const render = () => {
         if (options.deps) {
           const currentDeps = cloneDeep(
-            options?.deps(storeAdministration?.instance)
+            options.deps(storeAdministrator?.instance)
           );
           let changeDetected = false;
           for (const i in currentDeps) {
@@ -52,17 +52,17 @@ export const useStore = <T extends ClassType = any>(
             }
           }
           if (changeDetected) {
-            setRenderKey(uid());
+            forceUpdate();
           }
         } else {
-          setRenderKey(uid());
+          forceUpdate();
         }
       };
-      storeAdministration?.consumers.push({ render });
+      storeAdministrator?.consumers.push({ render });
 
       return () => {
-        if (storeAdministration) {
-          storeAdministration.consumers = storeAdministration.consumers.filter(
+        if (storeAdministrator) {
+          storeAdministrator.consumers = storeAdministrator.consumers.filter(
             (cnsr) => cnsr.render !== render
           );
         }
@@ -70,16 +70,16 @@ export const useStore = <T extends ClassType = any>(
     }, []);
   }
 
-  if (!storeAdministration?.instance) {
+  if (!storeAdministrator?.instance) {
     throw new Error(
       `${storeType.name} doesn't decorated with @Store/@GlobalStore`
     );
   }
   componentDeps.current =
-    cloneDeep(options.deps?.(storeAdministration.instance)) ||
+    cloneDeep(options.deps?.(storeAdministrator.instance)) ||
     componentDeps.current;
 
-  return storeAdministration.instance;
+  return storeAdministrator.instance;
 };
 
 const getUseStoreOptions = <T extends ClassType>(

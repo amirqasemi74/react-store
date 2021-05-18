@@ -1,6 +1,6 @@
 import { STORE_USED_CONTEXTES } from "../../constant";
 import { useContext } from "react";
-import { StoreAdministration } from "../store/storeAdministration";
+import { StoreAdministrator } from "../store/StoreAdministrator";
 
 export interface StoreUsedContext {
   propertyKey: PropertyKey;
@@ -9,12 +9,12 @@ export interface StoreUsedContext {
 }
 
 export const usedContextesHandler = (
-  storeAdministration: StoreAdministration
+  storeAdministrator: StoreAdministrator
 ) => {
   const storeUsedContextes: StoreUsedContext[] =
-    storeAdministration.type[STORE_USED_CONTEXTES] || [];
+    storeAdministrator.type[STORE_USED_CONTEXTES] || [];
 
-  storeAdministration.turnOffRender();
+  storeAdministrator.turnOffRender();
 
   storeUsedContextes
     .map<StoreUsedContext>((storeUsedCtx) => ({
@@ -23,10 +23,10 @@ export const usedContextesHandler = (
     }))
     .forEach((storeUsedCtx) => {
       Reflect.set(
-        storeAdministration.instance,
+        storeAdministrator.instance,
         storeUsedCtx.propertyKey,
         storeUsedCtx.value
       );
     });
-  storeAdministration.turnOnRender();
+  storeAdministrator.turnOnRender();
 };

@@ -1,4 +1,4 @@
-const EFFECTS = Symbol("EFFECTS");
+export const EFFECTS = Symbol("EFFECTS");
 
 /**
  * *********************** Decorator *********************
@@ -37,6 +37,3 @@ export function Effect<T extends {} = any>(
     return descriptor;
   };
 }
-
-export const getEffectsMetaData = (target: Function): EffectMetaData[] =>
-  Reflect.getMetadata(EFFECTS, target) || [];

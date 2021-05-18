@@ -1,77 +1,32 @@
-import React, { Context, useEffect, useRef, useState } from "react";
-import { getFromContainer } from "src/container/container";
+import React, { Context, useEffect } from "react";
 import { ClassType } from "src/types";
-import uid from "src/utils/uid";
-import { ReactApplicationContext } from "../appContext";
-import { STORE_ADMINISTRATION } from "../../constant";
+import { useForceUpdate } from "src/utils/useForceUpdate";
 import { registerHandlers } from "../handlers/registerHandlers";
-import storeInjectionHandler from "../handlers/storeInjectionHandler";
-import { StoreAdministration } from "./storeAdministration";
-import useLazyRef from "src/utils/useLazyRef";
+import { StoreAdministratorFactory } from "./StoreAdministorFactory";
+import { StoreAdministrator } from "./StoreAdministrator";
 
 interface ProviderComponentProps {
   props?: any;
 }
 
-export const buildStoreContextProvider = (
-  TheContext: Context<StoreAdministration | null>,
-  StoreType: ClassType
-): React.FC<ProviderComponentProps> => ({ children, props }) => {
-  const id = useLazyRef(() => uid()).current;
-  const [, setRenderKey] = useState(() => uid());
-  const appContext = getFromContainer(ReactApplicationContext);
+export const buildStoreContextProvider =
+  (
+    TheContext: Context<StoreAdministrator | null>,
+    StoreType: ClassType
+  ): React.FC<ProviderComponentProps> =>
+  ({ children, props }) => {
+    const render = useForceUpdate();
+    const storeAdministrator = StoreAdministratorFactory.create(StoreType);
 
-  // Inject Contextual Store which has been mounted before
-  const injectedStores = storeInjectionHandler(StoreType);
+    useEffect(() => {
+      storeAdministrator.consumers.push({ render });
+    }, []);
 
-  const storeAdministration = useLazyRef(() =>
-    appContext.resolveStoreAdmin({
-      id,
-      StoreType,
-      storeDeps: injectedStores,
-    })
-  ).current;
+    registerHandlers(storeAdministrator, props);
 
-  // for example if we inject store A  in to other store B
-  // if then injected store A change all store b consumer must be
-  // notified to rerender base of their deps
-  // so here we save store B ref in store A
-  // to nofify B if A changed
-  if (injectedStores.size) {
-    storeAdministration.turnOffRender();
-    injectedStores.forEach((injectedStore) => {
-      injectedStore.turnOffRender();
-      for (const [propertyKey, value] of Object.entries<any>(
-        storeAdministration.pureInstance
-      )) {
-        if (
-          (value?.[STORE_ADMINISTRATION] as StoreAdministration)?.id ===
-          injectedStore.id
-        ) {
-          injectedStore.addInjectedInto({ storeAdministration, propertyKey });
-        }
-      }
-      injectedStore.turnOnRender();
-    });
-    storeAdministration.turnOnRender();
-  }
-
-  useEffect(() => {
-    const render = () => setRenderKey(uid());
-    storeAdministration.consumers.push({ render });
-    return () => {
-      appContext.removeStoreAdmin(id);
-      storeAdministration.consumers = storeAdministration.consumers.filter(
-        (cnsr) => cnsr.render !== render
-      );
-    };
-  }, []);
-
-  registerHandlers(storeAdministration, props);
-
-  return (
-    <TheContext.Provider value={storeAdministration}>
-      {children}
-    </TheContext.Provider>
-  );
-};
+    return (
+      <TheContext.Provider value={storeAdministrator}>
+        {children}
+      </TheContext.Provider>
+    );
+  };

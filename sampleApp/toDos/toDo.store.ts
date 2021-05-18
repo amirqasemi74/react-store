@@ -18,7 +18,7 @@ export default class ToDoStore {
   validator = new FormValidator(this.todo);
 
   constructor(@Inject(ThemeStore) public theme: ThemeStore) {
-    this.init();
+    // this.init();
   }
 
   init() {
@@ -73,3 +73,5 @@ interface ToDoItem {
   value: string;
   isEditing: boolean;
 }
+
+console.log(ToDoStore);
