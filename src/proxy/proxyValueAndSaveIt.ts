@@ -10,7 +10,7 @@ import adtProxyBuilder, {
  * - Array & Object prototype methods and properties will not proxied
  * - Object & Array & Function proxied values only will save
  */
-export default function proxyValueAndSaveIt(
+export function proxyValueAndSaveIt(
   target: any,
   propertyKey: PropertyKey,
   receiver: any,
@@ -28,9 +28,7 @@ export default function proxyValueAndSaveIt(
     // Frozen Object does not need to be proxied (observable) like React Props
     !Object.isFrozen(value) &&
     !isInArrayOrObjectPrototype(target, propertyKey) &&
-    (value.constructor === Object ||
-      value.constructor === Array ||
-      value instanceof Function ||
+    ([Object, Array, Map, Function].includes(value.constructor) ||
       (value instanceof Object && isStorePart(value.constructor)))
   ) {
     const proxiedValue = () =>

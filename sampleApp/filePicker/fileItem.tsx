@@ -7,13 +7,16 @@ interface Props {
   fileId: string;
 }
 const FileItem = memo<Props>(({ fileId }) => {
-  const { filesInfo, removeFileItem } = useStore(FilePickerStore);
-  const fileInfo = filesInfo.find((info) => info.id === fileId);
+  const { filesInfo, removeFileItem } = useStore(FilePickerStore, {
+    deps: (_) => [_.filesInfo.get(fileId)],
+  });
+  const fileInfo = filesInfo.get(fileId);
 
   if (!fileInfo) {
     return <FileItemWrapper>File info not found</FileItemWrapper>;
   }
-  console.log("FileItem", fileInfo.file.name);
+
+  // console.log("FileItem", fileInfo.file.name);
 
   return (
     <FileItemWrapper>
@@ -23,9 +26,7 @@ const FileItem = memo<Props>(({ fileId }) => {
       <p>
         Status: {fileInfo.status} ({fileInfo.progress.toString()})
       </p>
-      <button onClick={() => removeFileItem(fileInfo.id)}>
-        Remove File Item
-      </button>
+      <button onClick={() => removeFileItem(fileId)}>Remove File Item</button>
     </FileItemWrapper>
   );
 });

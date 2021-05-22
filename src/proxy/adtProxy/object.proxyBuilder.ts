@@ -1,6 +1,6 @@
 import { isStore } from "src/utils/utils";
 import { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
-import proxyValueAndSaveIt from "../proxyValueAndSaveIt";
+import { proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
 
 interface ObjectProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   object: object;

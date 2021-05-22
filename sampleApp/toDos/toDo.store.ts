@@ -1,6 +1,6 @@
 import { Store, Effect, Inject, Props } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
-import ToDoService from "sampleApp/toDos/services/todos.service";
+import { ToDoService } from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
 import FormValidator from "sampleApp/libs/formValidator";
 
@@ -17,7 +17,10 @@ export default class ToDoStore {
 
   validator = new FormValidator(this.todo);
 
-  constructor(@Inject(ThemeStore) public theme: ThemeStore) {
+  constructor(
+    @Inject(ThemeStore) public theme: ThemeStore,
+    @Inject(ToDoService) public todoService: ToDoService
+  ) {
     // this.init();
   }
 
@@ -37,6 +40,7 @@ export default class ToDoStore {
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.todo.value = e.target.value;
     this.validator.validate();
+    this.todoService.toDos();
   }
 
   onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -73,5 +77,3 @@ interface ToDoItem {
   value: string;
   isEditing: boolean;
 }
-
-console.log(ToDoStore);

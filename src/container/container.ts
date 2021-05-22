@@ -1,16 +1,41 @@
 import { getConstructorDependencyTypes } from "src/decorators/inject";
+import {
+  INJECTABLE,
+  InjectableOptions,
+  Scope,
+} from "src/decorators/Injectable";
 import { ClassType } from "src/types";
+import { Injector } from "./Injector";
 
 class Container {
   private instances = new Map<Function, object>();
 
   resolve(SomeClass: ClassType): InstanceType<ClassType> {
-    let instance = this.instances.get(SomeClass);
-    if (!instance) {
-      instance = new SomeClass(...this.resolveDependencies(SomeClass));
-      this.instances.set(SomeClass, instance!);
+    const options: InjectableOptions = Reflect.getMetadata(
+      INJECTABLE,
+      SomeClass
+    );
+
+    if (!options) {
+      throw new Error(
+        `${SomeClass.name} has not been registred with @Injectable`
+      );
     }
-    return instance;
+
+    switch (options.scope) {
+      case Scope.TRANSIENT: {
+        return new SomeClass(...this.resolveDependencies(SomeClass));
+      }
+      case Scope.SINGLETON:
+      default: {
+        let instance = this.instances.get(SomeClass);
+        if (!instance) {
+          instance = new SomeClass(...this.resolveDependencies(SomeClass));
+          this.instances.set(SomeClass, instance!);
+        }
+        return instance;
+      }
+    }
   }
 
   resolveDependencies(someClass: ClassType) {
@@ -19,39 +44,17 @@ class Container {
     );
   }
 
-  private hasCircularDependency(SomeClass: ClassType) {
-    const detectCircularDependency = (
-      SomeClass: ClassType,
-      depsPath: ClassType[]
-    ) => {
-      const deps = getConstructorDependencyTypes(SomeClass);
-      for (const { type } of deps) {
-        if (type === SomeClass) {
-          throw new Error(
-            `Circular Dependency Detected: ${[...depsPath, type as ClassType]
-              .map((d) => d.name)
-              .join(" -> ")}`
-          );
-        }
-        detectCircularDependency(type as ClassType, [
-          ...depsPath,
-          type as ClassType,
-        ]);
-      }
-    };
-    detectCircularDependency(SomeClass, [SomeClass]);
-  }
-
   remove(someClass: ClassType) {
     this.instances.delete(someClass);
   }
 
   clearContainer() {
     this.instances.clear();
+    defaultContainer.resolve(Injector);
   }
 }
 
-const defaultContainer = new Container();
+export const defaultContainer = new Container();
 
 export const getFromContainer = <T extends ClassType>(
   someClass: T,

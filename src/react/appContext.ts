@@ -1,13 +1,8 @@
 import React from "react";
-import { ClassType } from "src/types";
+import { Injectable } from "src/decorators/Injectable";
 import { StoreAdministrator } from "./store/StoreAdministrator";
 
-interface ResolveStoreArgs {
-  id?: string;
-  StoreType: ClassType;
-  storeDeps?: Map<Function, StoreAdministrator>;
-}
-
+@Injectable()
 export class ReactApplicationContext {
   private storeAdministratorContexts = new Map<
     Function,

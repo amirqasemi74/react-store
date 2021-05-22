@@ -19,15 +19,15 @@ const FilePicker = connectStore<Props>(() => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
   });
-  console.log("FilePicker");
+
   return (
     <Wrapper>
       <DragAreaWrapper {...getRootProps()} active={isDragActive}>
         <p>فایل را بکشید یا کلیک کنید</p>
         <input {...getInputProps()} />
       </DragAreaWrapper>
-      {filesInfo.map((info) => (
-        <FileItem key={info.id} fileId={info.id} />
+      {Array.from(filesInfo.keys()).map((id) => (
+        <FileItem key={id} fileId={id} />
       ))}
     </Wrapper>
   );

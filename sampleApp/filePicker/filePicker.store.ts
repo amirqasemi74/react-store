@@ -1,4 +1,4 @@
-import { Store, Effect, Props } from "@react-store/core";
+import { Effect, Props, Store } from "@react-store/core";
 import { Props as FilePickerProps } from ".";
 
 @Store()
@@ -6,48 +6,49 @@ export default class FilePickerStore {
   @Props
   props: FilePickerProps;
 
-  filesInfo: FileInfo[] = [];
+  filesInfo = new Map<string, FileInfo>();
 
-  @Effect()
+  @Effect({ deps: (_: FilePickerStore) => [_.props.fileIds] })
   onNewFileIds() {
-    console.log(this.props.fileIds);
+    // console.log(this.props.fileIds);
   }
 
   onDrop(acceptedFiles: File[]) {
     acceptedFiles.forEach((file) => {
-      this.filesInfo.push({
-        id: Math.random().toString(),
+      const fileId = Math.random().toString();
+      this.filesInfo.set(fileId, {
         file,
         status: "uploading",
         progress: 0,
       });
-      this.props.onUpload(file, this.onProgress(file), this.onComplete(file));
+      this.props.onUpload(
+        file,
+        this.onProgress(fileId),
+        this.onComplete(fileId)
+      );
     });
   }
 
-  onProgress(file: File) {
+  onProgress(fileId: string) {
     return (progress: number) => {
-      const i = this.filesInfo.findIndex((fileInfo) => fileInfo.file === file);
-      this.filesInfo[i].progress = progress;
+      const file = this.filesInfo.get(fileId);
+      file && (file.progress = progress);
     };
   }
 
-  onComplete(file: File) {
+  onComplete(fileId: string) {
     return () => {
-      const i = this.filesInfo.findIndex((fileInfo) => fileInfo.file === file);
-      console.log("uploaded", i);
-      this.filesInfo[i].status = "uploaded";
+      const file = this.filesInfo.get(fileId);
+      file && (file.status = "uploaded");
     };
   }
 
   removeFileItem(fileId: string) {
-    const i = this.filesInfo.findIndex((f) => f.id === fileId);
-    this.filesInfo.splice(i, 1);
+    this.filesInfo.delete(fileId);
   }
 }
 
 export interface FileInfo {
-  id: string;
   file: File;
   status: "uploading" | "uploaded" | "error";
   progress: number;

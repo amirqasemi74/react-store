@@ -1,5 +1,5 @@
 import { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
-import proxyValueAndSaveIt from "../proxyValueAndSaveIt";
+import { proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
 
 interface ArrayProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   array: any[];

@@ -2,11 +2,12 @@ import { isStorePart } from "src/decorators/storePart";
 import { isStore } from "src/utils/utils";
 import arrayProxyBuilder from "./array.proxyBuilder";
 import functionProxyBuilder from "./function.proxyBuilder";
+import { mapProxyBuilder } from "./map.proxyBuilder";
 import objectProxyBuilder from "./object.proxyBuilder";
 
 export interface BaseAdtProxyBuilderArgs {
   onSet?: () => void;
-  proxyTypes?: Array<"Function" | "Array" | "Object">;
+  proxyTypes?: Array<"Function" | "Array" | "Object" | "Map">;
 }
 
 interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
@@ -19,8 +20,9 @@ const adtProxyBuilder = ({
   ...restOfArgs
 }: AdtProxyBuilderArgs) => {
   const { proxyTypes } = restOfArgs;
-  const doObjectProxy = proxyTypes?.includes("Object") ?? true;
+  const doMapProxy = proxyTypes?.includes("Map") ?? true;
   const doArrayProxy = proxyTypes?.includes("Array") ?? true;
+  const doObjectProxy = proxyTypes?.includes("Object") ?? true;
   const doFucntionProxy = proxyTypes?.includes("Function") ?? true;
 
   try {
@@ -48,6 +50,13 @@ const adtProxyBuilder = ({
       return functionProxyBuilder({
         func: value,
         context,
+      });
+    }
+
+    if (value instanceof Map && doMapProxy) {
+      return mapProxyBuilder({
+        map: value,
+        ...restOfArgs,
       });
     }
   } catch (error) {}
