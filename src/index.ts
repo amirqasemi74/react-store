@@ -1,5 +1,5 @@
 export { getFromContainer } from "./container/container";
-export { Injectable } from "./decorators/Injectable";
+export { Injectable, Scope } from "./decorators/Injectable";
 export { useStore } from "./react/hooks/useStore";
 export { Store } from "./decorators/store";
 export { Props } from "./decorators/props";
@@ -9,3 +9,4 @@ export { StoreProvider } from "./react/store/StoreProvider";
 export { Effect } from "./decorators/effect";
 export { Inject } from "./decorators/inject";
 export { StorePart } from "./decorators/storePart";
+export { Injector } from "./container/Injector";
