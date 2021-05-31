@@ -1,9 +1,10 @@
 import cloneDeep from "clone-deep";
 import { dequal } from "dequal";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useRef } from "react";
 import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
+import useLazyRef from "src/utils/useLazyRef";
 import { ReactApplicationContext } from "../appContext";
 import { StoreAdministrator } from "../store/storeAdministrator";
 
@@ -36,7 +37,7 @@ export const useStore = <T extends ClassType = any>(
       );
     }
 
-    useEffect(() => {
+    useLazyRef(() => {
       const render = () => {
         if (options.deps) {
           const currentDeps = cloneDeep(
@@ -67,7 +68,7 @@ export const useStore = <T extends ClassType = any>(
           );
         }
       };
-    }, []);
+    });
   }
 
   if (!storeAdministrator?.instance) {

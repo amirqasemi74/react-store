@@ -1,6 +1,7 @@
 import React, { Context, useEffect } from "react";
 import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
+import useLazyRef from "src/utils/useLazyRef";
 import { registerHandlers } from "../handlers/registerHandlers";
 import { StoreAdministratorFactory } from "./storeAdministorFactory";
 import { StoreAdministrator } from "./storeAdministrator";
@@ -18,9 +19,9 @@ export const buildStoreContextProvider =
     const render = useForceUpdate();
     const storeAdministrator = StoreAdministratorFactory.create(StoreType);
 
-    useEffect(() => {
+    useLazyRef(() => {
       storeAdministrator.consumers.push({ render });
-    }, []);
+    });
 
     registerHandlers(storeAdministrator, props);
 
