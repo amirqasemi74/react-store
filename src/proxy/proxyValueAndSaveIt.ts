@@ -1,4 +1,4 @@
-import { STORE_ADMINISTRATION } from "src/constant";
+import { AsyncFucntion, STORE_ADMINISTRATION } from "src/constant";
 import { isStorePart } from "src/decorators/storePart";
 import { getStoreAdministrator } from "src/utils/utils";
 import adtProxyBuilder, {
@@ -28,7 +28,8 @@ export function proxyValueAndSaveIt(
     // Frozen Object does not need to be proxied (observable) like React Props
     !Object.isFrozen(value) &&
     !isInArrayOrObjectPrototype(target, propertyKey) &&
-    ([Object, Array, Map, Function].includes(value.constructor) ||
+    ([Object, Array, Map].includes(value.constructor) ||
+      value instanceof Function ||
       (value instanceof Object && isStorePart(value.constructor)))
   ) {
     const proxiedValue = () =>

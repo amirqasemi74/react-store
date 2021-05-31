@@ -24,7 +24,8 @@ export const mapProxyBuilder = ({
             if (
               _val &&
               !Object.isFrozen(_val) &&
-              [Object, Array, Map, Function].includes(value.constructor)
+              ([Object, Array, Map].includes(_val.constructor) ||
+                _val instanceof Function)
             ) {
               return (
                 _val[PROXIED_VALUE] ||
