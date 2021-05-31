@@ -51,7 +51,7 @@
     "start:app": "webpack serve --config sampleApp/webpack.config.js --env development",
     "test": "jest",
     "build": "rm -rf dist && rollup -c rollup.config.js",
-    "prepare": "yarn build",
+    "prepare": "yarn test && yarn build",
     "pub": "npm publish --access public"
   }
 }

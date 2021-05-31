@@ -1,6 +1,6 @@
 import isPromise from "is-promise";
 import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
-import { StoreAdministrator } from "src/react/store/StoreAdministrator";
+import { StoreAdministrator } from "src/react/store/storeAdministrator";
 
 interface RunEffectArgs {
   effectKey: PropertyKey;

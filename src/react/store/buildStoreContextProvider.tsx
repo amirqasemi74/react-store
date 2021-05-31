@@ -2,8 +2,8 @@ import React, { Context, useEffect } from "react";
 import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
 import { registerHandlers } from "../handlers/registerHandlers";
-import { StoreAdministratorFactory } from "./StoreAdministorFactory";
-import { StoreAdministrator } from "./StoreAdministrator";
+import { StoreAdministratorFactory } from "./storeAdministorFactory";
+import { StoreAdministrator } from "./storeAdministrator";
 
 interface ProviderComponentProps {
   props?: any;

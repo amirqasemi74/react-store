@@ -1,4 +1,4 @@
-import { StoreAdministrator } from "src/react/store/StoreAdministrator";
+import { StoreAdministrator } from "src/react/store/storeAdministrator";
 import { runEffect } from "./runEffect";
 import { useEnhancedEffect } from "./useEnhancedEffect";
 

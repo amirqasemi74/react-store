@@ -5,7 +5,7 @@ import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
 import { ReactApplicationContext } from "../appContext";
-import { StoreAdministrator } from "../store/StoreAdministrator";
+import { StoreAdministrator } from "../store/storeAdministrator";
 
 interface UseStoreOptions<T extends ClassType> {
   deps?: (vm: InstanceType<T>) => any[];
