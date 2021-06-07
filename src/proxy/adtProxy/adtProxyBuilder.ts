@@ -23,7 +23,7 @@ const adtProxyBuilder = ({
   const doMapProxy = proxyTypes?.includes("Map") ?? true;
   const doArrayProxy = proxyTypes?.includes("Array") ?? true;
   const doObjectProxy = proxyTypes?.includes("Object") ?? true;
-  const doFucntionProxy = proxyTypes?.includes("Function") ?? true;
+  const doFunctionProxy = proxyTypes?.includes("Function") ?? true;
 
   try {
     if (
@@ -46,7 +46,7 @@ const adtProxyBuilder = ({
       });
     }
 
-    if (value instanceof Function && doFucntionProxy) {
+    if (value instanceof Function && doFunctionProxy) {
       return functionProxyBuilder({
         func: value,
         context,

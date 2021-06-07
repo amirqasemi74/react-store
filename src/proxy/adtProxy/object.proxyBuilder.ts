@@ -19,7 +19,7 @@ const objectProxyBuilder = ({
     },
 
     set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {
-      // console.log("Objct::set", target, propertyKey, value);
+      // console.log("Object::set", target, propertyKey, value);
       const res = Reflect.set(target, propertyKey, value, receiver);
       if (!isStore(target)) {
         onSet?.();

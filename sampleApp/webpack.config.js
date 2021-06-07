@@ -2,17 +2,17 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { resolve } = require("path");
 
 const srcDir = resolve(__dirname, "../src");
-const sampeAppDir = resolve(__dirname);
+const sampleAppDir = resolve(__dirname);
 
 module.exports = {
   devtool: "source-map",
-  entry: resolve(sampeAppDir, "index.tsx"),
+  entry: resolve(sampleAppDir, "index.tsx"),
   mode: "development",
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
     alias: {
       "@react-store/core": srcDir,
-      sampleApp: sampeAppDir,
+      sampleApp: sampleAppDir,
       src: srcDir,
     },
   },
@@ -26,7 +26,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: resolve(sampeAppDir, "index.html"),
+      template: resolve(sampleAppDir, "index.html"),
     }),
   ],
   performance: {

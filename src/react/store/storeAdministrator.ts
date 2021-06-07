@@ -14,7 +14,7 @@ export class StoreAdministrator {
 
   propertyKeysValue = new Map<PropertyKey, any>();
 
-  consumers: StoreConsumer[] = [];
+  consumers: Function[] = [];
 
   storeParts = new Map<PropertyKey, StoreAdministrator>();
 
@@ -23,6 +23,8 @@ export class StoreAdministrator {
   private injectedIntos = new Set<StoreAdministrator>();
 
   private isRenderAllow = true;
+
+  private runningActionsCount = 0;
 
   constructor(instance: any) {
     this.pureInstance = instance;
@@ -80,18 +82,24 @@ export class StoreAdministrator {
     this.isRenderAllow = true;
   }
 
+  runAction(action: Function) {
+    this.runningActionsCount++;
+    const res = action();
+    this.runningActionsCount--;
+    if (this.runningActionsCount === 0) {
+      this.renderConsumers();
+    }
+    return res;
+  }
+
   renderConsumers() {
-    if (this.isRenderAllow) {
-      this.consumers.forEach((cnsr) => cnsr.render());
+    if (this.isRenderAllow && this.runningActionsCount == 0) {
+      this.consumers.forEach((render) => render());
       Array.from(this.injectedIntos.values()).forEach((storeAdmin) =>
         storeAdmin.renderConsumers()
       );
     }
   }
-}
-
-interface StoreConsumer {
-  render: () => void;
 }
 
 interface Effect {

@@ -4,7 +4,7 @@ import { useContext, useRef } from "react";
 import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
-import useLazyRef from "src/utils/useLazyRef";
+import { useSyncOnMount } from "src/utils/useSyncOnMount";
 import { ReactApplicationContext } from "../appContext";
 import { StoreAdministrator } from "../store/storeAdministrator";
 
@@ -37,7 +37,7 @@ export const useStore = <T extends ClassType = any>(
       );
     }
 
-    useLazyRef(() => {
+    useSyncOnMount(() => {
       const render = () => {
         if (options.deps) {
           const currentDeps = cloneDeep(
@@ -59,12 +59,12 @@ export const useStore = <T extends ClassType = any>(
           forceUpdate();
         }
       };
-      storeAdministrator?.consumers.push({ render });
+      storeAdministrator?.consumers.push(render);
 
       return () => {
         if (storeAdministrator) {
           storeAdministrator.consumers = storeAdministrator.consumers.filter(
-            (cnsr) => cnsr.render !== render
+            (rndr) => rndr !== render
           );
         }
       };

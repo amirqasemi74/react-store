@@ -1,7 +1,7 @@
 import React from "react";
 import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
-import useLazyRef from "src/utils/useLazyRef";
+import { useLazyRef } from "src/utils/useLazyRef";
 import { ReactApplicationContext } from "../appContext";
 import { buildStoreContextProvider } from "./buildStoreContextProvider";
 

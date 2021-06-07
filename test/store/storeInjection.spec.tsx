@@ -11,8 +11,7 @@ import {
 
 describe("Store Injection", () => {
   it("Upper store should inject into lower store", () => {
-    let appStoreRef: AppStore | null = null,
-      appStoreRefInUserStore: AppStore | null = null;
+    let appStore!: AppStore, appStoreInUserStore!: AppStore;
 
     @Store()
     class AppStore {
@@ -26,7 +25,7 @@ describe("Store Injection", () => {
       password = "123456";
 
       constructor(public app: AppStore) {
-        appStoreRefInUserStore = app;
+        appStoreInUserStore = app;
       }
     }
 
@@ -43,7 +42,7 @@ describe("Store Injection", () => {
 
     const App = () => {
       const vm = useStore(AppStore);
-      appStoreRef = vm;
+      appStore = vm;
       return (
         <StoreProvider type={UserStore}>
           <User />
@@ -53,10 +52,10 @@ describe("Store Injection", () => {
     const AppWithStore = connectStore(App, AppStore);
     const { getByText } = render(<AppWithStore />);
 
-    expect(appStoreRef).not.toBe(null);
-    expect(appStoreRefInUserStore).not.toBe(null);
+    expect(appStore).not.toBe(null);
+    expect(appStoreInUserStore).not.toBe(null);
 
-    expect(appStoreRef).toBe(appStoreRefInUserStore);
+    expect(appStore).toBe(appStoreInUserStore);
 
     expect(getByText(/amir.qasemi74/i)).toBeInTheDocument();
     expect(getByText(/123456/i)).toBeInTheDocument();

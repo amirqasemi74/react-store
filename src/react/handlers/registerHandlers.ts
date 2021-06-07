@@ -1,9 +1,9 @@
 import { StoreAdministrator } from "../store/storeAdministrator";
-import { usedContextesHandler } from "./usedContextesHandler";
+import { usedContextsHandler as usedContextsHandler } from "./usedContextsHandler";
 import { effectHandler } from "./effects/effectHandler";
-import propsHandler from "./propsHandler";
+import { propsHandler } from "./propsHandler";
 
-const handlers = [usedContextesHandler, propsHandler, effectHandler];
+const handlers = [usedContextsHandler, propsHandler, effectHandler];
 
 export const registerHandlers = (admin: StoreAdministrator, props: object) =>
   handlers.forEach((handler) => handler(admin, props));

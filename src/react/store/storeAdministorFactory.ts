@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
 import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
-import useLazyRef from "src/utils/useLazyRef";
+import { useLazyRef } from "src/utils/useLazyRef";
 import { getStoreAdministrator } from "src/utils/utils";
 import { ReactApplicationContext } from "../appContext";
 import { StoreAdministrator } from "./storeAdministrator";

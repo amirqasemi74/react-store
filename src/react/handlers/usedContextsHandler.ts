@@ -1,4 +1,4 @@
-import { STORE_USED_CONTEXTES } from "../../constant";
+import { STORE_USED_CONTEXTS } from "../../constant";
 import { useContext } from "react";
 import { StoreAdministrator } from "../store/storeAdministrator";
 
@@ -8,15 +8,15 @@ export interface StoreUsedContext {
   value?: any;
 }
 
-export const usedContextesHandler = (
+export const usedContextsHandler = (
   storeAdministrator: StoreAdministrator
 ) => {
-  const storeUsedContextes: StoreUsedContext[] =
-    storeAdministrator.type[STORE_USED_CONTEXTES] || [];
+  const storeUsedContexts: StoreUsedContext[] =
+    storeAdministrator.type[STORE_USED_CONTEXTS] || [];
 
   storeAdministrator.turnOffRender();
 
-  storeUsedContextes
+  storeUsedContexts
     .map<StoreUsedContext>((storeUsedCtx) => ({
       ...storeUsedCtx,
       value: useContext(storeUsedCtx.type),

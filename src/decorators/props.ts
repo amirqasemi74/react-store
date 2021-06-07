@@ -1,8 +1,10 @@
 const PROPS_PROPERTY_KEY = Symbol();
 
-export const Props: PropertyDecorator = (target, propertyKey) => {
-  Reflect.defineMetadata(PROPS_PROPERTY_KEY, propertyKey, target.constructor);
-};
+export function Props(): PropertyDecorator {
+  return function (target, propertyKey) {
+    Reflect.defineMetadata(PROPS_PROPERTY_KEY, propertyKey, target.constructor);
+  };
+}
 
 export const getStorePropsPropertyKey = (
   target: Function

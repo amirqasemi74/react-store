@@ -1,4 +1,4 @@
-import { AsyncFucntion, STORE_ADMINISTRATION } from "src/constant";
+import { STORE_ADMINISTRATION } from "src/constant";
 import { isStorePart } from "src/decorators/storePart";
 import { getStoreAdministrator } from "src/utils/utils";
 import adtProxyBuilder, {

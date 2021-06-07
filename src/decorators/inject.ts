@@ -66,6 +66,6 @@ const IS_INJECTED_USING_CLASS_DECORATOR = Symbol();
 const IS_INJECTED_USING_PARAMETER_DECORATOR = Symbol();
 
 export const getConstructorDependencyTypes = (
-  consructorType: Function
+  constructorType: Function
 ): ConstructorDependency[] =>
-  Reflect.getMetadata(CONSTRUCTOR_DEPENDENCY_TYPES, consructorType) || [];
+  Reflect.getMetadata(CONSTRUCTOR_DEPENDENCY_TYPES, constructorType) || [];

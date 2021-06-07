@@ -10,3 +10,4 @@ export { Effect } from "./decorators/effect";
 export { Inject } from "./decorators/inject";
 export { StorePart } from "./decorators/storePart";
 export { Injector } from "./container/Injector";
+export { Action } from "./decorators/action";

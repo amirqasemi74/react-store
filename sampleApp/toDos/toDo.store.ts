@@ -1,4 +1,4 @@
-import { Store, Effect, Inject, Props } from "@react-store/core";
+import { Store, Effect, Inject, Props, Action } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 import { ToDoService } from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
@@ -6,10 +6,10 @@ import FormValidator from "sampleApp/libs/formValidator";
 
 @Store()
 export default class ToDoStore {
-  @Props
+  @Props()
   props: any;
 
-  todos: ToDoItem[] = [{ value: "amir", isEditing: false }];
+  todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
 
   todoCount = 0;
 
@@ -21,15 +21,20 @@ export default class ToDoStore {
     @Inject(ThemeStore) public theme: ThemeStore,
     @Inject(ToDoService) public todoService: ToDoService
   ) {
-    // this.init();
+    setTimeout(() => {
+      this.init();
+    });
   }
 
+  // @Action()
   init() {
-    setTimeout(() => {
-      for (let i = 0; i < 150; i++) {
-        this.todos.push({ value: i.toString(), isEditing: false });
-      }
-    });
+    for (let i = 0; i < 10; i++) {
+      this.todos.push({
+        id: Math.random().toString(),
+        value: "Job " + i.toString(),
+        isEditing: false,
+      });
+    }
   }
 
   @Effect((_: ToDoStore) => [_.todos.length])
@@ -49,7 +54,11 @@ export default class ToDoStore {
       this.todo.value &&
       !this.todos.find(({ value }) => value === e.currentTarget.value)
     ) {
-      this.todos.push({ value: this.todo.value, isEditing: false });
+      this.todos.push({
+        id: Math.random().toString(),
+        value: this.todo.value,
+        isEditing: false,
+      });
       this.todo.value = "";
     }
   }
@@ -74,6 +83,7 @@ export default class ToDoStore {
 }
 
 interface ToDoItem {
+  id: string;
   value: string;
   isEditing: boolean;
 }

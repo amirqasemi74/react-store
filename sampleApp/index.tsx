@@ -7,7 +7,7 @@ function AppWrapper() {
   return (
     <div>
       <button onClick={() => setMount((v) => !v)}>Toggle Mount</button>
-      {mount ? <App /> : "unmouted"}
+      {mount ? <App /> : "unmounted"}
     </div>
   );
 }

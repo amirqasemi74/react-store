@@ -18,7 +18,7 @@ class Container {
 
     if (!options) {
       throw new Error(
-        `${SomeClass.name} has not been registred with @Injectable`
+        `${SomeClass.name} has not been registered with @Injectable`
       );
     }
 

@@ -3,7 +3,7 @@ import { Props as FilePickerProps } from ".";
 
 @Store()
 export default class FilePickerStore {
-  @Props
+  @Props()
   props: FilePickerProps;
 
   filesInfo = new Map<string, FileInfo>();

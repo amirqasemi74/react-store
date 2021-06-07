@@ -55,8 +55,43 @@ export const createEnhancedStoreType = (StoreType: any) => {
           },
         });
       });
+
+      const methods = getMethodsPropertyDescriptors(this);
+
+      Object.keys(methods)
+        .filter((key) => key !== "constructor")
+        .forEach((methodKey) => {
+          const descriptor: PropertyDescriptor = methods[methodKey];
+          console.log(methodKey);
+
+          const fn = function (this: any, ...args: any) {
+            return getStoreAdministrator(this)?.runAction(() =>
+              descriptor.value.call(this, args)
+            );
+          };
+
+          Object.defineProperty(this, methodKey, {
+            enumerable: false,
+            configurable: true,
+            get() {
+              const storeAdmin = getStoreAdministrator(this);
+              const value = storeAdmin?.propertyKeysValue.get(methodKey);
+
+              // it first access value is undefined because proxied function
+              // has to not been sed yet and only descriptor.value has fn ref.
+              // console.log();
+
+              return value?.[PROXIED_VALUE] || value || descriptor.value;
+            },
+            set(value: any) {
+              const storeAdmin = getStoreAdministrator(this);
+              storeAdmin?.propertyKeysValue.set(methodKey, value);
+            },
+          });
+        });
     }
   } as any;
+
   // change constructor name for improve debugging
   Reflect.defineProperty(EnhancedStoreType, "name", {
     writable: false,
@@ -64,4 +99,17 @@ export const createEnhancedStoreType = (StoreType: any) => {
   });
 
   return EnhancedStoreType;
+};
+
+const getMethodsPropertyDescriptors = (o: any) => {
+  const _get = (o: any, methods = {}) => {
+    const proto = Object.getPrototypeOf(o);
+    if (proto && proto !== Object.prototype) {
+      methods = { ...methods, ...Object.getOwnPropertyDescriptors(proto) };
+      return _get(proto, methods);
+    } else {
+      return methods;
+    }
+  };
+  return _get(o);
 };

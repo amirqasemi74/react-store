@@ -1,6 +1,6 @@
 import { isStore } from "src/utils/utils";
 import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
-import { PROXIED_VALUE, proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
+import { PROXIED_VALUE } from "../proxyValueAndSaveIt";
 
 interface MapProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   map: Map<any, any>;
@@ -74,5 +74,3 @@ export const mapProxyBuilder = ({
     },
   });
 };
-
-class MapProxyHandler implements ProxyHandler<Map<unknown, unknown>> {}
