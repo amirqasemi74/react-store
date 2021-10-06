@@ -62,13 +62,13 @@ export const createEnhancedStoreType = (StoreType: any) => {
         .filter((key) => key !== "constructor")
         .forEach((methodKey) => {
           const descriptor: PropertyDescriptor = methods[methodKey];
-          console.log(methodKey);
 
           const fn = function (this: any, ...args: any) {
             return getStoreAdministrator(this)?.runAction(() =>
-              descriptor.value.call(this, args)
+              descriptor.value.apply(this, args)
             );
           };
+          Reflect.set(fn, "name", methodKey);
 
           Object.defineProperty(this, methodKey, {
             enumerable: false,
@@ -79,9 +79,7 @@ export const createEnhancedStoreType = (StoreType: any) => {
 
               // it first access value is undefined because proxied function
               // has to not been sed yet and only descriptor.value has fn ref.
-              // console.log();
-
-              return value?.[PROXIED_VALUE] || value || descriptor.value;
+              return value || fn;
             },
             set(value: any) {
               const storeAdmin = getStoreAdministrator(this);

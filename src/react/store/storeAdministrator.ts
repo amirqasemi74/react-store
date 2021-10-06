@@ -24,6 +24,8 @@ export class StoreAdministrator {
 
   private isRenderAllow = true;
 
+  private isStoreMutated = false;
+
   private runningActionsCount = 0;
 
   constructor(instance: any) {
@@ -93,11 +95,18 @@ export class StoreAdministrator {
   }
 
   renderConsumers() {
-    if (this.isRenderAllow && this.runningActionsCount == 0) {
+    if (
+      this.isRenderAllow &&
+      this.isStoreMutated &&
+      this.runningActionsCount == 0
+    ) {
       this.consumers.forEach((render) => render());
       Array.from(this.injectedIntos.values()).forEach((storeAdmin) =>
         storeAdmin.renderConsumers()
       );
+      this.isStoreMutated = false;
+    } else {
+      this.isStoreMutated = true;
     }
   }
 }

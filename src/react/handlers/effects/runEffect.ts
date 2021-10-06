@@ -16,7 +16,7 @@ export const runEffect = ({ effectKey, storeAdmin }: RunEffectArgs) => {
 
   //run ...
   const clearEffect: Func | undefined = Reflect.apply(
-    storeAdmin.pureInstance[effectKey],
+    storeAdmin.instance[effectKey],
     context,
     []
   );
@@ -28,7 +28,7 @@ export const runEffect = ({ effectKey, storeAdmin }: RunEffectArgs) => {
   if (clearEffect && typeof clearEffect !== "function") {
     throw new Error("Only return function from effect as it's clearEffect");
   }
-
+  
   storeAdmin.storeEffect(effectKey, {
     clearEffect,
   });

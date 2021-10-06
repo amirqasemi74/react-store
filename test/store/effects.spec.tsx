@@ -9,7 +9,7 @@ describe("Effects", () => {
     clearContainer();
   });
 
-  it("must be called when dependecies are being changed", async () => {
+  it("must be called when dependencies are being changed", async () => {
     const usernameChangeCallback = jest.fn();
     @Store()
     class UserStore {
