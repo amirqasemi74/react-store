@@ -1,10 +1,10 @@
 import { useStore } from "@react-store/core";
-import React from "react";
+import React, { memo } from "react";
 import styled, { css } from "styled-components";
 import ToDoStore from "./toDo.store";
 import ToDoList from "./ToDoList";
 
-const ToDos: React.FC = () => {
+const ToDos: React.FC = memo(() => {
   const vm = useStore(ToDoStore);
 
   return (
@@ -21,7 +21,7 @@ const ToDos: React.FC = () => {
       <ToDoCount>ToDo Count: {vm.todoCount}</ToDoCount>
     </ToDoWrapper>
   );
-};
+});
 
 export default ToDos;
 

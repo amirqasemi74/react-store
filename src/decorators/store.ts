@@ -51,7 +51,7 @@ export const createEnhancedStoreType = (StoreType: any) => {
           set(value: any) {
             const storeAdmin = getStoreAdministrator(this);
             storeAdmin?.propertyKeysValue.set(propertyKey, value);
-            storeAdmin?.renderConsumers();
+            storeAdmin?.renderConsumers(true);
           },
         });
       });

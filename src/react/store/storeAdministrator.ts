@@ -34,7 +34,7 @@ export class StoreAdministrator {
     instance[STORE_ADMINISTRATION] = this;
     this.instance = adtProxyBuilder({
       value: instance,
-      onSet: this.renderConsumers.bind(this),
+      onSet: () => this.renderConsumers(true),
     });
 
     // to access store in deep proxy for effects handler
@@ -94,7 +94,10 @@ export class StoreAdministrator {
     return res;
   }
 
-  renderConsumers() {
+  renderConsumers(isStoreMutated?: true) {
+    if (isStoreMutated !== undefined) {
+      this.isStoreMutated = true;
+    }
     if (
       this.isRenderAllow &&
       this.isStoreMutated &&
@@ -102,11 +105,9 @@ export class StoreAdministrator {
     ) {
       this.consumers.forEach((render) => render());
       Array.from(this.injectedIntos.values()).forEach((storeAdmin) =>
-        storeAdmin.renderConsumers()
+        storeAdmin.renderConsumers(true)
       );
       this.isStoreMutated = false;
-    } else {
-      this.isStoreMutated = true;
     }
   }
 }

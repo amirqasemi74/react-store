@@ -140,7 +140,7 @@ describe("Store", () => {
       expect(renderCount).toBe(2);
     });
 
-    it.only("should actions cause render if state mutations is happened", async () => {
+    it("should actions cause render if state mutations is happened", async () => {
       let renderCount = 0;
 
       @Store()

@@ -19,7 +19,7 @@ export class StoreAdministratorFactory {
       // if then injected store A change all store b consumer must be
       // notified to rerender base of their deps
       // so here we save store B ref in store A
-      // to nofify B if A changed
+      // to notify B if A changed
       storeAdministrator.turnOffRender();
       deps.map(getStoreAdministrator).forEach((storeAdmin) => {
         storeAdmin?.turnOffRender();
@@ -32,15 +32,15 @@ export class StoreAdministratorFactory {
   }
 
   private static resolveStoreDeps(storeType: ClassType) {
-    const storeDepsContextes = useLazyRef(() => {
+    const storeDepsContexts = useLazyRef(() => {
       const storeDeps = getConstructorDependencyTypes(storeType);
-      const storeDepsContextes = new Map<
+      const storeDepsContexts = new Map<
         Function,
         React.Context<StoreAdministrator | null>
       >();
       const appContext = getFromContainer(ReactApplicationContext);
 
-      // Find dependecies which is store type
+      // Find dependencies which is store type
       // then resolve them from context
       //TODO: for global stores
       storeDeps.forEach((dep) => {
@@ -53,13 +53,13 @@ export class StoreAdministratorFactory {
         if (!storeContext) {
           return;
         }
-        storeDepsContextes.set(dep.type, storeContext);
+        storeDepsContexts.set(dep.type, storeContext);
       });
 
-      return storeDepsContextes;
+      return storeDepsContexts;
     }).current;
 
-    const storicalDepsValues = Array.from(storeDepsContextes.entries()).map(
+    const storicalDepsValues = Array.from(storeDepsContexts.entries()).map(
       ([type, context]) => {
         const storeAdmin = useContext(context);
         if (!storeAdmin) {
