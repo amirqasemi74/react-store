@@ -1,5 +1,7 @@
 import { DependencyList, EffectCallback, useEffect, useRef } from "react";
 import { dequal } from "dequal";
+import cloneDeep from "clone-deep";
+import { useLazyRef } from "src/utils/useLazyRef";
 
 export const useEnhancedEffect = (
   callback: EffectCallback,
@@ -8,11 +10,11 @@ export const useEnhancedEffect = (
 ) => {
   if (options?.dequal && deps) {
     const signal = useRef(0);
-    const preDeps = useRef(deps);
+    const preDeps = useLazyRef(() => cloneDeep(deps));
     const isEqual = options?.dequal ? dequal : Object.is;
     for (let i = 0; i < deps.length; i++) {
-      if (!isEqual(deps[i], preDeps.current[i])) {
-        preDeps.current = deps;
+      if (!isEqual(deps[i], preDeps.current?.[i])) {
+        preDeps.current = cloneDeep(deps);
         signal.current += 1;
         break;
       }
