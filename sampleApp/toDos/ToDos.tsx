@@ -18,7 +18,7 @@ const ToDos: React.FC = memo(() => {
         placeholder="Enter To Do"
       />
       <ToDoList />
-      <ToDoCount>ToDo Count: {vm.todoCount}</ToDoCount>
+      <ToDoCount>ToDo Count: {vm.todosCount}</ToDoCount>
     </ToDoWrapper>
   );
 });

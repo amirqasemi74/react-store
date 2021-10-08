@@ -11,8 +11,6 @@ export default class ToDoStore {
 
   todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
 
-  todoCount = 0;
-
   todo = { value: "" };
 
   validator = new FormValidator(this.todo);
@@ -37,10 +35,13 @@ export default class ToDoStore {
     }
   }
 
-  @Effect((_: ToDoStore) => [_.todos.length])
-  setTodoCount() {
-    this.todoCount = this.todos.length;
+  get todosCount() {
+    return this.todos.length;
   }
+  // @Effect((_: ToDoStore) => [_.todos.length])
+  // setTodoCount() {
+  //   this.todoCount = this.todos.length;
+  // }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.todo.value = e.target.value;

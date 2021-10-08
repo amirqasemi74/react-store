@@ -58,11 +58,10 @@ export const createEnhancedStoreType = (StoreType: any) => {
 
       const methods = getMethodsPropertyDescriptors(this);
 
-      Object.keys(methods)
-        .filter((key) => key !== "constructor")
-        .forEach((methodKey) => {
-          const descriptor: PropertyDescriptor = methods[methodKey];
-
+      Object.entries(methods)
+        .filter(([key]) => key !== "constructor")
+        .filter(([, desc]) => desc.value) // only methods not getter or setter
+        .forEach(([methodKey, descriptor]) => {
           const fn = function (this: any, ...args: any) {
             return getStoreAdministrator(this)?.runAction(() =>
               descriptor.value.apply(this, args)
@@ -99,7 +98,9 @@ export const createEnhancedStoreType = (StoreType: any) => {
   return EnhancedStoreType;
 };
 
-const getMethodsPropertyDescriptors = (o: any) => {
+const getMethodsPropertyDescriptors = (
+  o: any
+): Record<PropertyKey, PropertyDescriptor> => {
   const _get = (o: any, methods = {}) => {
     const proto = Object.getPrototypeOf(o);
     if (proto && proto !== Object.prototype) {
