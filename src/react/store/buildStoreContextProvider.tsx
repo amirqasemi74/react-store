@@ -3,7 +3,7 @@ import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
 import { useLazyRef } from "src/utils/useLazyRef";
 import { registerHandlers } from "../handlers/registerHandlers";
-import { StoreAdministratorFactory } from "./storeAdministorFactory";
+import { StoreAdministratorFactory } from "./storeAdministratorFactory";
 import { StoreAdministrator } from "./storeAdministrator";
 
 interface ProviderComponentProps {

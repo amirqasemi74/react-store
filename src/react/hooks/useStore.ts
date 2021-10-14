@@ -20,6 +20,7 @@ export const useStore = <T extends ClassType = any>(
   storeType: T,
   opts?: UseStoreOptsArg<T>
 ): InstanceType<T> => {
+  const isUnMounted = useRef(false);
   const forceUpdate = useForceUpdate();
   const componentDeps = useRef<any[]>([]);
   const options = getUseStoreOptions(opts);
@@ -39,6 +40,8 @@ export const useStore = <T extends ClassType = any>(
 
     useSyncOnMount(() => {
       const render = () => {
+        if (isUnMounted.current) return;
+
         if (options.deps) {
           const currentDeps = cloneDeep(
             options.deps(storeAdministrator?.instance)
@@ -62,6 +65,7 @@ export const useStore = <T extends ClassType = any>(
       storeAdministrator?.consumers.push(render);
 
       return () => {
+        isUnMounted.current = true;
         if (storeAdministrator) {
           storeAdministrator.consumers = storeAdministrator.consumers.filter(
             (rndr) => rndr !== render
