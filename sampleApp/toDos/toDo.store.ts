@@ -7,7 +7,7 @@ import FormValidator from "sampleApp/libs/formValidator";
 @Store()
 export default class ToDoStore {
   @Props()
-  props: any;
+  props: any = {};
 
   todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
 

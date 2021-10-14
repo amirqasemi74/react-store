@@ -4,7 +4,8 @@ import { getFromContainer } from "src/container/container";
 import { PROXIED_VALUE } from "src/proxy/proxyValueAndSaveIt";
 import { ReactApplicationContext } from "src/react/appContext";
 import { StoreAdministrator } from "src/react/store/storeAdministrator";
-import { getStoreAdministrator } from "src/utils/utils";
+import { getStoreAdministrator, getType } from "src/utils/utils";
+import { isPropsPropertyKey } from "./props";
 
 export function Store(): ClassDecorator {
   return function (StoreType: any) {
@@ -51,7 +52,10 @@ export const createEnhancedStoreType = (StoreType: any) => {
           set(value: any) {
             const storeAdmin = getStoreAdministrator(this);
             storeAdmin?.propertyKeysValue.set(propertyKey, value);
-            storeAdmin?.renderConsumers(true);
+            // Props property key must not affect renders status at all.
+            if (!isPropsPropertyKey(getType(this)!, propertyKey)) {
+              storeAdmin?.renderConsumers(true);
+            }
           },
         });
       });
