@@ -103,11 +103,11 @@ export class StoreAdministrator {
       this.isStoreMutated &&
       this.runningActionsCount == 0
     ) {
+      this.isStoreMutated = false;
       this.consumers.forEach((render) => render());
       Array.from(this.injectedIntos.values()).forEach((storeAdmin) =>
         storeAdmin.renderConsumers(true)
       );
-      this.isStoreMutated = false;
     }
   }
 }

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import { useStore } from "@react-store/core";
 import styled from "styled-components";
 import ToDoStore from "./toDo.store";
@@ -7,7 +7,7 @@ interface Props {
   itemIndex: number;
 }
 
-const ToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
+const ToDoItem: React.FC<Props> = ({ itemIndex }) => {
   const vm = useStore(ToDoStore, ({ todos }) => [todos[itemIndex]]);
 
   return (
@@ -29,7 +29,7 @@ const ToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
       </ActionWrapper>
     </ToDoItemWrapper>
   );
-});
+};
 
 export default ToDoItem;
 
