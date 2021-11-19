@@ -7,8 +7,6 @@ export function propsHandler(
 ) {
   const propsPropertyKey = getStorePropsPropertyKey(storeAdministrator.type);
   if (propsPropertyKey) {
-    storeAdministrator.turnOffRender();
     Reflect.set(storeAdministrator.instance, propsPropertyKey, props);
-    storeAdministrator.turnOnRender();
   }
 }

@@ -13,7 +13,7 @@ export const configEffectRunner = (storeAdmin: StoreAdministrator) => {
           });
           return () => storeAdmin.getEffect(effectKey)?.clearEffect?.();
         },
-        deps?.(storeAdmin.instance),
+        deps?.(storeAdmin.instanceForComponents),
         { dequal }
       );
     }

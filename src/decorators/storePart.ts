@@ -1,4 +1,4 @@
-import { createEnhancedStoreType } from "./store";
+import { EnhancedStoreFactory } from "src/react/store/enhancedStoreFactory";
 
 const STORE_PART_OPTIONS = Symbol("STORE_PART_OPTIONS");
 
@@ -7,7 +7,7 @@ const STORE_PART_OPTIONS = Symbol("STORE_PART_OPTIONS");
  */
 export function StorePart(): ClassDecorator {
   return function (StoreType: any) {
-    const EnhancedStoreType = createEnhancedStoreType(StoreType);
+    const EnhancedStoreType = EnhancedStoreFactory.create(StoreType);
     Reflect.defineMetadata(STORE_PART_OPTIONS, {}, EnhancedStoreType);
     return EnhancedStoreType;
   } as any;

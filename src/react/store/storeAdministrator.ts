@@ -1,18 +1,23 @@
 import { EffectMetaData } from "src/decorators/effect";
 import { isStorePart } from "src/decorators/storePart";
-import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { getStoreAdministrator, getType } from "src/utils/utils";
 import { STORE_ADMINISTRATION } from "../../constant";
 import { EFFECTS } from "../../decorators/effect";
+import { StorePropertyKey } from "./storePropertyKey";
+import { StoreForComponentUsageProxy } from "./storeForComponentUsageProxy";
 
 export class StoreAdministrator {
   type: Function;
 
   instance: any;
 
-  pureInstance: any;
+  instanceForComponents: any;
 
-  propertyKeysValue = new Map<PropertyKey, any>();
+  isFirstRenderOccurred = false;
+
+  propertyKeys = new Map<PropertyKey, StorePropertyKey>();
+
+  methods = new Map<PropertyKey, Function | null>();
 
   consumers: Function[] = [];
 
@@ -20,41 +25,30 @@ export class StoreAdministrator {
 
   private effects = new Map<PropertyKey, Effect>();
 
-  private injectedIntos = new Set<StoreAdministrator>();
-
-  private isRenderAllow = true;
-
   private isStoreMutated = false;
 
   private runningActionsCount = 0;
 
   constructor(instance: any) {
-    this.pureInstance = instance;
+    this.instance = instance;
     this.type = getType(instance)!;
-    instance[STORE_ADMINISTRATION] = this;
-    this.instance = adtProxyBuilder({
-      value: instance,
-      onSet: () => this.renderConsumers(true),
-    });
-
-    // to access store in deep proxy for effects handler
-    this.turnOffRender();
-    this.instance[STORE_ADMINISTRATION] = this.pureInstance[
-      STORE_ADMINISTRATION
-    ] = this;
+    this.instance[STORE_ADMINISTRATION] = this;
+    this.instanceForComponents = new Proxy(
+      this.instance,
+      new StoreForComponentUsageProxy()
+    );
     this.initStorePartsEffectsContainers();
-    this.turnOnRender();
   }
 
   private initStorePartsEffectsContainers() {
-    Object.entries<any>(this.pureInstance).forEach(([propertyKey, value]) => {
+    Object.entries<any>(this.instance).forEach(([propertyKey, value]) => {
       if (
         value &&
         isStorePart(value.constructor) &&
         !this.storeParts.has(propertyKey)
       ) {
         const storePart = getStoreAdministrator(value)!;
-        storePart.addInjectedInto(this);
+        // storePart.addInjectedInto(this);
         this.storeParts.set(propertyKey, storePart);
       }
     });
@@ -72,18 +66,6 @@ export class StoreAdministrator {
     return this.effects.get(effectKey);
   }
 
-  addInjectedInto(storeAdmin: StoreAdministrator) {
-    this.injectedIntos.add(storeAdmin);
-  }
-
-  turnOffRender() {
-    this.isRenderAllow = false;
-  }
-
-  turnOnRender() {
-    this.isRenderAllow = true;
-  }
-
   runAction(action: Function) {
     this.runningActionsCount++;
     const res = action();
@@ -98,16 +80,9 @@ export class StoreAdministrator {
     if (isStoreMutated !== undefined) {
       this.isStoreMutated = true;
     }
-    if (
-      this.isRenderAllow &&
-      this.isStoreMutated &&
-      this.runningActionsCount == 0
-    ) {
+    if (this.isStoreMutated && this.runningActionsCount == 0) {
       this.isStoreMutated = false;
       this.consumers.forEach((render) => render());
-      Array.from(this.injectedIntos.values()).forEach((storeAdmin) =>
-        storeAdmin.renderConsumers(true)
-      );
     }
   }
 }

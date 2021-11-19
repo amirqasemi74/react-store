@@ -8,13 +8,9 @@ export interface StoreUsedContext {
   value?: any;
 }
 
-export const usedContextsHandler = (
-  storeAdministrator: StoreAdministrator
-) => {
+export const usedContextsHandler = (storeAdministrator: StoreAdministrator) => {
   const storeUsedContexts: StoreUsedContext[] =
     storeAdministrator.type[STORE_USED_CONTEXTS] || [];
-
-  storeAdministrator.turnOffRender();
 
   storeUsedContexts
     .map<StoreUsedContext>((storeUsedCtx) => ({
@@ -28,5 +24,4 @@ export const usedContextsHandler = (
         storeUsedCtx.value
       );
     });
-  storeAdministrator.turnOnRender();
 };

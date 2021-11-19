@@ -8,8 +8,9 @@ import {
   useStore,
   StoreProvider,
 } from "@react-store/core";
+import { getStoreAdministrator } from "src/utils/utils";
 
-describe("Store Injection", () => {
+export const storeInjectionTests = () => {
   it("Upper store should inject into lower store", () => {
     let appStore!: AppStore, appStoreInUserStore!: AppStore;
 
@@ -55,10 +56,12 @@ describe("Store Injection", () => {
     expect(appStore).not.toBe(null);
     expect(appStoreInUserStore).not.toBe(null);
 
-    expect(appStore).toBe(appStoreInUserStore);
+    expect(getStoreAdministrator(appStore)).toBe(
+      getStoreAdministrator(appStoreInUserStore)
+    );
 
     expect(getByText(/amir.qasemi74/i)).toBeInTheDocument();
     expect(getByText(/123456/i)).toBeInTheDocument();
     expect(getByText(/black/i)).toBeInTheDocument();
   });
-});
+};
