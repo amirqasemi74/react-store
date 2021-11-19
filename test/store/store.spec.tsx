@@ -1,10 +1,19 @@
-import "@testing-library/jest-dom/extend-expect";
-import { render, waitFor, screen } from "@testing-library/react";
-import React, { useEffect } from "react";
-import { connectStore, Effect, Store, useStore } from "@react-store/core";
-import { act } from "react-dom/test-utils";
+import { connectStore, Store, useStore } from "@react-store/core";
+import { render } from "@testing-library/react";
+import React from "react";
+import { storeActionsTest } from "./actions._spec";
+import { storeEffectTests } from "./effects._spec";
+import { storeHooksCompatibilityTests } from "./hooksCompatibility._spec";
+import { storeInjectionTests } from "./injection._spec";
+import { storePropertiesObservability } from "./propertiesObservability._spec";
 
 describe("Store", () => {
+  describe("Effects", storeEffectTests);
+  describe("Actions", storeActionsTest);
+  describe("Injections", storeInjectionTests);
+  describe("Properties Observability", storePropertiesObservability);
+  describe("Pure React Hook Compatibility", storeHooksCompatibilityTests);
+
   it("should each component which use store, have same instance of it", () => {
     let usernameStore!: UserStore,
       passwordStore!: UserStore,
@@ -41,7 +50,6 @@ describe("Store", () => {
     };
     const AppWithStore = connectStore(App, UserStore);
     const { getByText } = render(<AppWithStore />);
-    // debug();
 
     expect(appStore).not.toBe(null);
     expect(passwordStore).not.toBe(null);
@@ -53,117 +61,5 @@ describe("Store", () => {
     expect(getByText(/amir.qasemi74/i)).toBeInTheDocument();
     expect(getByText(/123456/i)).toBeInTheDocument();
     expect(getByText(/User store/i)).toBeInTheDocument();
-  });
-
-  it("should render on calling action in deeper pure react useEffect", async () => {
-    @Store()
-    class SampleStore {
-      title = "title";
-
-      changeTitle() {
-        this.title = "changed title";
-      }
-    }
-
-    const Title = () => {
-      const st = useStore(SampleStore);
-
-      useEffect(() => {
-        st.changeTitle();
-      }, []);
-      return <>static content</>;
-    };
-
-    const App = connectStore(() => {
-      const st = useStore(SampleStore);
-
-      return (
-        <>
-          <span>{st.title}</span>
-          <Title />
-        </>
-      );
-    }, SampleStore);
-
-    render(<App />);
-
-    await waitFor(() =>
-      expect(screen.getByText("changed title")).toHaveTextContent(
-        "changed title"
-      )
-    );
-  });
-
-  describe("Actions", () => {
-    it("should batch renders for multiple sync state mutations", async () => {
-      let renderCount = 0;
-      let setStateChanged;
-      let doRender = new Promise((res) => {
-        setStateChanged = res;
-      });
-
-      @Store()
-      class SampleStore {
-        title = "title";
-
-        content = "content";
-
-        constructor() {
-          setTimeout(() => {
-            act(() => {
-              this.change();
-              setStateChanged();
-            });
-          });
-        }
-
-        change() {
-          this.title = "changed title";
-          this.content = "changed content";
-        }
-      }
-
-      const App = connectStore(() => {
-        const st = useStore(SampleStore);
-        renderCount++;
-        return (
-          <>
-            <span>{st.title}</span>
-            <span>{st.content}</span>
-          </>
-        );
-      }, SampleStore);
-
-      render(<App />);
-
-      await doRender;
-      expect(renderCount).toBe(2);
-    });
-
-    it("should actions cause render if state mutations is happened", async () => {
-      let renderCount = 0;
-
-      @Store()
-      class SampleStore {
-        title = "title";
-
-        @Effect()
-        onRender() {}
-      }
-
-      const App = connectStore(() => {
-        const st = useStore(SampleStore);
-        renderCount++;
-        return (
-          <>
-            <span>{st.title}</span>
-          </>
-        );
-      }, SampleStore);
-
-      render(<App />);
-
-      expect(renderCount).toBe(1);
-    });
   });
 });

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 import styled from "styled-components";
 import { usePureToDos } from "./PureToDosProvider";
 
@@ -6,7 +6,7 @@ interface Props {
   itemIndex: number;
 }
 
-export const PureToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
+export const PureToDoItem: React.FC<Props> = ({ itemIndex }) => {
   const { todos, removeTodo, setToDoItemIsEditing, onToDoItemInputKeyDown } =
     usePureToDos();
 
@@ -29,7 +29,7 @@ export const PureToDoItem: React.FC<Props> = memo(({ itemIndex }) => {
       </ActionWrapper>
     </ToDoItemWrapper>
   );
-});
+};
 
 const ToDoItemWrapper = styled.div`
   display: flex;

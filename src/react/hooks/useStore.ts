@@ -4,7 +4,7 @@ import { useContext, useRef } from "react";
 import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
-import { useSyncOnMount } from "src/utils/useSyncOnMount";
+import { useWillMount } from "src/utils/useWillMount";
 import { ReactApplicationContext } from "../appContext";
 import { StoreAdministrator } from "../store/storeAdministrator";
 
@@ -38,13 +38,13 @@ export const useStore = <T extends ClassType = any>(
       );
     }
 
-    useSyncOnMount(() => {
+    useWillMount(() => {
       const render = () => {
         if (isUnMounted.current) return;
 
         if (options.deps) {
           const currentDeps = cloneDeep(
-            options.deps(storeAdministrator?.instance)
+            options.deps(storeAdministrator?.instanceForComponents)
           );
           let changeDetected = false;
           for (const i in currentDeps) {
@@ -75,16 +75,16 @@ export const useStore = <T extends ClassType = any>(
     });
   }
 
-  if (!storeAdministrator?.instance) {
+  if (!storeAdministrator?.instanceForComponents) {
     throw new Error(
       `${storeType.name} doesn't decorated with @Store/@GlobalStore`
     );
   }
   componentDeps.current =
-    cloneDeep(options.deps?.(storeAdministrator.instance)) ||
+    cloneDeep(options.deps?.(storeAdministrator.instanceForComponents)) ||
     componentDeps.current;
 
-  return storeAdministrator.instance;
+  return storeAdministrator.instanceForComponents;
 };
 
 const getUseStoreOptions = <T extends ClassType>(

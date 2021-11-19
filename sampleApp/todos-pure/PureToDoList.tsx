@@ -5,7 +5,6 @@ import { usePureToDos } from "./PureToDosProvider";
 
 export const PureToDoList = () => {
   const { todos } = usePureToDos();
-
   return (
     <ToDoListWrapper>
       {todos.map((item, i) => (

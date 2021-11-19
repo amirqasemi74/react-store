@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
 
-describe("Store Properties Observability", () => {
+export const storePropertiesObservability = () => {
   it("should observe primitive types", () => {
     let store!: PrimitiveTypesStore;
 
@@ -210,13 +210,13 @@ describe("Store Properties Observability", () => {
     );
   });
 
-  it("should save proxy value for arrays, object, function, maps", () => {
+  it("should save proxy value for arrays, objects, functions, maps", () => {
     let store!: SavedProxiedValueStore;
 
     @Store()
     class SavedProxiedValueStore {
       array = [1, { a: 1 }];
-      object = { a: [], b: 1 };
+      object = { a: [2, 3, 4], b: 1 };
       map = new Map<string, any>();
       onChange() {}
     }
@@ -230,9 +230,16 @@ describe("Store Properties Observability", () => {
     render(<App />);
 
     expect(store.array).toBeDefined();
-    expect(store.array).toBe(store.array);
+    act(() => {
+      // make array [1, Proxy] to check cache proxied
+      store.array = store.array.map((i) => i);
+    });
+
+    // Here we check for cache proxied
+    expect(store.array[1]).toBe(store.array[1]);
+
     expect(store.object).toBeDefined();
-    expect(store.object).toBe(store.object);
+    expect(store.object.a).toBe(store.object.a);
     expect(store.map).toBeDefined();
     expect(store.map).toBe(store.map);
     expect(store.onChange).toBeDefined();
@@ -269,4 +276,32 @@ describe("Store Properties Observability", () => {
     expect(store.object).not.toBe(preObject);
     expect(store.onChange).not.toBe(preOnChange);
   });
-});
+
+  it("should not rerender on set same value for primitive types", () => {
+    let store!: PrimitiveTypesStore;
+    let renderCount = 0;
+    @Store()
+    class PrimitiveTypesStore {
+      number = 1;
+    }
+
+    const App: React.FC = connectStore(() => {
+      const vm = useStore(PrimitiveTypesStore);
+      store = vm;
+      renderCount++;
+      return (
+        <div>
+          <span>{vm.number}</span>
+        </div>
+      );
+    }, PrimitiveTypesStore);
+
+    render(<App />);
+
+    act(() => {
+      store.number = 1;
+    });
+
+    expect(renderCount).toBe(1);
+  });
+};

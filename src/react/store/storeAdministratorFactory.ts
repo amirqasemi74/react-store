@@ -15,18 +15,15 @@ export class StoreAdministratorFactory {
       const store = new StoreType(...deps);
       const storeAdministrator = getStoreAdministrator(store)!;
 
-      // for example if we inject store A  in to other store B
+      // for example if we inject store A into other store B
       // if then injected store A change all store b consumer must be
       // notified to rerender base of their deps
       // so here we save store B ref in store A
       // to notify B if A changed
-      storeAdministrator.turnOffRender();
       deps.map(getStoreAdministrator).forEach((storeAdmin) => {
-        storeAdmin?.turnOffRender();
-        storeAdmin?.addInjectedInto(storeAdministrator);
-        storeAdmin?.turnOnRender();
+        // storeAdmin?.addInjectedInto(storeAdministrator);
       });
-      storeAdministrator.turnOnRender();
+
       return storeAdministrator;
     }).current;
   }

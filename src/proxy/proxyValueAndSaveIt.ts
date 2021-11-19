@@ -43,8 +43,7 @@ export function proxyValueAndSaveIt(
     // cause to store it for store type not
     // store instance
     if (value instanceof Function) {
-      const propertyKeysValue =
-        getStoreAdministrator(target)?.propertyKeysValue;
+      const propertyKeysValue = getStoreAdministrator(target)?.propertyKeys;
 
       return propertyKeysValue
         ? propertyKeysValue.get(propertyKey) ||

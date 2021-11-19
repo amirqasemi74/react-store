@@ -1,8 +1,8 @@
-import { Store, Effect, Inject, Props, Action } from "@react-store/core";
+import { Inject, Props, Store } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
+import FormValidator from "sampleApp/libs/formValidator";
 import { ToDoService } from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
-import FormValidator from "sampleApp/libs/formValidator";
 
 @Store()
 export default class ToDoStore {
@@ -24,7 +24,6 @@ export default class ToDoStore {
     });
   }
 
-  // @Action()
   init() {
     for (let i = 0; i < 10; i++) {
       this.todos.push({
@@ -38,14 +37,9 @@ export default class ToDoStore {
   get todosCount() {
     return this.todos.length;
   }
-  // @Effect((_: ToDoStore) => [_.todos.length])
-  // setTodoCount() {
-  //   this.todoCount = this.todos.length;
-  // }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.todo.value = e.target.value;
-    this.todoService.toDos();
   }
 
   onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {

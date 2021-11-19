@@ -6,8 +6,6 @@ import ToDoItem from "./ToDoItem";
 
 const ToDoList = () => {
   const vm = useStore(ToDoStore);
-  console.log("ToDoList");
-
   return (
     <ToDoListWrapper>
       {vm.todos.map((item, i) => (

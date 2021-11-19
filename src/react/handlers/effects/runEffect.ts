@@ -1,5 +1,4 @@
 import isPromise from "is-promise";
-import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { StoreAdministrator } from "src/react/store/storeAdministrator";
 
 interface RunEffectArgs {
@@ -10,14 +9,10 @@ interface RunEffectArgs {
 type Func<T = void> = () => T;
 
 export const runEffect = ({ effectKey, storeAdmin }: RunEffectArgs) => {
-  const context = adtProxyBuilder({
-    value: storeAdmin.instance,
-  });
-
   //run ...
   const clearEffect: Func | undefined = Reflect.apply(
-    storeAdmin.instance[effectKey],
-    context,
+    storeAdmin.instanceForComponents[effectKey],
+    storeAdmin.instanceForComponents,
     []
   );
 
@@ -28,7 +23,7 @@ export const runEffect = ({ effectKey, storeAdmin }: RunEffectArgs) => {
   if (clearEffect && typeof clearEffect !== "function") {
     throw new Error("Only return function from effect as it's clearEffect");
   }
-  
+
   storeAdmin.storeEffect(effectKey, {
     clearEffect,
   });
