@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 import { useLazyRef } from "src/utils/useLazyRef";
@@ -8,9 +8,10 @@ import { StoreContextProviderFactory } from "./storeContextProviderFactory";
 interface Props {
   props?: any;
   type: ClassType;
+  render: React.FC<any>;
 }
 
-export const StoreProvider: React.FC<Props> = ({ type, children, props }) => {
+export const StoreProvider = ({ type, render, props }: Props) => {
   const storeContext = useLazyRef(() =>
     getFromContainer(ReactApplicationContext).getStoreReactContext(type)
   ).current;
@@ -23,5 +24,11 @@ export const StoreProvider: React.FC<Props> = ({ type, children, props }) => {
     StoreContextProviderFactory.create(storeContext, type)
   ).current;
 
-  return <StoreContextProvider props={props}>{children}</StoreContextProvider>;
+  const Component = useMemo(() => React.memo(render), []);
+
+  return (
+    <StoreContextProvider props={props}>
+      <Component />
+    </StoreContextProvider>
+  );
 };

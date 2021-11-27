@@ -1,7 +1,9 @@
 import { STORE_ADMINISTRATION } from "src/constant";
 import { isPropsPropertyKey } from "src/decorators/props";
+import { isStorePart } from "src/decorators/storePart";
 import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { StoreAdministrator } from "src/react/store/storeAdministrator";
+import { isPrimitive } from "src/utils/isPrimitive";
 import { getStoreAdministrator, getType } from "src/utils/utils";
 import { StorePropertyKey } from "./storePropertyKey";
 
@@ -39,6 +41,10 @@ export class EnhancedStoreFactory {
     const storeAdmin = getStoreAdministrator(storeThis);
 
     const makeDeepObservable = (propertyKey: PropertyKey, value: any) => {
+      // temporary. should be better
+      if (value && isStorePart(value.constructor)) {
+        return value;
+      }
       return adtProxyBuilder({
         value,
         onSet: () => {
@@ -52,6 +58,8 @@ export class EnhancedStoreFactory {
     };
 
     Object.keys(storeThis).forEach((propertyKey) => {
+      // TODO for storeParts: 1. prevent reassignment
+      //2. prevent deep Observable
       storeAdmin?.propertyKeys.set(
         propertyKey,
         new StorePropertyKey(
@@ -72,12 +80,29 @@ export class EnhancedStoreFactory {
         },
 
         set(value: any) {
+          // TODO write test for props
+          const isPropsPK = isPropsPropertyKey(
+            getType(storeThis)!,
+            propertyKey
+          );
           const info = storeAdmin?.propertyKeys.get(propertyKey);
-          if (info)
-            info.setValue(makeDeepObservable(propertyKey, value), "Store");
+          const preValue = info?.getValue("Store");
+
+          info?.setValue(
+            isPropsPK ? value : makeDeepObservable(propertyKey, value),
+            "Store"
+          );
+
           // Props property key must not affect renders status at all.
-          if (!isPropsPropertyKey(getType(storeThis)!, propertyKey)) {
+          if (!isPropsPK) {
             info?.reactSetState(info.getValue("Store"));
+            if (isPrimitive(value)) {
+              if (preValue !== value) {
+                storeAdmin?.renderConsumers(true);
+              }
+            } else {
+              storeAdmin?.renderConsumers(true);
+            }
           }
         },
       });
@@ -110,7 +135,6 @@ export class EnhancedStoreFactory {
           enumerable: false,
           configurable: true,
           get() {
-            const storeAdmin = getStoreAdministrator(storeThis);
             const value = storeAdmin?.methods.get(methodKey);
 
             if (!value) {
@@ -123,7 +147,6 @@ export class EnhancedStoreFactory {
             return value || fn.bind(storeThis);
           },
           set(value: any) {
-            const storeAdmin = getStoreAdministrator(storeThis);
             storeAdmin?.methods.set(methodKey, value);
           },
         });

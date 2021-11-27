@@ -4,8 +4,8 @@ export class StorePropertyKey {
   isPrimitive: boolean;
 
   private value: {
-    store: any;
-    state: any;
+    store?: unknown;
+    state?: unknown;
   };
 
   private _reactSetState: React.Dispatch<React.SetStateAction<any>>;
@@ -43,9 +43,13 @@ export class StorePropertyKey {
   getValue(from: "State" | "Store") {
     switch (from) {
       case "State":
-        return this.isPrimitive ? this.value.state : this.value.state.$;
+        return this.isPrimitive
+          ? this.value.state
+          : (this.value.state as { $: unknown } | undefined)?.$;
       case "Store":
-        return this.isPrimitive ? this.value.store : this.value.store.$;
+        return this.isPrimitive
+          ? this.value.store
+          : (this.value.store as { $: unknown } | undefined)?.$;
     }
   }
 }

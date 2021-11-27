@@ -13,15 +13,15 @@ export class StoreAdministrator {
 
   instanceForComponents: any;
 
-  isFirstRenderOccurred = false;
-
   propertyKeys = new Map<PropertyKey, StorePropertyKey>();
 
   methods = new Map<PropertyKey, Function | null>();
 
-  consumers: Function[] = [];
+  consumers = new Set<Function>();
 
   storeParts = new Map<PropertyKey, StoreAdministrator>();
+
+  injectedInTos = new Set<StoreAdministrator>();
 
   private effects = new Map<PropertyKey, Effect>();
 
@@ -78,11 +78,14 @@ export class StoreAdministrator {
 
   renderConsumers(isStoreMutated?: true) {
     if (isStoreMutated !== undefined) {
-      this.isStoreMutated = true;
+      this.isStoreMutated = isStoreMutated;
     }
     if (this.isStoreMutated && this.runningActionsCount == 0) {
       this.isStoreMutated = false;
       this.consumers.forEach((render) => render());
+      Array.from(this.injectedInTos.values()).forEach((st) =>
+        st.renderConsumers(true)
+      );
     }
   }
 }
