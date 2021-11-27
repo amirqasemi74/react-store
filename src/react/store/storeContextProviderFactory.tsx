@@ -25,18 +25,6 @@ export class StoreContextProviderFactory {
       );
       registerHandlers(storeAdministrator, props);
 
-      /**
-       * Here all store useStates are placed and TheContext.Provider is memo by default
-       * So if here we have rerender here we must rerender store consumers.
-       */
-      useEffect(() => {
-        if (storeAdministrator.isFirstRenderOccurred) {
-          storeAdministrator?.renderConsumers(true);
-        } else {
-          storeAdministrator.isFirstRenderOccurred = true;
-        }
-      });
-
       return (
         <TheContext.Provider value={storeAdministrator}>
           {children}

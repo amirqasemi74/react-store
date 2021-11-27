@@ -20,9 +20,11 @@ export class StoreAdministratorFactory {
       // notified to rerender base of their deps
       // so here we save store B ref in store A
       // to notify B if A changed
-      deps.map(getStoreAdministrator).forEach((storeAdmin) => {
-        // storeAdmin?.addInjectedInto(storeAdministrator);
-      });
+      deps
+        .map(getStoreAdministrator)
+        .forEach((sourceStoreAdmin) =>
+          sourceStoreAdmin?.injectedInTos.add(storeAdministrator)
+        );
 
       return storeAdministrator;
     }).current;
@@ -31,6 +33,7 @@ export class StoreAdministratorFactory {
   private static resolveStoreDeps(storeType: ClassType) {
     const storeDepsContexts = useLazyRef(() => {
       const storeDeps = getConstructorDependencyTypes(storeType);
+
       const storeDepsContexts = new Map<
         Function,
         React.Context<StoreAdministrator | null>

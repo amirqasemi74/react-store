@@ -62,14 +62,12 @@ export const useStore = <T extends ClassType = any>(
           forceUpdate();
         }
       };
-      storeAdministrator?.consumers.push(render);
+      storeAdministrator?.consumers.add(render);
 
       return () => {
         isUnMounted.current = true;
         if (storeAdministrator) {
-          storeAdministrator.consumers = storeAdministrator.consumers.filter(
-            (rndr) => rndr !== render
-          );
+          storeAdministrator.consumers.delete(render);
         }
       };
     });

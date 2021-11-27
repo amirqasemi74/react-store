@@ -12,9 +12,7 @@ const App = () => {
   return (
     <>
       <button onClick={vm.changePrimary}>change theme</button>
-      <StoreProvider type={ToDoStore}>
-        <ToDos />
-      </StoreProvider>
+      <StoreProvider type={ToDoStore} render={ToDos} />
       {/* <PureToDosProvider>
         <PureToDos />
       </PureToDosProvider> */}
