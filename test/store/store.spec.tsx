@@ -6,11 +6,13 @@ import { storeEffectTests } from "./effects._spec";
 import { storeHooksCompatibilityTests } from "./hooksCompatibility._spec";
 import { storeInjectionTests } from "./injection._spec";
 import { storePropertiesObservability } from "./propertiesObservability._spec";
+import { storePartTests } from "./storePart._spec";
 
 describe("Store", () => {
   describe("Effects", storeEffectTests);
   describe("Actions", storeActionsTest);
   describe("Injections", storeInjectionTests);
+  describe("StoreParts", storePartTests);
   describe("Properties Observability", storePropertiesObservability);
   describe("Pure React Hook Compatibility", storeHooksCompatibilityTests);
 

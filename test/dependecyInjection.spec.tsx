@@ -9,10 +9,8 @@ import {
 } from "@react-store/core";
 
 describe("Dependency injection", () => {
-  it("should inject injectables into store", () => {
+  it("should inject injectable into store", () => {
     expect.assertions(5);
-
-    let userService!: UserService;
 
     @Injectable()
     class UserService {}

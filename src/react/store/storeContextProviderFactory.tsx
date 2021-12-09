@@ -1,7 +1,7 @@
-import React, { Context, useEffect, useState } from "react";
+import React, { Context, useState } from "react";
 import { ClassType } from "src/types";
 import { registerHandlers } from "../handlers/registerHandlers";
-import { StoreAdministrator } from "./storeAdministrator";
+import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { StoreAdministratorFactory } from "./storeAdministratorFactory";
 import { StorePropertyKey } from "./storePropertyKey";
 
@@ -17,9 +17,9 @@ export class StoreContextProviderFactory {
     return function StoreContextProviderBuilder({ children, props }) {
       const storeAdministrator = StoreAdministratorFactory.create(StoreType);
 
-      Array.from(storeAdministrator.propertyKeys.values()).forEach(
-        StoreContextProviderFactory.createUseStateForPropertyKey
-      );
+      Array.from(
+        storeAdministrator.propertyKeysManager.propertyKeys.values()
+      ).forEach(StoreContextProviderFactory.createUseStateForPropertyKey);
       StoreContextProviderFactory.registerUseStateForStoreParts(
         storeAdministrator
       );
@@ -34,12 +34,14 @@ export class StoreContextProviderFactory {
   }
 
   private static registerUseStateForStoreParts(storeAdmin: StoreAdministrator) {
-    Array.from(storeAdmin.storeParts.values()).forEach((sp) => {
-      Array.from(sp.propertyKeys.values()).forEach(
-        this.createUseStateForPropertyKey
-      );
-      this.registerUseStateForStoreParts(sp);
-    });
+    Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach(
+      (sp) => {
+        Array.from(sp.propertyKeysManager.propertyKeys.values()).forEach(
+          this.createUseStateForPropertyKey
+        );
+        this.registerUseStateForStoreParts(sp);
+      }
+    );
   }
 
   private static createUseStateForPropertyKey(info: StorePropertyKey) {

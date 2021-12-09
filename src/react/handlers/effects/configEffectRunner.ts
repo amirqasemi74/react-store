@@ -1,9 +1,9 @@
-import { StoreAdministrator } from "src/react/store/storeAdministrator";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 import { runEffect } from "./runEffect";
 import { useEnhancedEffect } from "./useEnhancedEffect";
 
 export const configEffectRunner = (storeAdmin: StoreAdministrator) => {
-  storeAdmin.effectsMetaData.forEach(
+  storeAdmin.effectsManager.effectsMetaData.forEach(
     ({ propertyKey: effectKey, options: { deps, dequal } }) => {
       useEnhancedEffect(
         () => {
@@ -11,7 +11,8 @@ export const configEffectRunner = (storeAdmin: StoreAdministrator) => {
             effectKey,
             storeAdmin,
           });
-          return () => storeAdmin.getEffect(effectKey)?.clearEffect?.();
+          return () =>
+            storeAdmin.effectsManager.getEffect(effectKey)?.clearEffect?.();
         },
         deps?.(storeAdmin.instanceForComponents),
         { dequal }

@@ -1,4 +1,4 @@
-import { STORE_ADMINISTRATION } from "src/constant";
+import { IS_PROXIED, STORE_ADMINISTRATION } from "src/constant";
 import { isStorePart } from "src/decorators/storePart";
 import { getStoreAdministrator } from "src/utils/utils";
 import adtProxyBuilder, {
@@ -16,6 +16,10 @@ export function proxyValueAndSaveIt(
   receiver: any,
   adtProxyBuilderArgs: BaseAdtProxyBuilderArgs
 ) {
+  if (propertyKey === IS_PROXIED) {
+    return true;
+  }
+
   const value = Reflect.get(target, propertyKey, receiver);
 
   if (propertyKey === PROXIED_VALUE) {
@@ -43,7 +47,8 @@ export function proxyValueAndSaveIt(
     // cause to store it for store type not
     // store instance
     if (value instanceof Function) {
-      const propertyKeysValue = getStoreAdministrator(target)?.propertyKeys;
+      const propertyKeysValue =
+        getStoreAdministrator(target)?.propertyKeysManager.propertyKeys;
 
       return propertyKeysValue
         ? propertyKeysValue.get(propertyKey) ||

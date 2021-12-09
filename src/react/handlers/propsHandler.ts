@@ -1,5 +1,5 @@
 import { getStorePropsPropertyKey } from "src/decorators/props";
-import { StoreAdministrator } from "../store/storeAdministrator";
+import { StoreAdministrator } from "../store/administrator/storeAdministrator";
 
 export function propsHandler(
   storeAdministrator: StoreAdministrator,

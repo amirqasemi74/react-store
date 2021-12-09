@@ -1,5 +1,5 @@
 import isPromise from "is-promise";
-import { StoreAdministrator } from "src/react/store/storeAdministrator";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 interface RunEffectArgs {
   effectKey: PropertyKey;
@@ -24,7 +24,7 @@ export const runEffect = ({ effectKey, storeAdmin }: RunEffectArgs) => {
     throw new Error("Only return function from effect as it's clearEffect");
   }
 
-  storeAdmin.storeEffect(effectKey, {
+  storeAdmin.effectsManager.storeEffect(effectKey, {
     clearEffect,
   });
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import { Injectable } from "src/decorators/Injectable";
-import { StoreAdministrator } from "./store/storeAdministrator";
+import { StoreAdministrator } from "./store/administrator/storeAdministrator";
 
 @Injectable()
 export class ReactApplicationContext {
