@@ -5,10 +5,12 @@ export class StoreForComponentUsageProxy implements ProxyHandler<object> {
     const storeAdmin = getStoreAdministrator(target);
 
     if (
-      !storeAdmin?.methods.has(propertyKey) &&
-      storeAdmin?.propertyKeys.has(propertyKey)
+      !storeAdmin?.methodsManager.methods.has(propertyKey) &&
+      storeAdmin?.propertyKeysManager.propertyKeys.has(propertyKey)
     ) {
-      return storeAdmin?.propertyKeys.get(propertyKey)?.getValue("State");
+      return storeAdmin?.propertyKeysManager.propertyKeys
+        .get(propertyKey)
+        ?.getValue("State");
     }
 
     return Reflect.get(target, propertyKey, receiver);

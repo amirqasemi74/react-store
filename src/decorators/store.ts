@@ -2,7 +2,7 @@ import React from "react";
 import { getFromContainer } from "src/container/container";
 import { ReactApplicationContext } from "src/react/appContext";
 import { EnhancedStoreFactory } from "src/react/store/enhancedStoreFactory";
-import { StoreAdministrator } from "src/react/store/storeAdministrator";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 export function Store(): ClassDecorator {
   return function (StoreType: any) {

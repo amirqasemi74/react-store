@@ -1,5 +1,3 @@
-import { isStorePart } from "src/decorators/storePart";
-import { isStore } from "src/utils/utils";
 import arrayProxyBuilder from "./array.proxyBuilder";
 import functionProxyBuilder from "./function.proxyBuilder";
 import { mapProxyBuilder } from "./map.proxyBuilder";
@@ -14,6 +12,7 @@ interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   value: any;
   context?: any;
 }
+
 const adtProxyBuilder = ({
   value,
   context,
@@ -27,11 +26,9 @@ const adtProxyBuilder = ({
 
   try {
     if (
-      (value.constructor === Object &&
-        !Object.isFrozen(value) &&
-        doObjectProxy) ||
-      (value instanceof Object &&
-        (isStore(value) || isStorePart(value.constructor)))
+      value.constructor === Object &&
+      !Object.isFrozen(value) &&
+      doObjectProxy
     ) {
       return objectProxyBuilder({
         object: value,

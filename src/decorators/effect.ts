@@ -32,7 +32,9 @@ export function Effect<T extends {} = any>(
 
     const effects: EffectMetaData[] =
       Reflect.getMetadata(EFFECTS, target.constructor) || [];
+
     effects.push({ options, propertyKey });
+    
     Reflect.defineMetadata(EFFECTS, effects, target.constructor);
     return descriptor;
   };
