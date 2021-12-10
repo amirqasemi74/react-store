@@ -10,11 +10,11 @@ export const useEnhancedEffect = (
 ) => {
   if (options?.dequal && deps) {
     const signal = useRef(0);
-    const preDeps = useLazyRef(() => cloneDeep(deps));
+    const preDeps = useLazyRef(() => cloneDeep(deps, true));
     const isEqual = options?.dequal ? dequal : Object.is;
     for (let i = 0; i < deps.length; i++) {
       if (!isEqual(deps[i], preDeps.current?.[i])) {
-        preDeps.current = cloneDeep(deps);
+        preDeps.current = cloneDeep(deps, true);
         signal.current += 1;
         break;
       }

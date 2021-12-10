@@ -1,6 +1,6 @@
-import { Inject, Props, Store } from "@react-store/core";
+import { Inject, Observable, Props, Store } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
-import FormValidator from "sampleApp/libs/formValidator";
+import { FormValidator } from "sampleApp/libs/formValidator";
 import { ToDoService } from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
 
@@ -11,9 +11,11 @@ export default class ToDoStore {
 
   todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
 
-  todo = { value: "" };
+  todo = new ToDo();
 
   validator = new FormValidator(this.todo);
+
+  d = new Date();
 
   constructor(
     @Inject(ThemeStore) public theme: ThemeStore,
@@ -21,6 +23,7 @@ export default class ToDoStore {
   ) {
     setTimeout(() => {
       this.init();
+      console.log(this);
     });
   }
 
@@ -74,6 +77,11 @@ export default class ToDoStore {
   removeTodo(id: number) {
     this.todos = this.todos.filter((item, i) => i !== id);
   }
+}
+
+@Observable()
+class ToDo {
+  value = "";
 }
 
 interface ToDoItem {

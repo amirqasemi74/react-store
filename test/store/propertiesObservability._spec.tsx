@@ -1,6 +1,6 @@
-import { connectStore, Store, useStore } from "@react-store/core";
+import { connectStore, Observable, Store, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
 
@@ -208,6 +208,37 @@ export const storePropertiesObservability = () => {
     expect(screen.getByText(JSON.stringify({ map: 11 }))).toHaveTextContent(
       JSON.stringify({ map: 11 })
     );
+  });
+
+  it("should observe the observable classes", () => {
+    @Observable()
+    class User {
+      username = "amir";
+    }
+
+    @Store()
+    class UserStore {
+      user = new User();
+
+      changeUsername() {
+        this.user.username = "amirhossein";
+      }
+    }
+
+    const App: React.FC = connectStore(() => {
+      const vm = useStore(UserStore);
+      return (
+        <div>
+          {vm.user.username}
+          <button onClick={vm.changeUsername}>change</button>
+        </div>
+      );
+    }, UserStore);
+
+    const { getByText } = render(<App />);
+    expect(getByText("amir")).toBeInTheDocument();
+    fireEvent.click(getByText("change"));
+    expect(getByText("amirhossein")).toBeInTheDocument();
   });
 
   it("should save proxy value for arrays, objects, functions, maps", () => {

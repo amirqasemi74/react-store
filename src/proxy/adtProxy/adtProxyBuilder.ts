@@ -1,3 +1,4 @@
+import { isObservable } from "src/decorators/observable";
 import arrayProxyBuilder from "./array.proxyBuilder";
 import functionProxyBuilder from "./function.proxyBuilder";
 import { mapProxyBuilder } from "./map.proxyBuilder";
@@ -18,6 +19,7 @@ const adtProxyBuilder = ({
   context,
   ...restOfArgs
 }: AdtProxyBuilderArgs) => {
+  const valType = value?.constructor;
   const { proxyTypes } = restOfArgs;
   const doMapProxy = proxyTypes?.includes("Map") ?? true;
   const doArrayProxy = proxyTypes?.includes("Array") ?? true;
@@ -26,8 +28,8 @@ const adtProxyBuilder = ({
 
   try {
     if (
-      value.constructor === Object &&
-      !Object.isFrozen(value) &&
+      ((valType === Object && !Object.isFrozen(value)) ||
+        (value instanceof Object && isObservable(valType))) &&
       doObjectProxy
     ) {
       return objectProxyBuilder({
@@ -36,7 +38,7 @@ const adtProxyBuilder = ({
       });
     }
 
-    if (value.constructor === Array && doArrayProxy) {
+    if (valType === Array && doArrayProxy) {
       return arrayProxyBuilder({
         array: value,
         ...restOfArgs,

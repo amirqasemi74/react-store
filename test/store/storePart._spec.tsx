@@ -145,7 +145,7 @@ export const storePartTests = () => {
       return <></>;
     };
     const AppWithStore = connectStore(App, UserStore);
-    const {} = render(<AppWithStore />);
+    render(<AppWithStore />);
 
     expect(validator[IS_PROXIED]).toBeFalsy();
   });

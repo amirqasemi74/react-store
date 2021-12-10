@@ -1,4 +1,10 @@
-import { connectStore, Store, Effect, useStore } from "@react-store/core";
+import {
+  connectStore,
+  Store,
+  Effect,
+  useStore,
+  Observable,
+} from "@react-store/core";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
 import { clearContainer } from "src/container/container";
@@ -21,7 +27,6 @@ export const storeEffectTests = () => {
 
       @Effect<UserStore>((_) => [_.user.name])
       onUsernameChange() {
-        const username = this.user.name;
         usernameChangeCallback();
       }
     }
@@ -80,7 +85,6 @@ export const storeEffectTests = () => {
 
       @Effect<UserStore>((_) => [_.username])
       onUsernameChange() {
-        const username = this.username;
         usernameChangeCallback();
         callStack.push("effect");
         return () => {
@@ -141,5 +145,50 @@ export const storeEffectTests = () => {
       "clear-effect",
       "effect",
     ]);
+  });
+
+  it("should run effect for observable class instance change in deep equal mode", async () => {
+    @Observable()
+    class User {
+      name = "amir.qasemi74";
+    }
+
+    const onUserChangeCB = jest.fn();
+    @Store()
+    class UserStore {
+      user = new User();
+
+      changeUsername(e: ChangeEvent<HTMLInputElement>) {
+        this.user.name = e.target.value;
+      }
+
+      @Effect<UserStore>({ deps: (_) => [_.user], dequal: true })
+      onUserChange() {
+        onUserChangeCB();
+      }
+    }
+
+    const App = connectStore(() => {
+      const vm = useStore(UserStore);
+      return (
+        <>
+          {vm.user.name}
+          <input
+            data-testid="username-input"
+            value={vm.user.name}
+            onChange={vm.changeUsername}
+          />
+        </>
+      );
+    }, UserStore);
+
+    const { getByTestId } = render(<App />);
+
+    expect(onUserChangeCB).toBeCalledTimes(1);
+
+    fireEvent.change(getByTestId("username-input"), {
+      target: { value: "amir.qasemi70" },
+    });
+    expect(onUserChangeCB).toBeCalledTimes(2);
   });
 };

@@ -1,7 +1,7 @@
 import { Effect, StorePart } from "@react-store/core";
 
 @StorePart()
-export default class FormValidator {
+export class FormValidator {
   hasAnyError = false;
 
   constructor(private form: any) {}
