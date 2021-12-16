@@ -162,7 +162,7 @@ export const storeEffectTests = () => {
         this.user.name = e.target.value;
       }
 
-      @Effect<UserStore>({ deps: (_) => [_.user], dequal: true })
+      @Effect<UserStore>((_) => [_.user], true)
       onUserChange() {
         onUserChangeCB();
       }

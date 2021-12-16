@@ -4,8 +4,8 @@ export const EFFECTS = Symbol("EFFECTS");
  * *********************** Decorator *********************
  */
 interface EffectOptions<T extends {} = any> {
-  dequal?: boolean;
   deps?: (_: T) => Array<any>;
+  dequal?: boolean;
 }
 
 export interface EffectMetaData {
@@ -14,27 +14,20 @@ export interface EffectMetaData {
 }
 
 export function Effect<T extends {} = any>(
-  arg: EffectOptions<T> | EffectOptions<T>["deps"] = {}
+  deps?: (_: T) => Array<any>,
+  dequal?: boolean
 ): MethodDecorator {
   return function (target, propertyKey, descriptor) {
-    let options: EffectOptions;
-
-    switch (typeof arg) {
-      case "function":
-        options = { deps: arg };
-        break;
-      case "object":
-        options = arg;
-        break;
-      default:
-        throw new Error("Invalid Effect argument");
-    }
+    let options: EffectOptions = {
+      deps,
+      dequal,
+    };
 
     const effects: EffectMetaData[] =
       Reflect.getMetadata(EFFECTS, target.constructor) || [];
 
     effects.push({ options, propertyKey });
-    
+
     Reflect.defineMetadata(EFFECTS, effects, target.constructor);
     return descriptor;
   };

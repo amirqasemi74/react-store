@@ -6,7 +6,7 @@ export class FormValidator {
 
   constructor(private form: any) {}
 
-  @Effect({ deps: (_) => [_.form], dequal: true })
+  @Effect((_) => [_.form], true)
   validate() {
     new Promise((res) => res(1)).then(() => {
       this.hasAnyError = !this.form.value;
