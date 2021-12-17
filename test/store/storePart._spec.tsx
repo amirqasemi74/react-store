@@ -8,7 +8,7 @@ import {
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
 import { IS_PROXIED } from "src/constant";
-import { getStoreAdministrator } from "src/utils/utils";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 export const storePartTests = () => {
   it("should store part state change rerender it's consumers", () => {
@@ -46,7 +46,7 @@ export const storePartTests = () => {
     const { getByText } = render(<AppWithStore />);
 
     fireEvent.click(getByText(/Create Error/i));
-    expect(getStoreAdministrator(storePartRef!)?.type.name).toBe(
+    expect(StoreAdministrator.get(storePartRef!)?.type.name).toBe(
       Validator.name
     );
     expect(getByText(/Has Error/i)).toBeInTheDocument();

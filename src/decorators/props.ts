@@ -1,18 +1,21 @@
-const PROPS_PROPERTY_KEY = Symbol();
-
 export function Props(): PropertyDecorator {
   return function (target, propertyKey) {
-    Reflect.defineMetadata(PROPS_PROPERTY_KEY, propertyKey, target.constructor);
+    StorePropsMetadataUtils.set(target.constructor, propertyKey);
   };
 }
 
-export const getStorePropsPropertyKey = (
-  target: Function
-): PropertyKey | undefined => Reflect.getMetadata(PROPS_PROPERTY_KEY, target);
+export class StorePropsMetadataUtils {
+  private static readonly KEY = Symbol();
 
-export const isPropsPropertyKey = (
-  target: Function,
-  propertyKey: PropertyKey
-) => {
-  return Reflect.getMetadata(PROPS_PROPERTY_KEY, target) === propertyKey;
-};
+  static set(storeType: Function, propertyKey: PropertyKey) {
+    Reflect.defineMetadata(this.KEY, propertyKey, storeType);
+  }
+
+  static get(storeType: Function): PropertyKey | undefined {
+    return Reflect.getMetadata(this.KEY, storeType);
+  }
+
+  static is(storeType: Function, propertyKey: PropertyKey) {
+    return this.get(storeType) === propertyKey;
+  }
+}

@@ -1,6 +1,6 @@
 import { IS_PROXIED, STORE_ADMINISTRATION } from "src/constant";
-import { isStorePart } from "src/decorators/storePart";
-import { getStoreAdministrator } from "src/utils/utils";
+import { StorePartMetadataUtils } from "src/decorators/storePart";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 import adtProxyBuilder, {
   BaseAdtProxyBuilderArgs,
 } from "./adtProxy/adtProxyBuilder";
@@ -34,7 +34,7 @@ export function proxyValueAndSaveIt(
     !isInArrayOrObjectPrototype(target, propertyKey) &&
     ([Object, Array, Map].includes(value.constructor) ||
       value instanceof Function ||
-      (value instanceof Object && isStorePart(value.constructor)))
+      (value instanceof Object && StorePartMetadataUtils.is(value.constructor)))
   ) {
     const proxiedValue = () =>
       adtProxyBuilder({
@@ -48,7 +48,7 @@ export function proxyValueAndSaveIt(
     // store instance
     if (value instanceof Function) {
       const propertyKeysValue =
-        getStoreAdministrator(target)?.propertyKeysManager.propertyKeys;
+        StoreAdministrator.get(target)?.propertyKeysManager.propertyKeys;
 
       return propertyKeysValue
         ? propertyKeysValue.get(propertyKey) ||

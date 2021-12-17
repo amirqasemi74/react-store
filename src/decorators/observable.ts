@@ -1,10 +1,16 @@
 export function Observable(): ClassDecorator {
-  return function (target: any) {
-    Reflect.defineMetadata(IS_OBSERVABLE, true, target);
+  return function (target: Function) {
+    ObservableMetadataUtils.set(target);
   };
 }
 
-const IS_OBSERVABLE = Symbol("IS_OBSERVABLE");
+export class ObservableMetadataUtils {
+  private static readonly KEY = Symbol();
+  static set(target: Function) {
+    Reflect.defineMetadata(this.KEY, true, target);
+  }
 
-export const isObservable = (target: any) =>
-  !!Reflect.hasMetadata(IS_OBSERVABLE, target);
+  static is(target: Function) {
+    return !!Reflect.hasOwnMetadata(this.KEY, target);
+  }
+}

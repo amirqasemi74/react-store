@@ -1,21 +1,25 @@
 import { EnhancedStoreFactory } from "src/react/store/enhancedStoreFactory";
 
-const STORE_PART_OPTIONS = Symbol("STORE_PART_OPTIONS");
-
 /**
  * ******************* Decorator *********************
  */
 export function StorePart(): ClassDecorator {
   return function (StoreType: any) {
+    // TODO: must be removed
     const EnhancedStoreType = EnhancedStoreFactory.create(StoreType);
-    Reflect.defineMetadata(STORE_PART_OPTIONS, {}, EnhancedStoreType);
+    StorePartMetadataUtils.set(StoreType);
     return EnhancedStoreType;
   } as any;
 }
 
-/**
- * ********************* Utils ************************
- */
-export const isStorePart = (target: Function) => {
-  return !!Reflect.getMetadata(STORE_PART_OPTIONS, target);
-};
+export class StorePartMetadataUtils {
+  private static readonly KEY = Symbol();
+
+  static set(storeType: Function) {
+    Reflect.defineMetadata(this.KEY, {}, storeType);
+  }
+
+  static is(storeType: Function) {
+    return !!Reflect.getMetadata(this.KEY, storeType);
+  }
+}

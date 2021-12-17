@@ -29,9 +29,9 @@ export class StoreAdministrator {
 
   private runningActionsCount = 0;
 
-  constructor(instance: any) {
+  private constructor(type: Function, instance: any) {
     this.instance = instance;
-    this.type = getType(instance)!;
+    this.type = type;
     this.instance[STORE_ADMINISTRATION] = this;
     this.instanceForComponents = new Proxy(
       this.instance,
@@ -41,6 +41,18 @@ export class StoreAdministrator {
     this.storePartsManager.initEffectsContainers();
     this.propertyKeysManager.makeAllObservable();
     this.methodsManager.makeAllAsActions();
+  }
+
+  static register(type: Function, instance: any) {
+    Reflect.set(
+      this,
+      STORE_ADMINISTRATION,
+      new StoreAdministrator(type, instance)
+    );
+  }
+
+  static get(store: object) {
+    return (store[STORE_ADMINISTRATION] as StoreAdministrator) || null;
   }
 
   runAction(action: Function) {

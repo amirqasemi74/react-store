@@ -1,8 +1,8 @@
-import { getStoreAdministrator } from "src/utils/utils";
+import { StoreAdministrator } from "./administrator/storeAdministrator";
 
 export class StoreForComponentUsageProxy implements ProxyHandler<object> {
   get(target: object, propertyKey: PropertyKey, receiver: any) {
-    const storeAdmin = getStoreAdministrator(target);
+    const storeAdmin = StoreAdministrator.get(this);
 
     if (
       !storeAdmin?.methodsManager.methods.has(propertyKey) &&

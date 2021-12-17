@@ -1,4 +1,3 @@
-import { isStore } from "src/utils/utils";
 import { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
 import { proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
 
@@ -21,9 +20,7 @@ const objectProxyBuilder = ({
     set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {
       // console.log("Object::set", target, propertyKey, value);
       const res = Reflect.set(target, propertyKey, value, receiver);
-      if (!isStore(target)) {
-        onSet?.();
-      }
+      onSet?.();
       return res;
     },
   });

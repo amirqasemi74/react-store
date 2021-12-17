@@ -1,6 +1,5 @@
-import { isStorePart } from "src/decorators/storePart";
-import { getStoreAdministrator } from "src/utils/utils";
-import type { StoreAdministrator } from "./storeAdministrator";
+import { StorePartMetadataUtils } from "src/decorators/storePart";
+import { StoreAdministrator } from "./storeAdministrator";
 
 export class StoreStorePartsManager {
   storeParts = new Map<PropertyKey, StoreAdministrator>();
@@ -12,10 +11,10 @@ export class StoreStorePartsManager {
       ([propertyKey, value]) => {
         if (
           value &&
-          isStorePart(value.constructor) &&
+          StorePartMetadataUtils.is(value.constructor) &&
           !this.storeParts.has(propertyKey)
         ) {
-          const storePart = getStoreAdministrator(value)!;
+          const storePart = StoreAdministrator.get(value);
           storePart.injectedInTos.add(this.storeAdmin);
           this.storeParts.set(propertyKey, storePart);
         }

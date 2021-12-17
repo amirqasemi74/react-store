@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useLazyRef } from "./useLazyRef";
+import { useFixedLazyRef } from "./useLazyRef";
 
 export const useWillMount = (fn: () => (() => void) | void) => {
-  const clearEffect = useLazyRef(fn).current;
+  const clearEffect = useFixedLazyRef(fn);
   useEffect(() => {
     return clearEffect;
   }, [clearEffect]);

@@ -1,4 +1,4 @@
-import { getStoreAdministrator } from "src/utils/utils";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 export function Action() {
   return function (
@@ -12,7 +12,7 @@ export function Action() {
       configurable: descriptor.configurable,
       get() {
         return (...args: any) => {
-          return getStoreAdministrator(this)?.runAction(() =>
+          return StoreAdministrator.get(this)?.runAction(() =>
             fn.call(this, args)
           );
         };

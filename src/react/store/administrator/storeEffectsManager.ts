@@ -1,4 +1,4 @@
-import { EffectMetaData, EFFECTS } from "src/decorators/effect";
+import { StoreEffectsMetadataUtils } from "src/decorators/effect";
 import type { StoreAdministrator } from "./storeAdministrator";
 
 export class StoreEffectsManager {
@@ -6,8 +6,8 @@ export class StoreEffectsManager {
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
-  get effectsMetaData(): EffectMetaData[] {
-    return Reflect.getMetadata(EFFECTS, this.storeAdmin.type) || [];
+  get effectsMetaData() {
+    return StoreEffectsMetadataUtils.get(this.storeAdmin.type);
   }
 
   storeEffect(effectKey: PropertyKey, effect: Effect) {

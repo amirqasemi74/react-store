@@ -2,8 +2,7 @@ import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
 import { getConstructorDependencyTypes } from "src/decorators/inject";
 import { ClassType } from "src/types";
-import { useLazyRef } from "src/utils/useLazyRef";
-import { getStoreAdministrator } from "src/utils/utils";
+import { useFixedLazyRef } from "src/utils/useLazyRef";
 import { ReactApplicationContext } from "../appContext";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 
@@ -11,9 +10,9 @@ export class StoreAdministratorFactory {
   static create(StoreType: ClassType) {
     const deps = this.resolveStoreDeps(StoreType);
 
-    return useLazyRef(() => {
+    return useFixedLazyRef(() => {
       const store = new StoreType(...deps);
-      const storeAdministrator = getStoreAdministrator(store)!;
+      const storeAdministrator = StoreAdministrator.get(store);
 
       // for example if we inject store A into other store B
       // if then injected store A change all store b consumer must be
@@ -21,19 +20,18 @@ export class StoreAdministratorFactory {
       // so here we save store B ref in store A
       // to notify B if A changed
       deps
-        .map(getStoreAdministrator)
+        .map(StoreAdministrator.get)
         .forEach((sourceStoreAdmin) =>
           sourceStoreAdmin?.injectedInTos.add(storeAdministrator)
         );
 
       return storeAdministrator;
-    }).current;
+    });
   }
 
   private static resolveStoreDeps(storeType: ClassType) {
-    const storeDepsContexts = useLazyRef(() => {
-      const storeDeps = getConstructorDependencyTypes(storeType);
-
+    const storeDeps = getConstructorDependencyTypes(storeType);
+    const storeDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<
         Function,
         React.Context<StoreAdministrator | null>
@@ -57,7 +55,7 @@ export class StoreAdministratorFactory {
       });
 
       return storeDepsContexts;
-    }).current;
+    });
 
     const storicalDepsValues = Array.from(storeDepsContexts.entries()).map(
       ([type, context]) => {
@@ -71,13 +69,12 @@ export class StoreAdministratorFactory {
       }
     );
 
-    return useLazyRef(() => {
-      const allStoreDepTypes = getConstructorDependencyTypes(storeType);
-      return allStoreDepTypes.map(
+    return useFixedLazyRef(() => {
+      return storeDeps.map(
         (dep) =>
           storicalDepsValues.find((sdv) => sdv.type === dep.type)?.instance ||
           getFromContainer(dep.type as ClassType)
       );
-    }).current;
+    });
   }
 }

@@ -1,4 +1,3 @@
-import { isStore } from "src/utils/utils";
 import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
 import { PROXIED_VALUE } from "../proxyValueAndSaveIt";
 
@@ -43,27 +42,21 @@ export const mapProxyBuilder = ({
         case "set": {
           return function (mapKey: any, mapValue: any) {
             (value as Function).bind(target)(mapKey, mapValue);
-            if (!isStore(target)) {
-              onSet?.();
-            }
+            onSet?.();
           };
         }
 
         case "delete": {
           return function (mapKey: any) {
             (value as Function).bind(target)(mapKey);
-            if (!isStore(target)) {
-              onSet?.();
-            }
+            onSet?.();
           };
         }
 
         case "clear": {
           return function () {
             (value as Function).bind(target)();
-            if (!isStore(target)) {
-              onSet?.();
-            }
+            onSet?.();
           };
         }
       }

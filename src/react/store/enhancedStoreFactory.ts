@@ -1,4 +1,3 @@
-import { STORE_ADMINISTRATION } from "src/constant";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 export class EnhancedStoreFactory {
@@ -7,7 +6,7 @@ export class EnhancedStoreFactory {
       constructor(...args: any) {
         super(...args);
         // first set default values to store admin
-        Reflect.set(this, STORE_ADMINISTRATION, new StoreAdministrator(this));
+        StoreAdministrator.register(StoreType, this);
       }
     } as any;
 

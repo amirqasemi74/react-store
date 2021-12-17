@@ -11,3 +11,11 @@ export const useLazyRef = <T>(initValFunc: () => T) => {
   }
   return ref;
 };
+
+export const useFixedLazyRef = <T>(initValFunc: () => T) => {
+  const ref: MutableRefObject<T> = useRef(null) as any;
+  if (ref.current === null) {
+    ref.current = initValFunc();
+  }
+  return ref.current;
+};

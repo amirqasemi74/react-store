@@ -1,8 +1,11 @@
 import React, { useMemo } from "react";
 import { getFromContainer } from "src/container/container";
+import { StoreMetadataUtils } from "src/decorators/store";
 import { ClassType } from "src/types";
-import { useLazyRef } from "src/utils/useLazyRef";
+import { useFixedLazyRef } from "src/utils/useLazyRef";
 import { ReactApplicationContext } from "../appContext";
+import { StoreAdministrator } from "./administrator/storeAdministrator";
+import { EnhancedStoreFactory } from "./enhancedStoreFactory";
 import { StoreContextProviderFactory } from "./storeContextProviderFactory";
 
 interface Props {
@@ -12,17 +15,31 @@ interface Props {
 }
 
 export const StoreProvider = ({ type, render, props }: Props) => {
-  const storeContext = useLazyRef(() =>
-    getFromContainer(ReactApplicationContext).getStoreReactContext(type)
-  ).current;
+  const storeContext = useFixedLazyRef(() => {
+    if (!StoreMetadataUtils.isStore(type)) {
+      throw new Error(`${type.name} doesn't decorated with @Store`);
+    }
 
-  if (!storeContext) {
-    throw new Error(`${type.name} doesn't decorated with @Store`);
-  }
+    const appContext = getFromContainer(ReactApplicationContext);
+    let context = appContext.getStoreReactContext(type);
+    if (!context) {
+      context = React.createContext<StoreAdministrator | null>(null);
+      context.displayName = `${type.name}`;
+      // store context provider in app container
+      // to use context ref in useStore to get context value
+      appContext.registerStoreContext(type, context);
+    }
 
-  const StoreContextProvider = useLazyRef(() =>
-    StoreContextProviderFactory.create(storeContext, type)
-  ).current;
+    return context;
+  });
+
+  const EnhancedStoreType = useFixedLazyRef(() =>
+    EnhancedStoreFactory.create(type)
+  );
+
+  const StoreContextProvider = useFixedLazyRef(() =>
+    StoreContextProviderFactory.create(storeContext, EnhancedStoreType)
+  );
 
   const Component = useMemo(() => React.memo(render), []);
 

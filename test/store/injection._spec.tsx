@@ -8,7 +8,7 @@ import {
   useStore,
   StoreProvider,
 } from "@react-store/core";
-import { getStoreAdministrator } from "src/utils/utils";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 export const storeInjectionTests = () => {
   it("Upper store should inject into lower store", () => {
@@ -52,8 +52,8 @@ export const storeInjectionTests = () => {
     expect(appStore).not.toBe(null);
     expect(appStoreInUserStore).not.toBe(null);
 
-    expect(getStoreAdministrator(appStore)).toBe(
-      getStoreAdministrator(appStoreInUserStore)
+    expect(StoreAdministrator.get(appStore)).toBe(
+      StoreAdministrator.get(appStoreInUserStore)
     );
 
     expect(getByText(/amir.qasemi74/i)).toBeInTheDocument();

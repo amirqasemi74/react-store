@@ -1,4 +1,4 @@
-import { isObservable } from "src/decorators/observable";
+import { ObservableMetadataUtils } from "src/decorators/observable";
 import arrayProxyBuilder from "./array.proxyBuilder";
 import functionProxyBuilder from "./function.proxyBuilder";
 import { mapProxyBuilder } from "./map.proxyBuilder";
@@ -29,7 +29,7 @@ const adtProxyBuilder = ({
   try {
     if (
       ((valType === Object && !Object.isFrozen(value)) ||
-        (value instanceof Object && isObservable(valType))) &&
+        (value instanceof Object && ObservableMetadataUtils.is(valType))) &&
       doObjectProxy
     ) {
       return objectProxyBuilder({
