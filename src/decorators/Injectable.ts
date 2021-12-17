@@ -1,18 +1,28 @@
 import "reflect-metadata";
 
-export const INJECTABLE = Symbol("Injectable");
+export function Injectable(scope = Scope.SINGLETON): ClassDecorator {
+  return function (target: Function) {
+    InjectableMetadataUtils.set(target, scope);
+  };
+}
+
+export class InjectableMetadataUtils {
+  private static readonly KEY = Symbol();
+
+  static set(target: Function, scope: Scope) {
+    Reflect.defineMetadata(this.KEY, scope, target);
+  }
+
+  static is(target: Function) {
+    return Reflect.hasOwnMetadata(this.KEY, target);
+  }
+
+  static get(target: Function): Scope | null {
+    return Reflect.getOwnMetadata(this.KEY, target) || null;
+  }
+}
 
 export enum Scope {
   SINGLETON = "SINGLETON",
   TRANSIENT = "TRANSIENT",
-}
-
-export interface InjectableOptions {
-  scope?: Scope;
-}
-
-export function Injectable(options: InjectableOptions = {}): ClassDecorator {
-  return function (target: Function) {
-    Reflect.defineMetadata(INJECTABLE, options, target);
-  };
 }

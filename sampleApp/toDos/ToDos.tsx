@@ -1,7 +1,7 @@
 import { useStore } from "@react-store/core";
 import React from "react";
 import styled, { css } from "styled-components";
-import ToDoStore from "./toDo.store";
+import { ToDoStore } from "./toDo.store";
 import ToDoList from "./ToDoList";
 
 const ToDos: React.FC = () => {

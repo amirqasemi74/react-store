@@ -12,7 +12,7 @@ export class StorePropsMetadataUtils {
   }
 
   static get(storeType: Function): PropertyKey | undefined {
-    return Reflect.getMetadata(this.KEY, storeType);
+    return Reflect.getOwnMetadata(this.KEY, storeType);
   }
 
   static is(storeType: Function, propertyKey: PropertyKey) {

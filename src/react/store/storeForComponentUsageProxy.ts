@@ -2,7 +2,7 @@ import { StoreAdministrator } from "./administrator/storeAdministrator";
 
 export class StoreForComponentUsageProxy implements ProxyHandler<object> {
   get(target: object, propertyKey: PropertyKey, receiver: any) {
-    const storeAdmin = StoreAdministrator.get(this);
+    const storeAdmin = StoreAdministrator.get(target);
 
     if (
       !storeAdmin?.methodsManager.methods.has(propertyKey) &&
