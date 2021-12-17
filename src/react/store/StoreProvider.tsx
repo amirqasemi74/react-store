@@ -16,8 +16,8 @@ interface Props {
 
 export const StoreProvider = ({ type, render, props }: Props) => {
   const storeContext = useFixedLazyRef(() => {
-    if (!StoreMetadataUtils.isStore(type)) {
-      throw new Error(`${type.name} doesn't decorated with @Store`);
+    if (!StoreMetadataUtils.is(type)) {
+      throw new Error(`\`${type.name}\` does not decorated with @Store()`);
     }
 
     const appContext = getFromContainer(ReactApplicationContext);

@@ -1,71 +1,98 @@
+import { InjectableMetadataUtils } from "./Injectable";
+import { StoreMetadataUtils } from "./store";
+
 export function Inject(...deps: any[]): any {
   return function (...decoArgs: any[]) {
-    const isClassDecorator = decoArgs.length === 1;
-    const isParameterDecorator =
-      decoArgs.length === 3 &&
-      decoArgs[1] === undefined &&
-      typeof decoArgs[2] === "number";
+    const target = decoArgs[0];
+    const injectType: InjectType =
+      decoArgs.length === 1 ? "CLASS" : "PARAMETER";
+    const preInjectType = InjectMetadataUtils.getType(target);
 
-    if (isClassDecorator) {
-      const target = decoArgs[0];
-      Reflect.defineMetadata(IS_INJECTED_USING_CLASS_DECORATOR, true, target);
-
-      if (Reflect.getMetadata(IS_INJECTED_USING_PARAMETER_DECORATOR, target)) {
-        throw new Error(`${target.name}: Dependencies are injecting by @Inject as parameter decorator. Simultaneous, using @Inject as class 
-          decorator is not allow. remove one of them.
-        `);
-      }
-
-      Reflect.defineMetadata(
-        CONSTRUCTOR_DEPENDENCY_TYPES,
-        deps
-          .map<ConstructorDependency>((type, parameterIndex) => ({
-            type,
-            parameterIndex,
-          }))
-          .sort((a, b) => a.parameterIndex - b.parameterIndex),
-        target
+    if (preInjectType && preInjectType !== injectType) {
+      throw new Error(
+        `Dependencies are injecting by @Inject() as parameter and class decorator for ${target.name}. Use one of them.`
       );
     }
-
-    if (isParameterDecorator) {
-      const target = decoArgs[0];
-      Reflect.defineMetadata(
-        IS_INJECTED_USING_PARAMETER_DECORATOR,
-        true,
-        target
-      );
-
-      if (Reflect.getMetadata(IS_INJECTED_USING_CLASS_DECORATOR, target)) {
-        throw new Error(`${target.name}: Dependencies are injecting by @Inject as class decorator. Simultaneous, using @Inject as parameter 
-          decorator is not allow. remove one of them.
-        `);
-      }
-
-      const constructorDepTypes: ConstructorDependency[] =
-        Reflect.getMetadata(CONSTRUCTOR_DEPENDENCY_TYPES, target) || [];
-
-      Reflect.defineMetadata(
-        CONSTRUCTOR_DEPENDENCY_TYPES,
-        constructorDepTypes
-          .concat({ type: deps[0], parameterIndex: decoArgs[2] })
-          .sort((a, b) => a.parameterIndex - b.parameterIndex),
-        target
-      );
-    }
+    InjectMetadataUtils.setType(target, injectType);
+    InjectMetadataUtils.setDependencies(injectType, target, deps, decoArgs[2]);
   };
 }
 
+export class InjectMetadataUtils {
+  private static readonly INJECT_TYPE = Symbol();
+  private static readonly DEP_TYPES = Symbol();
+
+  static setType(target: Function, type: InjectType) {
+    Reflect.defineMetadata(this.INJECT_TYPE, type, target);
+  }
+
+  static getType(target: Function): InjectType | null {
+    return Reflect.getOwnMetadata(this.INJECT_TYPE, target) || null;
+  }
+
+  static setDependencies(
+    type: InjectType,
+    target: Function,
+    deps: any[],
+    paramIndex?: number
+  ) {
+    if (type === "CLASS") {
+      Reflect.defineMetadata(
+        this.DEP_TYPES,
+        deps
+          .map<ConstructorDependency>((type, i) => ({
+            type,
+            paramIndex: i,
+          }))
+          .sort((a, b) => a.paramIndex - b.paramIndex),
+        target
+      );
+    } else {
+      const depTypes: ConstructorDependency[] =
+        Reflect.getMetadata(this.DEP_TYPES, target) || [];
+
+      Reflect.defineMetadata(
+        this.DEP_TYPES,
+        depTypes
+          .concat({ type: deps[0], paramIndex: paramIndex! })
+          .sort((a, b) => a.paramIndex - b.paramIndex),
+        target
+      );
+    }
+  }
+
+  static getOwnDependencies(target: Function) {
+    return Reflect.getOwnMetadata(this.DEP_TYPES, target);
+  }
+
+  static getDependenciesDecoratedWith(
+    target: Function | null,
+    decoratedWith: DecoratedWith
+  ): ConstructorDependency[] {
+    if (target) {
+      const isDecorated =
+        decoratedWith === "STORE"
+          ? StoreMetadataUtils.is(target)
+          : InjectableMetadataUtils.is(target);
+
+      if (this.getOwnDependencies(target) && isDecorated) {
+        return this.getOwnDependencies(target);
+      } else {
+        return this.getDependenciesDecoratedWith(
+          Reflect.getPrototypeOf(target) as any,
+          decoratedWith
+        );
+      }
+    }
+
+    return [];
+  }
+}
+
 interface ConstructorDependency {
-  parameterIndex: number;
+  paramIndex: number;
   type: Function;
 }
 
-export const CONSTRUCTOR_DEPENDENCY_TYPES = Symbol();
-const IS_INJECTED_USING_CLASS_DECORATOR = Symbol();
-const IS_INJECTED_USING_PARAMETER_DECORATOR = Symbol();
-
-export const getConstructorDependencyTypes = (
-  constructorType: Function
-): ConstructorDependency[] =>
-  Reflect.getMetadata(CONSTRUCTOR_DEPENDENCY_TYPES, constructorType) || [];
+type DecoratedWith = "STORE" | "INJECTABLE";
+type InjectType = "CLASS" | "PARAMETER";

@@ -2,7 +2,6 @@ import { StorePropsMetadataUtils } from "src/decorators/props";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
 import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { isPrimitive } from "src/utils/isPrimitive";
-import { getType } from "src/utils/utils";
 import { StorePropertyKey } from "../storePropertyKey";
 import type { StoreAdministrator } from "./storeAdministrator";
 
@@ -14,7 +13,7 @@ export class StorePropertyKeysManager {
   constructor(private storeAdmin: StoreAdministrator) {
     this.policies.push({
       matcher: (propertyKey) =>
-        StorePropsMetadataUtils.is(getType(storeAdmin.instance)!, propertyKey),
+        StorePropsMetadataUtils.is(storeAdmin.type, propertyKey),
       render: false,
       set: "ORIGINAL",
     });

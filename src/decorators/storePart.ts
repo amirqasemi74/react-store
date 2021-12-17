@@ -7,7 +7,7 @@ export function StorePart(): ClassDecorator {
   return function (StoreType: any) {
     // TODO: must be removed
     const EnhancedStoreType = EnhancedStoreFactory.create(StoreType);
-    StorePartMetadataUtils.set(StoreType);
+    StorePartMetadataUtils.set(EnhancedStoreType);
     return EnhancedStoreType;
   } as any;
 }
@@ -20,6 +20,6 @@ export class StorePartMetadataUtils {
   }
 
   static is(storeType: Function) {
-    return !!Reflect.getMetadata(this.KEY, storeType);
+    return !!Reflect.getOwnMetadata(this.KEY, storeType);
   }
 }

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
-import { getConstructorDependencyTypes } from "src/decorators/inject";
+import { InjectMetadataUtils } from "src/decorators/inject";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 import { ReactApplicationContext } from "../appContext";
@@ -30,7 +30,10 @@ export class StoreAdministratorFactory {
   }
 
   private static resolveStoreDeps(storeType: ClassType) {
-    const storeDeps = getConstructorDependencyTypes(storeType);
+    const storeDeps = useFixedLazyRef(() =>
+      InjectMetadataUtils.getDependenciesDecoratedWith(storeType, "STORE")
+    );
+
     const storeDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<
         Function,
@@ -69,12 +72,12 @@ export class StoreAdministratorFactory {
       }
     );
 
-    return useFixedLazyRef(() => {
-      return storeDeps.map(
+    return useFixedLazyRef(() =>
+      storeDeps.map(
         (dep) =>
           storicalDepsValues.find((sdv) => sdv.type === dep.type)?.instance ||
           getFromContainer(dep.type as ClassType)
-      );
-    });
+      )
+    );
   }
 }

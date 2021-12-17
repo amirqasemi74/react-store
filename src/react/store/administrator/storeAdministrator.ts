@@ -1,4 +1,3 @@
-import { getType } from "src/utils/utils";
 import { STORE_ADMINISTRATION } from "../../../constant";
 import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
 import { StoreEffectsManager } from "./storeEffectsManager";

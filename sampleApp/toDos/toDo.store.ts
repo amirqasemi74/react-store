@@ -1,11 +1,10 @@
-import { Inject, Observable, Props, Store } from "@react-store/core";
+import { Effect, Observable, Props, Store } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 import { FormValidator } from "sampleApp/libs/formValidator";
-import { ToDoService } from "sampleApp/toDos/services/todos.service";
-import ThemeStore from "../theme.store";
+import { BaseStore } from "./base.store";
 
 @Store()
-export default class ToDoStore {
+export class ToDoStore extends BaseStore {
   @Props()
   props: any = {};
 
@@ -17,16 +16,7 @@ export default class ToDoStore {
 
   d = new Date();
 
-  constructor(
-    @Inject(ThemeStore) public theme: ThemeStore,
-    @Inject(ToDoService) public todoService: ToDoService
-  ) {
-    setTimeout(() => {
-      this.init();
-      console.log(this);
-    });
-  }
-
+  @Effect(() => [])
   init() {
     for (let i = 0; i < 10; i++) {
       this.todos.push({

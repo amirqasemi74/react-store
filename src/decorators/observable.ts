@@ -6,6 +6,7 @@ export function Observable(): ClassDecorator {
 
 export class ObservableMetadataUtils {
   private static readonly KEY = Symbol();
+  
   static set(target: Function) {
     Reflect.defineMetadata(this.KEY, true, target);
   }

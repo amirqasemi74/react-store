@@ -1,4 +1,8 @@
-import { getFromContainer, clearContainer } from "./container";
+import {
+  getFromContainer,
+  clearContainer,
+  removeFromContainer,
+} from "./container";
 import { Injectable, Scope } from "src/decorators/Injectable";
 import { Inject } from "..";
 import { Injector } from "./Injector";
@@ -59,8 +63,55 @@ describe("IOC Container", () => {
     expect(app1).not.toBe(app2);
   });
 
+  it("should throw error with both usage of @Inject() as class and parameter decorator for one class", () => {
+    expect.assertions(1);
+
+    try {
+      @Injectable()
+      class A {}
+
+      @Injectable()
+      class B {}
+
+      @Injectable()
+      @Inject(A)
+      class C {
+        constructor(public a: A, @Inject(B) public b: B) {}
+      }
+      getFromContainer(C);
+    } catch (error: any) {
+      expect(1).toBe(1);
+    }
+  });
+
+  it("should throw error if class is not decorated wit @Injectable()", () => {
+    expect.assertions(1);
+
+    try {
+      class A {}
+      getFromContainer(A);
+    } catch (error: any) {
+      expect(1).toBe(1);
+    }
+  });
+
+  it("should can remove class instance from container", () => {
+    let createCount = 0;
+
+    @Injectable()
+    class A {
+      constructor() {
+        createCount++;
+      }
+    }
+    getFromContainer(A);
+    removeFromContainer(A);
+    getFromContainer(A);
+    expect(createCount).toBe(2);
+  });
+
   describe("Scope", () => {
-    it("should resolve deps with default scope Singelton", () => {
+    it("should resolve deps with default scope (singleton)", () => {
       @Injectable()
       class App {
         p1 = Math.random();
@@ -71,7 +122,7 @@ describe("IOC Container", () => {
     });
 
     it("should resolve deps with transient scope", () => {
-      @Injectable({ scope: Scope.TRANSIENT })
+      @Injectable(Scope.TRANSIENT)
       class App {
         p1 = Math.random();
       }
@@ -126,7 +177,7 @@ describe("IOC Container", () => {
       return wait!;
     });
 
-    it("shotuld resolve dependency with injector with circular deps", () => {
+    it("should resolve dependency with injector with circular deps", () => {
       expect.assertions(2);
 
       let resolve;
@@ -153,6 +204,51 @@ describe("IOC Container", () => {
       getFromContainer(ToDoService);
 
       return wait;
+    });
+  });
+
+  describe("Inheritance", () => {
+    it("should inject dependencies from parent class", () => {
+      @Injectable()
+      class A {}
+
+      @Inject(A)
+      @Injectable()
+      class B {
+        constructor(public a: A) {}
+      }
+
+      @Injectable()
+      class C extends B {}
+
+      const c = getFromContainer(C);
+      expect(c.a).toBeInstanceOf(A);
+    });
+
+    it("should inject dependencies from main class and ignore parent class dependencies", () => {
+      @Injectable()
+      class A1 {}
+
+      @Injectable()
+      class A2 {}
+
+      @Inject(A1)
+      @Injectable()
+      class B {
+        constructor(public a1: A1) {}
+      }
+
+      @Inject(A1, A2)
+      @Injectable()
+      class C extends B {
+        constructor(public a1: A2, public a2: A2) {
+          super(a1);
+        }
+      }
+
+      const c = getFromContainer(C);
+      expect(c.a1).toBeInstanceOf(A1);
+      expect(c.a2).toBeInstanceOf(A2);
     });
   });
 });

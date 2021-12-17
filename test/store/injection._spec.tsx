@@ -7,11 +7,58 @@ import {
   Inject,
   useStore,
   StoreProvider,
+  Injectable,
 } from "@react-store/core";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 export const storeInjectionTests = () => {
-  it("Upper store should inject into lower store", () => {
+  it("should inject @Injectable into store", () => {
+    expect.assertions(5);
+
+    @Injectable()
+    class UserService {}
+
+    @Injectable()
+    class PostService {}
+
+    @Store()
+    @Inject(PostService, UserService)
+    class PostStore {
+      constructor(postService: PostService, userService: UserService) {
+        expect(postService).toBeInstanceOf(PostService);
+        expect(userService).toBeInstanceOf(UserService);
+        userService = userService;
+      }
+    }
+
+    @Store()
+    @Inject(PostStore, UserService)
+    class UserStore {
+      username = "amir.qasemi74";
+      password = "123456";
+
+      constructor(postStore: PostStore, userService: UserService) {
+        expect(postStore).toBeInstanceOf(PostStore);
+        expect(userService).toBeInstanceOf(UserService);
+        expect(userService).toBe(userService);
+      }
+    }
+
+    const App = () => {
+      const vm = useStore(UserStore);
+      useStore(PostStore);
+      return (
+        <div>
+          username: {vm.username}
+          password: {vm.password}
+        </div>
+      );
+    };
+    const AppWithStore = connectStore(connectStore(App, UserStore), PostStore);
+    render(<AppWithStore />);
+  });
+
+  it("should upper store inject into lower store", () => {
     let appStore!: AppStore, appStoreInUserStore!: AppStore;
 
     @Store()
@@ -62,8 +109,6 @@ export const storeInjectionTests = () => {
   });
 
   it("Upper store mutations should rerender it's consumers", () => {
-    let appStore!: AppStore, appStoreInUserStore!: AppStore;
-
     @Store()
     class AppStore {
       theme = "black";
@@ -79,9 +124,7 @@ export const storeInjectionTests = () => {
       username = "amir.qasemi74";
       password = "123456";
 
-      constructor(public app: AppStore) {
-        appStoreInUserStore = app;
-      }
+      constructor(public app: AppStore) {}
     }
 
     const User = memo(() => {
@@ -97,7 +140,6 @@ export const storeInjectionTests = () => {
 
     const App = () => {
       const vm = useStore(AppStore);
-      appStore = vm;
       return (
         <>
           <button onClick={vm.changeTheme}>change Theme</button>
@@ -111,5 +153,64 @@ export const storeInjectionTests = () => {
     fireEvent.click(getByText("change Theme"));
 
     expect(getByText(/white/i)).toBeInTheDocument();
+  });
+
+  describe("Inheritance", () => {
+    it("should inject parent store dependencies", () => {
+      let mainStore!: MainStore;
+      @Injectable()
+      class A {}
+
+      @Store()
+      @Inject(A)
+      class BaseStore {
+        constructor(public a: A) {}
+      }
+
+      @Store()
+      class MainStore extends BaseStore {}
+
+      const App = connectStore(() => {
+        mainStore = useStore(MainStore);
+        return <></>;
+      }, MainStore);
+
+      render(<App />);
+
+      expect(mainStore.a).toBeInstanceOf(A);
+    });
+
+    it("should inject main store dependencies and ignore parent dependencies", () => {
+      let mainStore!: MainStore;
+      @Injectable()
+      class A {}
+
+      @Injectable()
+      class B {}
+
+      @Store()
+      @Inject(A)
+      class BaseStore {
+        constructor(public a: A) {}
+      }
+
+      @Store()
+      @Inject(A, B)
+      class MainStore extends BaseStore {
+        constructor(public a: A, public b: B) {
+          super(a);
+        }
+      }
+
+      const App = connectStore(() => {
+        mainStore = useStore(MainStore);
+        return <></>;
+      }, MainStore);
+
+      render(<App />);
+
+      expect(mainStore.a).toBeInstanceOf(A);
+      expect(mainStore.b).toBeInstanceOf(B);
+    });
   });
 };

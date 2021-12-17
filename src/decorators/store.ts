@@ -1,17 +1,17 @@
 export function Store(): ClassDecorator {
   return function (StoreType: any) {
-    StoreMetadataUtils.setStore(StoreType);
+    StoreMetadataUtils.set(StoreType);
   };
 }
 
 export class StoreMetadataUtils {
-  private static IS_STORE = Symbol();
+  private static KEY = Symbol();
 
-  static setStore(storeType: any) {
-    Reflect.defineMetadata(StoreMetadataUtils.IS_STORE, true, storeType);
+  static set(storeType: any) {
+    Reflect.defineMetadata(this.KEY, true, storeType);
   }
 
-  static isStore(storeType: any) {
-    return Reflect.getOwnMetadata(StoreMetadataUtils.IS_STORE, storeType);
+  static is(storeType: any): boolean {
+    return !!Reflect.getOwnMetadata(this.KEY, storeType);
   }
 }

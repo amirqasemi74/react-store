@@ -3,7 +3,7 @@ import ToDos from "./toDos/ToDos";
 import { connectStore, StoreProvider, useStore } from "@react-store/core";
 import ThemeStore from "./theme.store";
 import FilePicker from "./filePicker";
-import ToDoStore from "./toDos/toDo.store";
+import { ToDoStore } from "./toDos/toDo.store";
 import { PureToDosProvider } from "./todos-pure/PureToDosProvider";
 import { PureToDos } from "./todos-pure/PureToDos";
 

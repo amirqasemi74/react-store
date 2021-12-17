@@ -1,9 +1,5 @@
-import { getConstructorDependencyTypes } from "src/decorators/inject";
-import {
-  INJECTABLE,
-  InjectableOptions,
-  Scope,
-} from "src/decorators/Injectable";
+import { InjectMetadataUtils } from "src/decorators/inject";
+import { InjectableMetadataUtils, Scope } from "src/decorators/Injectable";
 import { ClassType } from "src/types";
 import { Injector } from "./Injector";
 
@@ -11,18 +7,15 @@ class Container {
   private instances = new Map<Function, object>();
 
   resolve(SomeClass: ClassType): InstanceType<ClassType> {
-    const options: InjectableOptions = Reflect.getMetadata(
-      INJECTABLE,
-      SomeClass
-    );
+    const scope = InjectableMetadataUtils.get(SomeClass);
 
-    if (!options) {
+    if (!scope) {
       throw new Error(
-        `${SomeClass.name} has not been registered with @Injectable`
+        `${SomeClass.name} has not been decorated with @Injectable()`
       );
     }
 
-    switch (options.scope) {
+    switch (scope) {
       case Scope.TRANSIENT: {
         return new SomeClass(...this.resolveDependencies(SomeClass));
       }
@@ -39,9 +32,10 @@ class Container {
   }
 
   resolveDependencies(someClass: ClassType) {
-    return getConstructorDependencyTypes(someClass).map((dep) =>
-      this.resolve(dep.type as ClassType)
-    );
+    return InjectMetadataUtils.getDependenciesDecoratedWith(
+      someClass,
+      "INJECTABLE"
+    ).map((dep) => this.resolve(dep.type as ClassType));
   }
 
   remove(someClass: ClassType) {
