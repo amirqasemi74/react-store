@@ -16,7 +16,7 @@ export class ToDoStore extends BaseStore {
 
   d = new Date();
 
-  @Effect(() => [])
+  @Effect<ToDoStore>([])
   init() {
     for (let i = 0; i < 10; i++) {
       this.todos.push({

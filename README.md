@@ -80,7 +80,7 @@ export default function Input() {
 
 # Effects
 
-You can manage side effects with `@Effect` decorator. Like react dependency array you must return array of dependency.
+You can manage side effects with `@Effect()` decorator. Like react dependency array you must return array of dependency.
 <br>For **clear effects** again like React useEffect you can return a function from methods which is decorated with @Effect.
 
 ```ts
@@ -105,9 +105,25 @@ export class UserStore {
   user = { name: "" };
 
   @Effect<UserStore>((_) => [_.user], true)
-  nameChanged() {
+  usernameChanged() {
     console.log("name changed to:", this.name);
   }
+}
+```
+
+Instead of passing a function to effect to detect dependencies you can pass an array of strings or just one string.<br>
+The string can be an object path to define dependencies:
+
+```ts
+@Store()
+export class UserStore {
+  user = { name: "" };
+
+  @Effect<UserStore>(["user.name"])
+  usernameChanged() {}
+
+  @Effect<UserStore>("user", true)
+  userChanged() {}
 }
 ```
 

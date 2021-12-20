@@ -1,11 +1,26 @@
-export function Effect<T extends {} = any>(
-  deps?: (_: T) => Array<any>,
+import objectPath from "object-path";
+import type { Paths } from "src/types";
+
+export function Effect<T extends object = any>(
+  deps?: ((_: T) => Array<any>) | Array<Paths<T>> | Paths<T>,
   dequal?: boolean
 ): MethodDecorator {
   return function (target, propertyKey, descriptor) {
+    let depsFn!: (_: T) => Array<any>;
+
+    // @ts-ignore
+    if (typeof deps === "function") {
+      // @ts-ignore
+      depsFn = deps;
+    } else if (Array.isArray(deps)) {
+      depsFn = (o) => deps.map((d) => objectPath.withInheritedProps.get(o, d));
+    } else if (typeof deps === "string") {
+      depsFn = (o) => [objectPath.withInheritedProps.get(o, deps)];
+    }
+
     StoreEffectsMetadataUtils.add(target.constructor, {
       options: {
-        deps,
+        deps: depsFn,
         dequal,
       },
       propertyKey,

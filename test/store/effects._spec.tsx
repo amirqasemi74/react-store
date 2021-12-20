@@ -14,7 +14,7 @@ export const storeEffectTests = () => {
     clearContainer();
   });
 
-  it("must be called when dependencies are being changed", async () => {
+  it("should effect be called when dependencies are being changed", async () => {
     const usernameChangeCallback = jest.fn();
     @Store()
     class UserStore {
@@ -69,7 +69,7 @@ export const storeEffectTests = () => {
     await waitFor(() => expect(usernameChangeCallback).toBeCalledTimes(3));
   });
 
-  it("clear Effect must be called before running new effect", async () => {
+  it("should call clear Effect before running new effect", async () => {
     const usernameChangeCallback = jest.fn();
     const usernameChangeClearEffect = jest.fn();
     const callStack: Array<"effect" | "clear-effect"> = [];
@@ -190,5 +190,69 @@ export const storeEffectTests = () => {
       target: { value: "amir.qasemi70" },
     });
     expect(onUserChangeCB).toBeCalledTimes(2);
+  });
+
+  it("should can pass effect deps as array of string object path", () => {
+    const onMountChangeCB = jest.fn();
+    const onUserChangeCB = jest.fn();
+    const onUsernameChangeCB = jest.fn();
+    const onUsernameDepAsStringChangeCB = jest.fn();
+    @Store()
+    class UserStore {
+      user = { name: "sdf" };
+
+      changeUsername(e: ChangeEvent<HTMLInputElement>) {
+        this.user.name = e.target.value;
+      }
+
+      @Effect<UserStore>([])
+      onMount() {
+        onMountChangeCB();
+      }
+
+      @Effect<UserStore>(["user.name"])
+      onUsernameChange() {
+        onUsernameChangeCB();
+      }
+
+      @Effect<UserStore>(["user"], true)
+      onUserChange() {
+        onUserChangeCB();
+      }
+
+      @Effect<UserStore>("user.name")
+      onUsernameAsStringDepChange() {
+        onUsernameDepAsStringChangeCB();
+      }
+    }
+
+    const App = connectStore(() => {
+      const vm = useStore(UserStore);
+      return (
+        <>
+          {vm.user.name}
+          <input
+            data-testid="username-input"
+            value={vm.user.name}
+            onChange={vm.changeUsername}
+          />
+        </>
+      );
+    }, UserStore);
+
+    const { getByTestId } = render(<App />);
+
+    expect(onMountChangeCB).toBeCalledTimes(1);
+    expect(onUserChangeCB).toBeCalledTimes(1);
+    expect(onUsernameChangeCB).toBeCalledTimes(1);
+    expect(onUsernameDepAsStringChangeCB).toBeCalledTimes(1);
+
+    fireEvent.change(getByTestId("username-input"), {
+      target: { value: "amir.qasemi70" },
+    });
+    expect(onMountChangeCB).toBeCalledTimes(1);
+    expect(onUserChangeCB).toBeCalledTimes(2);
+    expect(onUsernameChangeCB).toBeCalledTimes(2);
+    expect(onUsernameDepAsStringChangeCB).toBeCalledTimes(2);
   });
 };

@@ -1,6 +1,6 @@
 {
   "name": "@react-store/core",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "dist/index.js",
   "repository": "https://github.com/amirqasemi74/react-store.git",
   "author": "Amir Hossein Qasemi Moqaddam <amir.qasemi74@gmail.com>",
@@ -9,6 +9,7 @@
     "clone-deep": "^4.0.1",
     "dequal": "^2.0.2",
     "is-promise": "^4.0.0",
+    "object-path": "^0.11.8",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
@@ -24,6 +25,7 @@
     "@trust/webcrypto": "^0.9.2",
     "@types/clone-deep": "^4.0.1",
     "@types/jest": "^27.0.3",
+    "@types/object-path": "^0.11.1",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "@types/react-dropzone": "^5.1.0",
