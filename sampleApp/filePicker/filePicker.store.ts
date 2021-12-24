@@ -8,7 +8,7 @@ export default class FilePickerStore {
 
   filesInfo = new Map<string, FileInfo>();
 
-  @Effect((_: FilePickerStore) => [_.props.fileIds])
+  @Effect<FilePickerStore>("props.fileIds")
   onNewFileIds() {
     // console.log(this.props.fileIds);
   }

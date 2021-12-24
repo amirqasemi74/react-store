@@ -24,7 +24,7 @@ export const runEffect = ({ effectKey, storeAdmin }: RunEffectArgs) => {
     throw new Error("Only return function from effect as it's clearEffect");
   }
 
-  storeAdmin.effectsManager.storeEffect(effectKey, {
-    clearEffect,
-  });
+  if (clearEffect) {
+    storeAdmin.effectsManager.setClearEffect(effectKey, clearEffect);
+  }
 };

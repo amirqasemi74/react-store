@@ -61,7 +61,7 @@ export class InjectMetadataUtils {
     }
   }
 
-  static getOwnDependencies(target: Function) {
+  private static getOwnDependencies(target: Function) {
     return Reflect.getOwnMetadata(this.DEP_TYPES, target);
   }
 

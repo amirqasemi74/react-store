@@ -11,8 +11,7 @@ export const configEffectRunner = (storeAdmin: StoreAdministrator) => {
             effectKey,
             storeAdmin,
           });
-          return () =>
-            storeAdmin.effectsManager.getEffect(effectKey)?.clearEffect?.();
+          return () => storeAdmin.effectsManager.getClearEffect(effectKey)?.();
         },
         deps?.(storeAdmin.instanceForComponents),
         { dequal }
