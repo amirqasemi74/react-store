@@ -1,23 +1,24 @@
-import { StoreEffectsMetadataUtils } from "src/decorators/effect";
+import { EffectsMetadataUtils } from "src/decorators/effect";
 import type { StoreAdministrator } from "./storeAdministrator";
 
 export class StoreEffectsManager {
-  private effects = new Map<PropertyKey, Effect>();
+  private clearEffects = new Map<PropertyKey, Function>();
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
   get effectsMetaData() {
-    return StoreEffectsMetadataUtils.get(this.storeAdmin.type);
+    return EffectsMetadataUtils.get(this.storeAdmin.type);
   }
 
-  storeEffect(effectKey: PropertyKey, effect: Effect) {
-    this.effects.set(effectKey, effect);
+  setClearEffect(effectKey: PropertyKey, clear: Function) {
+    this.clearEffects.set(effectKey, clear);
   }
 
-  getEffect(effectKey: PropertyKey) {
-    return this.effects.get(effectKey);
+  getClearEffect(effectKey: PropertyKey) {
+    return this.clearEffects.get(effectKey);
   }
 }
+
 interface Effect {
   clearEffect?: (() => void) | null;
 }

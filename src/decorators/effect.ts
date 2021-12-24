@@ -1,5 +1,5 @@
 import objectPath from "object-path";
-import type { Paths } from "src/types";
+import type { ClassType, Paths } from "src/types";
 
 export function Effect<T extends object = any>(
   deps?: ((_: T) => Array<any>) | Array<Paths<T>> | Paths<T>,
@@ -18,7 +18,7 @@ export function Effect<T extends object = any>(
       depsFn = (o) => [objectPath.withInheritedProps.get(o, deps)];
     }
 
-    StoreEffectsMetadataUtils.add(target.constructor, {
+    EffectsMetadataUtils.add(target.constructor, {
       options: {
         deps: depsFn,
         dequal,
@@ -29,10 +29,10 @@ export function Effect<T extends object = any>(
   };
 }
 
-export class StoreEffectsMetadataUtils {
+export class EffectsMetadataUtils {
   private static readonly KEY = Symbol();
 
-  static get(storeType: Function): EffectMetaData[] {
+  static getOwn(storeType: Function): EffectMetaData[] {
     let effects = Reflect.getOwnMetadata(this.KEY, storeType);
     if (!effects) {
       effects = [];
@@ -41,8 +41,18 @@ export class StoreEffectsMetadataUtils {
     return effects;
   }
 
+  static get(storeType: Function): EffectMetaData[] {
+    // TODO: Effects must be returns only for @Store & @StorePart
+    let effects = this.getOwn(storeType);
+    const parentClass = Reflect.getPrototypeOf(storeType) as ClassType;
+    if (parentClass) {
+      effects = effects.concat(this.get(parentClass));
+    }
+    return effects;
+  }
+
   static add(storeType: Function, metadata: EffectMetaData) {
-    this.get(storeType).push(metadata);
+    this.getOwn(storeType).push(metadata);
   }
 }
 

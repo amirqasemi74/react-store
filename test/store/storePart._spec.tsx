@@ -52,7 +52,7 @@ export const storePartTests = () => {
     expect(getByText(/Has Error/i)).toBeInTheDocument();
   });
 
-  it("should store part effects run", () => {
+  it("should run store part effects", () => {
     let hasErrorChanged = jest.fn();
 
     @StorePart()

@@ -1,4 +1,4 @@
-import { Inject, Store } from "@react-store/core";
+import { Effect, Inject, Store } from "@react-store/core";
 import { ToDoService } from "sampleApp/toDos/services/todos.service";
 import ThemeStore from "../theme.store";
 
@@ -8,4 +8,9 @@ export class BaseStore {
     @Inject(ThemeStore) public theme: ThemeStore,
     @Inject(ToDoService) public todoService: ToDoService
   ) {}
+
+  @Effect<BaseStore>([])
+  onMount() {
+    console.log("mounted");
+  }
 }

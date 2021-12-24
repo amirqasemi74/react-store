@@ -1,9 +1,9 @@
 import {
   connectStore,
-  Store,
   Effect,
-  useStore,
   Observable,
+  Store,
+  useStore,
 } from "@react-store/core";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
@@ -254,5 +254,29 @@ export const storeEffectTests = () => {
     expect(onUserChangeCB).toBeCalledTimes(2);
     expect(onUsernameChangeCB).toBeCalledTimes(2);
     expect(onUsernameDepAsStringChangeCB).toBeCalledTimes(2);
+  });
+
+  it("should run parent store class effects", () => {
+    const onMountedCB = jest.fn();
+
+    @Store()
+    class A {
+      @Effect<A>([])
+      onMount() {
+        onMountedCB();
+      }
+    }
+
+    @Store()
+    class B extends A {}
+
+    const App = connectStore(() => {
+      useStore(B);
+      return <></>;
+    }, B);
+
+    const {} = render(<App />);
+
+    expect(onMountedCB).toBeCalledTimes(1);
   });
 };
