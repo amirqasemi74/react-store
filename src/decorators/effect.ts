@@ -1,8 +1,8 @@
 import objectPath from "object-path";
-import type { ClassType, Paths } from "src/types";
+import type { ClassType } from "src/types";
 
 export function Effect<T extends object = any>(
-  deps?: ((_: T) => Array<any>) | Array<Paths<T>> | Paths<T>,
+  deps?: ((_: T) => Array<any>) | Array<string> | string,
   dequal?: boolean
 ): MethodDecorator {
   return function (target, propertyKey, descriptor) {
