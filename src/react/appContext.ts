@@ -4,7 +4,7 @@ import { Injectable } from "src/decorators/Injectable";
 
 @Injectable()
 export class ReactApplicationContext {
-  private storeAdministratorContexts = new Map<
+  private storeContexts = new Map<
     Function,
     React.Context<StoreAdministrator | null>
   >();
@@ -13,10 +13,10 @@ export class ReactApplicationContext {
     storeType: Function,
     context: React.Context<StoreAdministrator | null>
   ) {
-    this.storeAdministratorContexts.set(storeType, context);
+    this.storeContexts.set(storeType, context);
   }
 
   getStoreReactContext(storeType: Function) {
-    return this.storeAdministratorContexts.get(storeType);
+    return this.storeContexts.get(storeType);
   }
 }

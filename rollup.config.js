@@ -11,4 +11,12 @@ export default {
     format: "es",
   },
   plugins: [typescript({ tsconfig, typescript: ttypescript })],
+  external: [
+    "dequal",
+    "react",
+    "is-promise",
+    "clone-deep",
+    "object-path",
+    "reflect-metadata",
+  ],
 };
