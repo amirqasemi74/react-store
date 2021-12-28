@@ -1,10 +1,10 @@
+import { ReactApplicationContext } from "../appContext";
+import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/decorators/inject";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
-import { ReactApplicationContext } from "../appContext";
-import { StoreAdministrator } from "./administrator/storeAdministrator";
 
 export class StoreAdministratorFactory {
   static create(StoreType: ClassType) {

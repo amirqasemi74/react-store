@@ -1,6 +1,6 @@
-import ttypescript from "ttypescript";
 import typescript from "@rollup/plugin-typescript";
 import { resolve } from "path";
+import ttypescript from "ttypescript";
 
 const tsconfig = resolve(__dirname, "tsconfig.build.json");
 

@@ -1,4 +1,4 @@
-import { useRef, MutableRefObject } from "react";
+import { MutableRefObject, useRef } from "react";
 
 /**
  * React useRef not accept lazy values. here we made it

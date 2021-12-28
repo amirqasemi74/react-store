@@ -1,5 +1,5 @@
-import { Inject, Injectable, Injector } from "@react-store/core";
 import { UserService } from "./userService";
+import { Inject, Injectable, Injector } from "@react-store/core";
 
 @Injectable()
 export class ToDoService {

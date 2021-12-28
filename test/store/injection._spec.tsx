@@ -1,14 +1,14 @@
-import "@testing-library/jest-dom/extend-expect";
-import { render, fireEvent } from "@testing-library/react";
-import React, { memo } from "react";
 import {
-  connectStore,
-  Store,
   Inject,
-  useStore,
-  StoreProvider,
   Injectable,
+  Store,
+  StoreProvider,
+  connectStore,
+  useStore,
 } from "@react-store/core";
+import "@testing-library/jest-dom/extend-expect";
+import { fireEvent, render } from "@testing-library/react";
+import React, { memo } from "react";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 export const storeInjectionTests = () => {

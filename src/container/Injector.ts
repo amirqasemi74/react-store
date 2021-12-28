@@ -1,6 +1,6 @@
+import { getFromContainer } from "./container";
 import { Injectable } from "src/decorators/Injectable";
 import { ClassType } from "src/types";
-import { getFromContainer } from "./container";
 
 @Injectable()
 export class Injector {

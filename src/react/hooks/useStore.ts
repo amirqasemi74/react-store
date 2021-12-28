@@ -1,3 +1,5 @@
+import { ReactApplicationContext } from "../appContext";
+import { StoreAdministrator } from "../store/administrator/storeAdministrator";
 import cloneDeep from "clone-deep";
 import { dequal } from "dequal";
 import { useContext, useRef } from "react";
@@ -5,8 +7,6 @@ import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
 import { useWillMount } from "src/utils/useWillMount";
-import { ReactApplicationContext } from "../appContext";
-import { StoreAdministrator } from "../store/administrator/storeAdministrator";
 
 interface UseStoreOptions<T extends ClassType> {
   deps?: (vm: InstanceType<T>) => any[];

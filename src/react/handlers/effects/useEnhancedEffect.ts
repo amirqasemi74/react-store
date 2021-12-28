@@ -1,6 +1,6 @@
-import { DependencyList, EffectCallback, useEffect, useRef } from "react";
-import { dequal } from "dequal";
 import cloneDeep from "clone-deep";
+import { dequal } from "dequal";
+import { DependencyList, EffectCallback, useEffect, useRef } from "react";
 import { useLazyRef } from "src/utils/useLazyRef";
 
 export const useEnhancedEffect = (

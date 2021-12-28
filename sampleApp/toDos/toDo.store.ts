@@ -1,7 +1,7 @@
+import { BaseStore } from "./base.store";
 import { Effect, Observable, Props, Store } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 import { FormValidator } from "sampleApp/libs/formValidator";
-import { BaseStore } from "./base.store";
 
 @Store()
 export class ToDoStore extends BaseStore {

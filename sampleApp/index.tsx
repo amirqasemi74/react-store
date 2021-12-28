@@ -1,6 +1,6 @@
+import App from "./App";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
 
 function AppWrapper() {
   const [mount, setMount] = useState(true);

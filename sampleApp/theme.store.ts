@@ -1,5 +1,5 @@
-import { Inject, Store } from "@react-store/core";
 import { ToDoService } from "./toDos/services/todos.service";
+import { Inject, Store } from "@react-store/core";
 
 @Store()
 @Inject(ToDoService)

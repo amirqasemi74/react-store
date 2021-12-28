@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "styled-components";
 import { PureToDoItem } from "./PureToDoItem";
 import { usePureToDos } from "./PureToDosProvider";
+import React from "react";
+import styled from "styled-components";
 
 export const PureToDoList = () => {
   const { todos } = usePureToDos();

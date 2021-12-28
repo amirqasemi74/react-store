@@ -1,5 +1,5 @@
-import { StorePartMetadataUtils } from "src/decorators/storePart";
 import { StoreAdministrator } from "./storeAdministrator";
+import { StorePartMetadataUtils } from "src/decorators/storePart";
 
 export class StoreStorePartsManager {
   storeParts = new Map<PropertyKey, StoreAdministrator>();

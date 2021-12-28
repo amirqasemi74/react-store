@@ -1,7 +1,7 @@
-import { InjectMetadataUtils } from "src/decorators/inject";
-import { InjectableMetadataUtils, Scope } from "src/decorators/Injectable";
-import { ClassType } from "src/types";
 import { Injector } from "./Injector";
+import { InjectableMetadataUtils, Scope } from "src/decorators/Injectable";
+import { InjectMetadataUtils } from "src/decorators/inject";
+import { ClassType } from "src/types";
 
 class Container {
   private instances = new Map<Function, object>();

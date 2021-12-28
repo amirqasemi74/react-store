@@ -1,12 +1,12 @@
-import { connectStore, Store, useStore } from "@react-store/core";
-import { render } from "@testing-library/react";
-import React from "react";
 import { storeActionsTest } from "./actions._spec";
 import { storeEffectTests } from "./effects._spec";
 import { storeHooksCompatibilityTests } from "./hooksCompatibility._spec";
 import { storeInjectionTests } from "./injection._spec";
 import { storePropertiesObservability } from "./propertiesObservability._spec";
 import { storePartTests } from "./storePart._spec";
+import { Store, connectStore, useStore } from "@react-store/core";
+import { render } from "@testing-library/react";
+import React from "react";
 
 describe("Store", () => {
   describe("Effects", storeEffectTests);

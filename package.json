@@ -24,6 +24,7 @@
     "@rollup/plugin-typescript": "^8.3.0",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
+    "@trivago/prettier-plugin-sort-imports": "^3.1.1",
     "@trust/webcrypto": "^0.9.2",
     "@types/clone-deep": "^4.0.1",
     "@types/jest": "^27.0.3",
@@ -65,7 +66,15 @@
     "*.{js,css,ts,tsx}": "yarn format"
   },
   "prettier": {
-    "printWidth": 85
+    "printWidth": 85,
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true,
+    "importOrderParserPlugins": [
+      "typescript",
+      "jsx",
+      "classProperties",
+      "decorators-legacy"
+    ]
   },
   "commitlint": {
     "extends": [

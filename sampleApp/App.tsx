@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import ToDos from "./toDos/ToDos";
-import { connectStore, StoreProvider, useStore } from "@react-store/core";
 import ThemeStore from "./theme.store";
+import ToDos from "./toDos/ToDos";
 import { ToDoStore } from "./toDos/toDo.store";
-import { PureToDosProvider } from "./todos-pure/PureToDosProvider";
 import { PureToDos } from "./todos-pure/PureToDos";
+import { PureToDosProvider } from "./todos-pure/PureToDosProvider";
+import { StoreProvider, connectStore, useStore } from "@react-store/core";
+import React, { useState } from "react";
 
 const App = () => {
   const vm = useStore(ThemeStore);

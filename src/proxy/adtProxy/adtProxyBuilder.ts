@@ -1,8 +1,8 @@
-import { ObservableMetadataUtils } from "src/decorators/observable";
 import arrayProxyBuilder from "./array.proxyBuilder";
 import functionProxyBuilder from "./function.proxyBuilder";
 import { mapProxyBuilder } from "./map.proxyBuilder";
 import objectProxyBuilder from "./object.proxyBuilder";
+import { ObservableMetadataUtils } from "src/decorators/observable";
 
 export interface BaseAdtProxyBuilderArgs {
   onSet?: () => void;

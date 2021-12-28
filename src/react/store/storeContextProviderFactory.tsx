@@ -1,9 +1,9 @@
-import React, { Context, useState } from "react";
-import { ClassType } from "src/types";
 import { registerHandlers } from "../handlers/registerHandlers";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { StoreAdministratorFactory } from "./storeAdministratorFactory";
 import { StorePropertyKey } from "./storePropertyKey";
+import React, { Context, useState } from "react";
+import { ClassType } from "src/types";
 
 interface ProviderComponentProps {
   props?: any;

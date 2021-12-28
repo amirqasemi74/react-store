@@ -1,4 +1,4 @@
-import { connectStore, Effect, Store, StorePart, useStore } from "@react-store/core";
+import { Effect, Store, StorePart, connectStore, useStore } from "@react-store/core";
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
 import { IS_PROXIED } from "src/constant";

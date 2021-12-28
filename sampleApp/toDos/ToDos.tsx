@@ -1,8 +1,8 @@
+import ToDoList from "./ToDoList";
+import { ToDoStore } from "./toDo.store";
 import { useStore } from "@react-store/core";
 import React from "react";
 import styled, { css } from "styled-components";
-import { ToDoStore } from "./toDo.store";
-import ToDoList from "./ToDoList";
 
 const ToDos: React.FC = () => {
   const vm = useStore(ToDoStore);

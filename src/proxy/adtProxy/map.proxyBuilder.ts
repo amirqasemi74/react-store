@@ -1,5 +1,5 @@
-import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
 import { PROXIED_VALUE } from "../proxyValueAndSaveIt";
+import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
 
 interface MapProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   map: Map<any, any>;

@@ -147,8 +147,8 @@ To have parent component props (the component directly connected to store by usi
 
 ```ts
 // user.store.ts
-import { Store, Props } from "@react-store/core";
 import { Props as AppProps } from "./App";
+import { Props, Store } from "@react-store/core";
 
 @Store()
 export class UserStore {

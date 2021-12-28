@@ -1,6 +1,6 @@
+import ThemeStore from "../theme.store";
 import { Effect, Inject, Store } from "@react-store/core";
 import { ToDoService } from "sampleApp/toDos/services/todos.service";
-import ThemeStore from "../theme.store";
 
 @Store()
 export class BaseStore {

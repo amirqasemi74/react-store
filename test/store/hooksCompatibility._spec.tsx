@@ -1,4 +1,4 @@
-import { connectStore, Store, useStore } from "@react-store/core";
+import { Store, connectStore, useStore } from "@react-store/core";
 import { render, screen, waitFor } from "@testing-library/react";
 import React, { useEffect } from "react";
 

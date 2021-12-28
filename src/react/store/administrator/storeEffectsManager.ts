@@ -1,5 +1,5 @@
-import { EffectsMetadataUtils } from "src/decorators/effect";
 import type { StoreAdministrator } from "./storeAdministrator";
+import { EffectsMetadataUtils } from "src/decorators/effect";
 
 export class StoreEffectsManager {
   private clearEffects = new Map<PropertyKey, Function>();

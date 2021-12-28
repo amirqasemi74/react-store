@@ -1,9 +1,9 @@
-import { IS_PROXIED, STORE_ADMINISTRATION } from "src/constant";
-import { StorePartMetadataUtils } from "src/decorators/storePart";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 import adtProxyBuilder, {
   BaseAdtProxyBuilderArgs,
 } from "./adtProxy/adtProxyBuilder";
+import { IS_PROXIED, STORE_ADMINISTRATION } from "src/constant";
+import { StorePartMetadataUtils } from "src/decorators/storePart";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 /**
  * Proxy value if need and then proxied value for next usage

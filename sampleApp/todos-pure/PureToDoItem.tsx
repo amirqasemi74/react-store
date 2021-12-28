@@ -1,6 +1,6 @@
+import { usePureToDos } from "./PureToDosProvider";
 import React from "react";
 import styled from "styled-components";
-import { usePureToDos } from "./PureToDosProvider";
 
 interface Props {
   itemIndex: number;

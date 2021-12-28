@@ -1,7 +1,7 @@
-import { getFromContainer, clearContainer, removeFromContainer } from "./container";
-import { Injectable, Scope } from "src/decorators/Injectable";
 import { Inject } from "..";
 import { Injector } from "./Injector";
+import { clearContainer, getFromContainer, removeFromContainer } from "./container";
+import { Injectable, Scope } from "src/decorators/Injectable";
 
 describe("IOC Container", () => {
   beforeEach(() => {

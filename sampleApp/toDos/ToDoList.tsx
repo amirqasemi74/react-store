@@ -1,8 +1,8 @@
-import React from "react";
-import { useStore } from "@react-store/core";
-import styled from "styled-components";
-import { ToDoStore } from "./toDo.store";
 import ToDoItem from "./ToDoItem";
+import { ToDoStore } from "./toDo.store";
+import { useStore } from "@react-store/core";
+import React from "react";
+import styled from "styled-components";
 
 const ToDoList = () => {
   const vm = useStore(ToDoStore);

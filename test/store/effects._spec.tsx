@@ -1,8 +1,8 @@
 import {
-  connectStore,
   Effect,
   Observable,
   Store,
+  connectStore,
   useStore,
 } from "@react-store/core";
 import { fireEvent, render, waitFor } from "@testing-library/react";

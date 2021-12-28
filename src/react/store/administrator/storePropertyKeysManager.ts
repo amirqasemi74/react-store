@@ -1,9 +1,9 @@
+import { StorePropertyKey } from "../storePropertyKey";
+import type { StoreAdministrator } from "./storeAdministrator";
 import { StorePropsMetadataUtils } from "src/decorators/props";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
 import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { isPrimitive } from "src/utils/isPrimitive";
-import { StorePropertyKey } from "../storePropertyKey";
-import type { StoreAdministrator } from "./storeAdministrator";
 
 export class StorePropertyKeysManager {
   propertyKeys = new Map<PropertyKey, StorePropertyKey>();

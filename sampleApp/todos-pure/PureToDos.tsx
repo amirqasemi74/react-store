@@ -1,10 +1,10 @@
+import { PureToDoList } from "./PureToDoList";
+import { usePureToDos } from "./PureToDosProvider";
+import { useValidator } from "./useValidator";
 import { useStore } from "@react-store/core";
 import React, { useState } from "react";
 import ThemeStore from "sampleApp/theme.store";
 import styled, { css } from "styled-components";
-import { PureToDoList } from "./PureToDoList";
-import { usePureToDos } from "./PureToDosProvider";
-import { useValidator } from "./useValidator";
 
 export const PureToDos: React.FC = () => {
   const vm = useStore(ThemeStore);

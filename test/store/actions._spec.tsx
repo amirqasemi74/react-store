@@ -1,4 +1,4 @@
-import { connectStore, Effect, Store, useStore } from "@react-store/core";
+import { Effect, Store, connectStore, useStore } from "@react-store/core";
 import { act, render } from "@testing-library/react";
 import React from "react";
 

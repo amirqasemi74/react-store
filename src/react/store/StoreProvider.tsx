@@ -1,12 +1,12 @@
+import { ReactApplicationContext } from "../appContext";
+import { StoreAdministrator } from "./administrator/storeAdministrator";
+import { EnhancedStoreFactory } from "./enhancedStoreFactory";
+import { StoreContextProviderFactory } from "./storeContextProviderFactory";
 import React, { useMemo } from "react";
 import { getFromContainer } from "src/container/container";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
-import { ReactApplicationContext } from "../appContext";
-import { StoreAdministrator } from "./administrator/storeAdministrator";
-import { EnhancedStoreFactory } from "./enhancedStoreFactory";
-import { StoreContextProviderFactory } from "./storeContextProviderFactory";
 
 interface Props {
   props?: any;
