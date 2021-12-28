@@ -1,5 +1,6 @@
 import { ReactApplicationContext } from "../appContext";
 import { StoreAdministrator } from "../store/administrator/storeAdministrator";
+import { StoreFactory } from "../store/storeFactory";
 import cloneDeep from "clone-deep";
 import { dequal } from "dequal";
 import { useContext, useRef } from "react";
@@ -8,33 +9,43 @@ import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
 import { useWillMount } from "src/utils/useWillMount";
 
+export const useStore = <T extends ClassType = any>(
+  storeType: T,
+  opts?: UseStoreOptsArg<T>
+): InstanceType<T> => {
+  const options = getUseStoreOptions(opts);
+  const storeContext = getFromContainer(
+    ReactApplicationContext
+  ).getStoreReactContext(storeType);
+
+  if (!storeContext) {
+    throw new Error(
+      `${storeType.name} haven't been connected to the component tree!`
+    );
+  }
+  const storeAdmin = useContext(storeContext)!;
+
+  registerAsConsumer(storeAdmin, options);
+
+  return storeAdmin.instanceForComponents;
+};
+
 interface UseStoreOptions<T extends ClassType> {
   deps?: (vm: InstanceType<T>) => any[];
+  props?: any;
 }
 
 type UseStoreOptsArg<T extends ClassType> =
   | UseStoreOptions<T>
   | UseStoreOptions<T>["deps"];
 
-export const useStore = <T extends ClassType = any>(
-  storeType: T,
-  opts?: UseStoreOptsArg<T>
-): InstanceType<T> => {
+const registerAsConsumer = <T extends ClassType = any>(
+  storeAdmin: StoreAdministrator,
+  options: UseStoreOptions<T>
+) => {
   const isUnMounted = useRef(false);
   const forceUpdate = useForceUpdate();
   const componentDeps = useRef<any[]>([]);
-  const options = getUseStoreOptions(opts);
-  let storeAdministrator: StoreAdministrator | null = null;
-  const appContext = getFromContainer(ReactApplicationContext);
-
-  // check if it has context pointer
-  const storeAdministratorContext = appContext.getStoreReactContext(storeType);
-  if (!storeAdministratorContext) {
-    throw new Error(
-      `${storeType.name} haven't been connected to the component tree!`
-    );
-  }
-  storeAdministrator = useContext(storeAdministratorContext)!;
 
   useWillMount(() => {
     const render = () => {
@@ -42,7 +53,7 @@ export const useStore = <T extends ClassType = any>(
 
       if (options.deps) {
         const currentDeps = cloneDeep(
-          options.deps(storeAdministrator?.instanceForComponents)
+          options.deps(storeAdmin.instanceForComponents)
         );
         let changeDetected = false;
         for (const i in currentDeps) {
@@ -60,21 +71,17 @@ export const useStore = <T extends ClassType = any>(
         forceUpdate();
       }
     };
-    storeAdministrator?.consumers.add(render);
+    storeAdmin.consumers.add(render);
 
     return () => {
       isUnMounted.current = true;
-      if (storeAdministrator) {
-        storeAdministrator.consumers.delete(render);
-      }
+      storeAdmin.consumers.delete(render);
     };
   });
 
   componentDeps.current =
-    cloneDeep(options.deps?.(storeAdministrator.instanceForComponents)) ||
+    cloneDeep(options.deps?.(storeAdmin.instanceForComponents)) ||
     componentDeps.current;
-
-  return storeAdministrator.instanceForComponents;
 };
 
 const getUseStoreOptions = <T extends ClassType>(

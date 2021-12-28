@@ -1,7 +1,7 @@
 import { ReactApplicationContext } from "../appContext";
+import { registerHandlers } from "../handlers/registerHandlers";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
-import { EnhancedStoreFactory } from "./enhancedStoreFactory";
-import { StoreContextProviderFactory } from "./storeContextProviderFactory";
+import { StoreFactory } from "./storeFactory";
 import React, { useMemo } from "react";
 import { getFromContainer } from "src/container/container";
 import { StoreMetadataUtils } from "src/decorators/store";
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export const StoreProvider = ({ type, render, props }: Props) => {
-  const storeContext = useFixedLazyRef(() => {
+  const TheContext = useFixedLazyRef(() => {
     if (!StoreMetadataUtils.is(type)) {
       throw new Error(`\`${type.name}\` does not decorated with @Store()`);
     }
@@ -33,17 +33,13 @@ export const StoreProvider = ({ type, render, props }: Props) => {
     return context;
   });
 
-  const EnhancedStoreType = useFixedLazyRef(() => EnhancedStoreFactory.create(type));
-
-  const StoreContextProvider = useFixedLazyRef(() =>
-    StoreContextProviderFactory.create(storeContext, EnhancedStoreType)
-  );
+  const { store, storeAdmin } = StoreFactory.create(type, props);
 
   const Component = useMemo(() => React.memo(render), []);
 
   return (
-    <StoreContextProvider props={props}>
+    <TheContext.Provider value={storeAdmin}>
       <Component />
-    </StoreContextProvider>
+    </TheContext.Provider>
   );
 };

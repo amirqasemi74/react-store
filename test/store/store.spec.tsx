@@ -7,8 +7,13 @@ import { storePartTests } from "./storePart._spec";
 import { Store, connectStore, useStore } from "@react-store/core";
 import { render } from "@testing-library/react";
 import React from "react";
+import { clearContainer } from "src/container/container";
 
 describe("Store", () => {
+  beforeEach(() => {
+    clearContainer();
+  });
+
   describe("Effects", storeEffectTests);
   describe("Actions", storeActionsTest);
   describe("Injections", storeInjectionTests);

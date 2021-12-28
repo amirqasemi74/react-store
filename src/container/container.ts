@@ -1,4 +1,3 @@
-import { Injector } from "./Injector";
 import { InjectableMetadataUtils, Scope } from "src/decorators/Injectable";
 import { InjectMetadataUtils } from "src/decorators/inject";
 import { ClassType } from "src/types";
@@ -42,7 +41,6 @@ class Container {
 
   clearContainer() {
     this.instances.clear();
-    defaultContainer.resolve(Injector);
   }
 }
 
