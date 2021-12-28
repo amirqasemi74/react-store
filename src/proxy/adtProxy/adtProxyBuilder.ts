@@ -54,7 +54,9 @@ const adtProxyBuilder = ({ value, context, ...restOfArgs }: AdtProxyBuilderArgs)
         ...restOfArgs,
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    // Nothing to do
+  }
   return value;
 };
 
