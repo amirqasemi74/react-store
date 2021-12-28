@@ -4,8 +4,7 @@ import { StoreMetadataUtils } from "./store";
 export function Inject(...deps: any[]): any {
   return function (...decoArgs: any[]) {
     const target = decoArgs[0];
-    const injectType: InjectType =
-      decoArgs.length === 1 ? "CLASS" : "PARAMETER";
+    const injectType: InjectType = decoArgs.length === 1 ? "CLASS" : "PARAMETER";
     const preInjectType = InjectMetadataUtils.getType(target);
 
     if (preInjectType && preInjectType !== injectType) {

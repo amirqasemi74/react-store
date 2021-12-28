@@ -17,9 +17,7 @@ describe("Store", () => {
   describe("Pure React Hook Compatibility", storeHooksCompatibilityTests);
 
   it("should each component which use store, have same instance of it", () => {
-    let usernameStore!: UserStore,
-      passwordStore!: UserStore,
-      appStore!: UserStore;
+    let usernameStore!: UserStore, passwordStore!: UserStore, appStore!: UserStore;
 
     @Store()
     class UserStore {

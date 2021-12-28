@@ -50,10 +50,7 @@ export class ToDoStore extends BaseStore {
     }
   }
 
-  onToDoItemInputKeyDown(
-    e: KeyboardEvent<HTMLInputElement>,
-    itemIndex: number
-  ) {
+  onToDoItemInputKeyDown(e: KeyboardEvent<HTMLInputElement>, itemIndex: number) {
     if (e.key === "Enter") {
       this.todos[itemIndex].value = e.currentTarget.value;
       this.todos[itemIndex].isEditing = false;

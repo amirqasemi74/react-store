@@ -10,9 +10,7 @@ class Container {
     const scope = InjectableMetadataUtils.get(SomeClass);
 
     if (!scope) {
-      throw new Error(
-        `${SomeClass.name} has not been decorated with @Injectable()`
-      );
+      throw new Error(`${SomeClass.name} has not been decorated with @Injectable()`);
     }
 
     switch (scope) {

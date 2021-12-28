@@ -21,9 +21,7 @@ export class StorePropertyKeysManager {
     this.policies.push({
       matcher: (propertyKey) =>
         storeAdmin.instance[propertyKey] &&
-        StorePartMetadataUtils.is(
-          storeAdmin.instance[propertyKey]?.constructor
-        ),
+        StorePartMetadataUtils.is(storeAdmin.instance[propertyKey]?.constructor),
       render: false,
       set: "NONE",
       onSet: (propertyKey) =>
@@ -72,9 +70,7 @@ export class StorePropertyKeysManager {
     const info = this.propertyKeys.get(propertyKey);
     const preValue = info?.getValue("Store");
 
-    const matchedPolicy = this.policies.find(({ matcher }) =>
-      matcher(propertyKey)
-    );
+    const matchedPolicy = this.policies.find(({ matcher }) => matcher(propertyKey));
 
     switch (matchedPolicy?.set) {
       case "ORIGINAL":

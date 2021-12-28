@@ -79,5 +79,4 @@ export const useStore = <T extends ClassType = any>(
 
 const getUseStoreOptions = <T extends ClassType>(
   opts: UseStoreOptsArg<T>
-): UseStoreOptions<T> =>
-  typeof opts === "function" ? { deps: opts } : opts || {};
+): UseStoreOptions<T> => (typeof opts === "function" ? { deps: opts } : opts || {});

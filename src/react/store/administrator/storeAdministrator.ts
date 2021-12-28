@@ -43,11 +43,7 @@ export class StoreAdministrator {
   }
 
   static register(type: Function, instance: any) {
-    Reflect.set(
-      this,
-      STORE_ADMINISTRATION,
-      new StoreAdministrator(type, instance)
-    );
+    Reflect.set(this, STORE_ADMINISTRATION, new StoreAdministrator(type, instance));
   }
 
   static get(store: object) {

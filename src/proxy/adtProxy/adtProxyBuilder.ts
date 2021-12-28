@@ -14,11 +14,7 @@ interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   context?: any;
 }
 
-const adtProxyBuilder = ({
-  value,
-  context,
-  ...restOfArgs
-}: AdtProxyBuilderArgs) => {
+const adtProxyBuilder = ({ value, context, ...restOfArgs }: AdtProxyBuilderArgs) => {
   const valType = value?.constructor;
   const { proxyTypes } = restOfArgs;
   const doMapProxy = proxyTypes?.includes("Map") ?? true;

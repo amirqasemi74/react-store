@@ -38,6 +38,8 @@
     "html-webpack-plugin": "^5.5.0",
     "husky": "^7.0.0",
     "jest": "^27.4.5",
+    "lint-staged": ">=10",
+    "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-refresh-typescript": "^2.0.3",
@@ -56,6 +58,18 @@
     "test": "jest",
     "build": "rm -rf dist && rollup -c rollup.config.js",
     "prepare": "yarn test && yarn build && husky install",
-    "pub": "npm publish --access public"
+    "pub": "npm publish --access public",
+    "format": "yarn prettier --write ."
+  },
+  "lint-staged": {
+    "*.{js,css,ts,tsx}": "yarn format"
+  },
+  "prettier": {
+    "printWidth": 85
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }

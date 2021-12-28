@@ -20,9 +20,7 @@ export class StoreContextProviderFactory {
       Array.from(
         storeAdministrator.propertyKeysManager.propertyKeys.values()
       ).forEach(StoreContextProviderFactory.createUseStateForPropertyKey);
-      StoreContextProviderFactory.registerUseStateForStoreParts(
-        storeAdministrator
-      );
+      StoreContextProviderFactory.registerUseStateForStoreParts(storeAdministrator);
       registerHandlers(storeAdministrator, props);
 
       return (
@@ -34,14 +32,12 @@ export class StoreContextProviderFactory {
   }
 
   private static registerUseStateForStoreParts(storeAdmin: StoreAdministrator) {
-    Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach(
-      (sp) => {
-        Array.from(sp.propertyKeysManager.propertyKeys.values()).forEach(
-          this.createUseStateForPropertyKey
-        );
-        this.registerUseStateForStoreParts(sp);
-      }
-    );
+    Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach((sp) => {
+      Array.from(sp.propertyKeysManager.propertyKeys.values()).forEach(
+        this.createUseStateForPropertyKey
+      );
+      this.registerUseStateForStoreParts(sp);
+    });
   }
 
   private static createUseStateForPropertyKey(info: StorePropertyKey) {

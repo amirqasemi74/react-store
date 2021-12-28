@@ -1,10 +1,4 @@
-import {
-  connectStore,
-  Effect,
-  Store,
-  StorePart,
-  useStore,
-} from "@react-store/core";
+import { connectStore, Effect, Store, StorePart, useStore } from "@react-store/core";
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
 import { IS_PROXIED } from "src/constant";
@@ -46,9 +40,7 @@ export const storePartTests = () => {
     const { getByText } = render(<AppWithStore />);
 
     fireEvent.click(getByText(/Create Error/i));
-    expect(StoreAdministrator.get(storePartRef!)?.type.name).toBe(
-      Validator.name
-    );
+    expect(StoreAdministrator.get(storePartRef!)?.type.name).toBe(Validator.name);
     expect(getByText(/Has Error/i)).toBeInTheDocument();
   });
 

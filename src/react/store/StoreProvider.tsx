@@ -33,9 +33,7 @@ export const StoreProvider = ({ type, render, props }: Props) => {
     return context;
   });
 
-  const EnhancedStoreType = useFixedLazyRef(() =>
-    EnhancedStoreFactory.create(type)
-  );
+  const EnhancedStoreType = useFixedLazyRef(() => EnhancedStoreFactory.create(type));
 
   const StoreContextProvider = useFixedLazyRef(() =>
     StoreContextProviderFactory.create(storeContext, EnhancedStoreType)

@@ -12,9 +12,7 @@ export function Action() {
       configurable: descriptor.configurable,
       get() {
         return (...args: any) => {
-          return StoreAdministrator.get(this)?.runAction(() =>
-            fn.call(this, args)
-          );
+          return StoreAdministrator.get(this)?.runAction(() => fn.call(this, args));
         };
       },
       set() {},

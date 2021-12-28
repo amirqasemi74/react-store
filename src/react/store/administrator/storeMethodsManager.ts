@@ -14,9 +14,7 @@ export class StoreMethodsManager {
         this.methods.set(methodKey, null);
 
         const fn = function (this: any, ...args: any) {
-          return self.storeAdmin.runAction(() =>
-            descriptor.value.apply(this, args)
-          );
+          return self.storeAdmin.runAction(() => descriptor.value.apply(this, args));
         };
         Reflect.set(fn, "name", methodKey);
 

@@ -11,7 +11,7 @@ export interface StoreUsedContext {
 export const usedContextsHandler = (storeAdministrator: StoreAdministrator) => {
   const storeUsedContexts: StoreUsedContext[] =
     storeAdministrator.type[STORE_USED_CONTEXTS] || [];
-  
+
   storeUsedContexts
     .map<StoreUsedContext>((storeUsedCtx) => ({
       ...storeUsedCtx,

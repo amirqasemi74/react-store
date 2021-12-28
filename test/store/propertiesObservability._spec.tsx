@@ -86,19 +86,13 @@ export const storePropertiesObservability = () => {
     expect(screen.getByText("true")).toHaveTextContent("true");
 
     // symbol
-    expect(screen.getByText("Symbol(symbol1)")).toHaveTextContent(
-      "Symbol(symbol1)"
-    );
+    expect(screen.getByText("Symbol(symbol1)")).toHaveTextContent("Symbol(symbol1)");
     act(() => store.changeSymbol());
-    expect(screen.getByText("Symbol(symbol2)")).toHaveTextContent(
-      "Symbol(symbol2)"
-    );
+    expect(screen.getByText("Symbol(symbol2)")).toHaveTextContent("Symbol(symbol2)");
 
     // undefined
     act(() => store.changeUndefined());
-    expect(screen.getByText("not undefined")).toHaveTextContent(
-      "not undefined"
-    );
+    expect(screen.getByText("not undefined")).toHaveTextContent("not undefined");
 
     // null
     act(() => store.changeNull());
@@ -201,9 +195,9 @@ export const storePropertiesObservability = () => {
     act(() => store.changeMapAKey());
     expect(screen.getByText("map2")).toHaveTextContent("map2");
 
-    expect(
-      screen.getByText(JSON.stringify(store.map.get("b")))
-    ).toHaveTextContent(JSON.stringify(store.map.get("b")));
+    expect(screen.getByText(JSON.stringify(store.map.get("b")))).toHaveTextContent(
+      JSON.stringify(store.map.get("b"))
+    );
     act(() => store.changeMapBKey());
     expect(screen.getByText(JSON.stringify({ map: 11 }))).toHaveTextContent(
       JSON.stringify({ map: 11 })

@@ -7,18 +7,16 @@ export class StoreStorePartsManager {
   constructor(private storeAdmin: StoreAdministrator) {}
 
   initEffectsContainers() {
-    Object.entries<any>(this.storeAdmin.instance).forEach(
-      ([propertyKey, value]) => {
-        if (
-          value &&
-          StorePartMetadataUtils.is(value.constructor) &&
-          !this.storeParts.has(propertyKey)
-        ) {
-          const storePart = StoreAdministrator.get(value);
-          storePart.injectedInTos.add(this.storeAdmin);
-          this.storeParts.set(propertyKey, storePart);
-        }
+    Object.entries<any>(this.storeAdmin.instance).forEach(([propertyKey, value]) => {
+      if (
+        value &&
+        StorePartMetadataUtils.is(value.constructor) &&
+        !this.storeParts.has(propertyKey)
+      ) {
+        const storePart = StoreAdministrator.get(value);
+        storePart.injectedInTos.add(this.storeAdmin);
+        this.storeParts.set(propertyKey, storePart);
       }
-    );
+    });
   }
 }

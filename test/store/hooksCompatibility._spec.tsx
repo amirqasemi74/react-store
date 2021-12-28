@@ -37,9 +37,7 @@ export const storeHooksCompatibilityTests = () => {
     render(<App />);
 
     await waitFor(() =>
-      expect(screen.getByText("changed title")).toHaveTextContent(
-        "changed title"
-      )
+      expect(screen.getByText("changed title")).toHaveTextContent("changed title")
     );
   });
 };
