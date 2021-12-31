@@ -87,6 +87,7 @@ export const storePartTests = () => {
   });
 
   it("should can't set store part property key", () => {
+    const errorMock = jest.spyOn(console, "error").mockImplementation();
     let pre, post;
 
     @StorePart()
@@ -119,6 +120,9 @@ export const storePartTests = () => {
     expect(pre).toBeDefined();
     expect(post).toBeDefined();
     expect(pre).toBe(post);
+    expect(errorMock).toHaveBeenLastCalledWith(
+      "`validator` property key is reassigned. it isn't valid for propertyKeys which is declared for store part"
+    );
   });
 
   it("should not be observable the store part in store propertyKey", () => {

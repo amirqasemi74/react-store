@@ -5,7 +5,7 @@ import { Inject, Injectable, Injector } from "@react-store/core";
 export class ToDoService {
   private userService: UserService;
 
-  constructor(@Inject(Injector) private injector: Injector) {
+  constructor(private injector: Injector) {
     this.injector
       .getLazy(UserService)
       .then((userService) => (this.userService = userService));

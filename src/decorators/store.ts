@@ -1,6 +1,9 @@
+import { Inject } from "..";
+
 export function Store(): ClassDecorator {
   return function (StoreType: any) {
     StoreMetadataUtils.set(StoreType);
+    Inject()(StoreType);
   };
 }
 

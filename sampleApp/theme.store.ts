@@ -2,7 +2,6 @@ import { ToDoService } from "./toDos/services/todos.service";
 import { Inject, Store } from "@react-store/core";
 
 @Store()
-@Inject(ToDoService)
 export default class ThemeStore {
   primary = "black";
 

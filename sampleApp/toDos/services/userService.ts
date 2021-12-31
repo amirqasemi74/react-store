@@ -7,7 +7,7 @@ export class UserService {
 
   private toDoService: ToDoService;
 
-  constructor(@Inject(Injector) private injector: Injector) {
+  constructor(private injector: Injector) {
     this.injector
       .getLazy(ToDoService)
       .then((todoService) => (this.toDoService = todoService));

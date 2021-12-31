@@ -12,6 +12,7 @@ import { clearContainer } from "src/container/container";
 describe("Store", () => {
   beforeEach(() => {
     clearContainer();
+    jest.restoreAllMocks();
   });
 
   describe("Effects", storeEffectTests);

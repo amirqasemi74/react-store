@@ -1,5 +1,5 @@
-import { InjectableMetadataUtils, Scope } from "src/decorators/Injectable";
-import { InjectMetadataUtils } from "src/decorators/inject";
+import { InjectableMetadataUtils, Scope } from "./decorators/Injectable";
+import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { ClassType } from "src/types";
 
 class Container {
@@ -9,7 +9,9 @@ class Container {
     const scope = InjectableMetadataUtils.get(SomeClass);
 
     if (!scope) {
-      throw new Error(`${SomeClass.name} has not been decorated with @Injectable()`);
+      throw new Error(
+        `\`class ${SomeClass.name}\` has not been decorated with @Injectable()`
+      );
     }
 
     switch (scope) {

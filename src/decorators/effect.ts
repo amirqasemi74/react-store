@@ -8,9 +8,7 @@ export function Effect<T extends object = any>(
   return function (target, propertyKey, descriptor) {
     let depsFn!: (_: T) => Array<any>;
 
-    // @ts-ignore
     if (typeof deps === "function") {
-      // @ts-ignore
       depsFn = deps;
     } else if (Array.isArray(deps)) {
       depsFn = (o) => deps.map((d) => objectPath.withInheritedProps.get(o, d));

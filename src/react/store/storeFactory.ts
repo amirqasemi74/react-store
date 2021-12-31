@@ -5,7 +5,7 @@ import { EnhancedStoreFactory } from "./enhancedStoreFactory";
 import { StorePropertyKey } from "./storePropertyKey";
 import { useContext, useState } from "react";
 import { getFromContainer } from "src/container/container";
-import { InjectMetadataUtils } from "src/decorators/inject";
+import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
