@@ -22,7 +22,6 @@ export const storeInjectionTests = () => {
     class PostService {}
 
     @Store()
-    @Inject(PostService, UserService)
     class PostStore {
       constructor(postService: PostService, userService: UserService) {
         expect(postService).toBeInstanceOf(PostService);
@@ -32,7 +31,6 @@ export const storeInjectionTests = () => {
     }
 
     @Store()
-    @Inject(PostStore, UserService)
     class UserStore {
       username = "amir.qasemi74";
       password = "123456";
@@ -67,7 +65,6 @@ export const storeInjectionTests = () => {
     }
 
     @Store()
-    @Inject(AppStore)
     class UserStore {
       username = "amir.qasemi74";
       password = "123456";
@@ -119,7 +116,6 @@ export const storeInjectionTests = () => {
     }
 
     @Store()
-    @Inject(AppStore)
     class UserStore {
       username = "amir.qasemi74";
       password = "123456";
@@ -162,7 +158,6 @@ export const storeInjectionTests = () => {
       class A {}
 
       @Store()
-      @Inject(A)
       class BaseStore {
         constructor(public a: A) {}
       }
@@ -189,13 +184,11 @@ export const storeInjectionTests = () => {
       class B {}
 
       @Store()
-      @Inject(A)
       class BaseStore {
         constructor(public a: A) {}
       }
 
       @Store()
-      @Inject(A, B)
       class MainStore extends BaseStore {
         constructor(public a: A, public b: B) {
           super(a);

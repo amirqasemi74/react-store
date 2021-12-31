@@ -1,11 +1,11 @@
-import { Inject } from "..";
+import { Inject, Injectable, Scope } from "..";
 import { Injector } from "./Injector";
 import { clearContainer, getFromContainer, removeFromContainer } from "./container";
-import { Injectable, Scope } from "src/decorators/Injectable";
 
 describe("IOC Container", () => {
   beforeEach(() => {
     clearContainer();
+    jest.restoreAllMocks();
   });
 
   it("should resolve dependencies automatically", () => {
@@ -23,14 +23,10 @@ describe("IOC Container", () => {
 
     @Injectable()
     class App1 {
-      constructor(
-        @Inject(UserInfo1) public user1: UserInfo1,
-        @Inject(UserInfo2) public user2: UserInfo2
-      ) {}
+      constructor(public user1: UserInfo1, public user2: UserInfo2) {}
     }
 
     @Injectable()
-    @Inject(UserInfo1, UserInfo2)
     class App2 {
       constructor(public user1: UserInfo1, public user2: UserInfo2) {}
     }
@@ -57,38 +53,6 @@ describe("IOC Container", () => {
     const app2 = getFromContainer(App);
     expect(app2).toBeDefined();
     expect(app1).not.toBe(app2);
-  });
-
-  it("should throw error with both usage of @Inject() as class and parameter decorator for one class", () => {
-    expect.assertions(1);
-
-    try {
-      @Injectable()
-      class A {}
-
-      @Injectable()
-      class B {}
-
-      @Injectable()
-      @Inject(A)
-      class C {
-        constructor(public a: A, @Inject(B) public b: B) {}
-      }
-      getFromContainer(C);
-    } catch (error: any) {
-      expect(1).toBe(1);
-    }
-  });
-
-  it("should throw error if class is not decorated wit @Injectable()", () => {
-    expect.assertions(1);
-
-    try {
-      class A {}
-      getFromContainer(A);
-    } catch (error: any) {
-      expect(1).toBe(1);
-    }
   });
 
   it("should can remove class instance from container", () => {
@@ -128,12 +92,28 @@ describe("IOC Container", () => {
     });
   });
 
+  it("should @Inject param decorator override dependencies", () => {
+    @Injectable()
+    class A {}
+
+    @Injectable()
+    class B {}
+
+    @Injectable()
+    class C {
+      constructor(public injector: Injector, @Inject(B) public a: A) {}
+    }
+
+    const c = getFromContainer(C);
+    expect(c.a).toBeInstanceOf(B);
+  });
+
   describe("Injector", () => {
     it("should inject injector class instance", () => {
       expect.assertions(1);
       @Injectable()
       class UserService {
-        constructor(@Inject(Injector) injector: Injector) {
+        constructor(injector: Injector) {
           expect(injector).toBeInstanceOf(Injector);
         }
       }
@@ -147,7 +127,7 @@ describe("IOC Container", () => {
 
       @Injectable()
       class ToDoService {
-        constructor(@Inject(Injector) injector: Injector) {
+        constructor(injector: Injector) {
           expect(injector.get(UserService)).toBeInstanceOf(UserService);
         }
       }
@@ -163,7 +143,7 @@ describe("IOC Container", () => {
 
       @Injectable()
       class ToDoService {
-        constructor(@Inject(Injector) injector: Injector) {
+        constructor(injector: Injector) {
           wait = injector.getLazy(UserService).then((userService) => {
             expect(userService).toBeInstanceOf(UserService);
           });
@@ -183,7 +163,7 @@ describe("IOC Container", () => {
 
       @Injectable()
       class UserService {
-        constructor(@Inject(Injector) injector: Injector) {
+        constructor(injector: Injector) {
           injector.getLazy(ToDoService).then((toDoService) => {
             expect(toDoService).toBeInstanceOf(ToDoService);
             resolve();
@@ -193,7 +173,7 @@ describe("IOC Container", () => {
 
       @Injectable()
       class ToDoService {
-        constructor(@Inject(UserService) userService: UserService) {
+        constructor(userService: UserService) {
           expect(userService).toBeInstanceOf(UserService);
         }
       }
@@ -208,7 +188,6 @@ describe("IOC Container", () => {
       @Injectable()
       class A {}
 
-      @Inject(A)
       @Injectable()
       class B {
         constructor(public a: A) {}
@@ -228,16 +207,14 @@ describe("IOC Container", () => {
       @Injectable()
       class A2 {}
 
-      @Inject(A1)
       @Injectable()
       class B {
         constructor(public a1: A1) {}
       }
 
-      @Inject(A1, A2)
       @Injectable()
       class C extends B {
-        constructor(public a1: A2, public a2: A2) {
+        constructor(public a2: A2, public a1: A1) {
           super(a1);
         }
       }
@@ -245,6 +222,82 @@ describe("IOC Container", () => {
       const c = getFromContainer(C);
       expect(c.a1).toBeInstanceOf(A1);
       expect(c.a2).toBeInstanceOf(A2);
+    });
+  });
+
+  describe("Injection Errors And Warnings", () => {
+    it("should throw error if class is not decorated wit @Injectable()", () => {
+      expect.assertions(1);
+
+      try {
+        class A {}
+        getFromContainer(A);
+      } catch (error: any) {
+        expect(error.message).toBe(
+          "`class A` has not been decorated with @Injectable()"
+        );
+      }
+    });
+
+    it("should throw error if @Inject class decorator and @Injectable with access to decorator meta data is used simultaneously", () => {
+      expect.assertions(1);
+      try {
+        @Injectable()
+        class A {}
+
+        @Inject(A)
+        @Injectable()
+        class B {
+          constructor(@Inject(A) a: A) {}
+        }
+
+        getFromContainer(B);
+      } catch (error: any) {
+        expect(error.message).toBe(
+          "Dependencies are injecting by @Inject() as parameter and class decorator for `class B`. Use one of them."
+        );
+      }
+    });
+
+    it("should show warning for auto dependency detection and explicit @Inject(...)", () => {
+      const warnMock = jest.spyOn(console, "warn").mockImplementation();
+      expect.assertions(1);
+      @Injectable()
+      class A {}
+
+      @Injectable()
+      @Inject(A)
+      class B {
+        constructor(a: A) {}
+      }
+      expect(warnMock).toHaveBeenLastCalledWith(
+        "Dependencies are automatically detected for `class B`. Remove @Inject(...)"
+      );
+      getFromContainer(B);
+    });
+  });
+
+  describe("Without Decorator Metadata", () => {
+    it("should inject dependencies with class @Inject(...) decorator", () => {
+      const getOwnMetadata = Reflect.getOwnMetadata;
+      jest
+        .spyOn(Reflect, "getOwnMetadata")
+        .mockImplementation((mdKey, target) =>
+          mdKey === "design:paramtypes" ? null : getOwnMetadata(mdKey, target)
+        );
+
+      @Injectable()
+      class A {}
+
+      @Inject(A)
+      @Injectable()
+      class B {
+        constructor(public a: A) {}
+      }
+
+      const b = getFromContainer(B);
+      expect(b.a).toBeInstanceOf(A);
+      expect(Reflect.getOwnMetadata("design:paramtypes", B)).toBeNull();
     });
   });
 });

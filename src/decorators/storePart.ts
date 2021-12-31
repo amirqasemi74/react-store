@@ -1,8 +1,5 @@
 import { EnhancedStoreFactory } from "src/react/store/enhancedStoreFactory";
 
-/**
- * ******************* Decorator *********************
- */
 export function StorePart(): ClassDecorator {
   return function (StoreType: any) {
     // TODO: must be removed

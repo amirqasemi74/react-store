@@ -1,8 +1,10 @@
+import { Inject } from "./inject";
 import "reflect-metadata";
 
 export function Injectable(scope = Scope.SINGLETON): ClassDecorator {
   return function (target: Function) {
     InjectableMetadataUtils.set(target, scope);
+    Inject()(target);
   };
 }
 

@@ -9,3 +9,9 @@ jest*
 _config.yml
 rollup*
 coverage
+.husky
+.eslintignore
+.prettierignore
+README.md
+LICENSE
+.github

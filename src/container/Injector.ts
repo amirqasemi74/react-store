@@ -1,5 +1,5 @@
+import { Injectable } from "..";
 import { getFromContainer } from "./container";
-import { Injectable } from "src/decorators/Injectable";
 import { ClassType } from "src/types";
 
 @Injectable()
