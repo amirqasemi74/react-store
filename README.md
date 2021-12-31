@@ -3,21 +3,20 @@
 **React Store** is a library for better state management in react hooks new world.
 
 It facilitates to split components into smaller and maintainable ones then share `States` between them.
-It also covers shortcomings of react hooks (believe me!) and let developers to use `class`es to manage their components logic, use it's IOC container.
-<br>The ability to separate components logics and jsx is one of other benefits of this library
+It also covers shortcomings of react hooks (believe me!) and let developers to use `class`es to manage their components logic and using it's IOC container.
+<br>The ability to separate components logics and jsx is one of other benefits of this library.
 
-# Usage
+## Usage
 
 First install core library:
 
-`yarn add @react-store/core` or `npm i @react-store/core`
+`yarn add @react-store/core`
 
 Then enable **decorators** in typescript:
 
 ```json
 {
   "compilerOptions": {
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
 }
 ```
@@ -78,7 +77,7 @@ export default function Input() {
 }
 ```
 
-# Effects
+## Effects
 
 You can manage side effects with `@Effect()` decorator. Like react dependency array you must return array of dependency.
 <br>For **clear effects** again like React useEffect you can return a function from methods which is decorated with @Effect.
@@ -119,15 +118,73 @@ The string can be an object path to define dependencies:
 export class UserStore {
   user = { name: "" };
 
-  @Effect<UserStore>(["user.name"])
+  @Effect(["user.name"])
   usernameChanged() {}
 
-  @Effect<UserStore>("user", true)
+  @Effect("user", true)
   userChanged() {}
 }
 ```
 
-#### Store property & method
+## Props in store
+
+To have store parent component props (the component directly connected to store by using `connectStore`) inside store class use `@Props()`:
+
+```ts
+// user.store.ts
+import type { Props as AppProps } from "./App";
+import { Props, Store } from "@react-store/core";
+
+@Store()
+export class UserStore {
+  @Props()
+  props: AppProps;
+}
+```
+
+## Dependency Injection
+
+In this library we have also supported dependency injection. To define `Injectable`s, decorate class with `@Injectable()`:
+
+```ts
+@Injectable()
+class UserService {}
+```
+
+In order to inject dependencies into injectable, use `@Inject(...)`:
+
+```ts
+@Injectable()
+@Inject(AuthService, UserService)
+class PostService {
+  constructor(private authService: AuthService, private userService: UserService) {}
+}
+```
+
+Also you can use `@Inject()` as parameter decorator:
+
+```ts
+@Injectable()
+@Inject(AuthService)
+class PostService {
+  constructor(
+    private authService: AuthService,
+    @Inject(UserService) private userService: UserService
+  ) {}
+}
+```
+
+Injection works fine for **stores**. Injectable can be injected into all stores. Also stores can be injected into other stores but there is one condition. For example, you want to inject `A` store into `B` store so the component which is wrapped with `connectStore(..., A)` must be higher in `B` store parent component. In other words, it works like React `useContext` rule.
+
+```ts
+@Injectable()
+@Inject(AlertsStore)
+class UserStore {
+  constructor(private alertsStore: AlertsStore) {}
+}
+```
+
+## Store property & method
 
 - _Property_: Each store property can act like piece of component state and mutating their values will rerender _all_ store users as react context API works. Also in more precise way you can declare _dependencies_ for each user of store to prevent additional rendering and optimization purposes. we will talk about more.
 
@@ -138,21 +195,5 @@ export class UserStore {
 function Input() {
   const st = useStore(UserStore);
   return <input onChange={st.onNameChange} />;
-}
-```
-
-#### Props in store
-
-To have parent component props (the component directly connected to store by using `connectStore` function) inside store class use `@Props`:
-
-```ts
-// user.store.ts
-import { Props as AppProps } from "./App";
-import { Props, Store } from "@react-store/core";
-
-@Store()
-export class UserStore {
-  @Props()
-  props: AppProps;
 }
 ```
