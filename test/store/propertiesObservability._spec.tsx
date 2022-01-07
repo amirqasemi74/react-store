@@ -1,4 +1,4 @@
-import { Observable, Store, connectStore, useStore } from "@react-store/core";
+import { Observable, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
@@ -47,7 +47,7 @@ export const storePropertiesObservability = () => {
       }
     }
 
-    const App: React.FC = connectStore(() => {
+    const App: React.FC = connect(() => {
       const vm = useStore(PrimitiveTypesStore);
       store = vm;
       return (
@@ -142,7 +142,7 @@ export const storePropertiesObservability = () => {
       }
     }
 
-    const App: React.FC = connectStore(() => {
+    const App: React.FC = connect(() => {
       const vm = useStore(ComplexTypesStore);
       store = vm;
       return (
@@ -219,7 +219,7 @@ export const storePropertiesObservability = () => {
       }
     }
 
-    const App: React.FC = connectStore(() => {
+    const App: React.FC = connect(() => {
       const vm = useStore(UserStore);
       return (
         <div>
@@ -246,7 +246,7 @@ export const storePropertiesObservability = () => {
       onChange() {}
     }
 
-    const App: React.FC = connectStore(() => {
+    const App: React.FC = connect(() => {
       const vm = useStore(SavedProxiedValueStore);
       store = vm;
       return <div>App</div>;
@@ -282,7 +282,7 @@ export const storePropertiesObservability = () => {
       onChange() {}
     }
 
-    const App: React.FC = connectStore(() => {
+    const App: React.FC = connect(() => {
       const vm = useStore(SavedProxiedValueStore);
       store = vm;
       return <div>App</div>;
@@ -310,7 +310,7 @@ export const storePropertiesObservability = () => {
       number = 1;
     }
 
-    const App: React.FC = connectStore(() => {
+    const App: React.FC = connect(() => {
       const vm = useStore(PrimitiveTypesStore);
       store = vm;
       renderCount++;

@@ -39,7 +39,7 @@ export class UserStore {
 }
 ```
 
-Then connect it to the component **Tree** by using `connectStore`:
+Then connect it to the component **Tree** by using `connect`:
 
 ```tsx
 // App.tsx
@@ -58,7 +58,7 @@ function App(props: Props) {
     </div>
   );
 }
-export default connectStore(App, UserStore);
+export default connect(App, UserStore);
 ```
 
 And enjoy to use store in child components by `useStore` hook. pass **Store Class** as first parameter:
@@ -128,7 +128,7 @@ export class UserStore {
 
 ## Props in store
 
-To have store parent component props (the component directly connected to store by using `connectStore`) inside store class use `@Props()`:
+To have store parent component props (the component directly connected to store by using `connect`) inside store class use `@Props()`:
 
 ```ts
 // user.store.ts
@@ -174,7 +174,7 @@ class PostService {
 }
 ```
 
-Injection works fine for **stores**. Injectable can be injected into all stores. Also stores can be injected into other stores but there is one condition. For example, you want to inject `A` store into `B` store so the component which is wrapped with `connectStore(..., A)` must be higher in `B` store parent component. In other words, it works like React `useContext` rule.
+Injection works fine for **stores**. Injectable can be injected into all stores. Also stores can be injected into other stores but there is one condition. For example, you want to inject `A` store into `B` store so the component which is wrapped with `connect(..., A)` must be higher in `B` store parent component. In other words, it works like React `useContext` rule.
 
 ```ts
 @Injectable()

@@ -18,7 +18,3 @@ export class StoreEffectsManager {
     return this.clearEffects.get(effectKey);
   }
 }
-
-interface Effect {
-  clearEffect?: (() => void) | null;
-}

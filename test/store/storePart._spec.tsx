@@ -1,4 +1,11 @@
-import { Effect, Store, StorePart, connectStore, useStore } from "@react-store/core";
+import {
+  AutoWire,
+  Effect,
+  Store,
+  StorePart,
+  connect,
+  useStore,
+} from "@react-store/core";
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
 import { IS_PROXIED } from "src/constant";
@@ -20,7 +27,9 @@ export const storePartTests = () => {
     @Store()
     class UserStore {
       username = "amirhossein";
-      validator = new Validator();
+
+      @AutoWire()
+      validator: Validator;
     }
 
     const App = () => {
@@ -36,7 +45,7 @@ export const storePartTests = () => {
         </>
       );
     };
-    const AppWithStore = connectStore(App, UserStore);
+    const AppWithStore = connect(App, UserStore);
     const { getByText } = render(<AppWithStore />);
 
     fireEvent.click(getByText(/Create Error/i));
@@ -64,7 +73,8 @@ export const storePartTests = () => {
     @Store()
     class UserStore {
       username = "amirhossein";
-      validator = new Validator();
+      @AutoWire()
+      validator: Validator;
     }
 
     const App = () => {
@@ -79,7 +89,7 @@ export const storePartTests = () => {
         </>
       );
     };
-    const AppWithStore = connectStore(App, UserStore);
+    const AppWithStore = connect(App, UserStore);
     const { getByText } = render(<AppWithStore />);
 
     fireEvent.click(getByText(/Create Error/i));
@@ -95,7 +105,8 @@ export const storePartTests = () => {
 
     @Store()
     class UserStore {
-      validator = new Validator();
+      @AutoWire()
+      validator: Validator;
 
       resetStorePart() {
         this.validator = "sdf";
@@ -112,7 +123,7 @@ export const storePartTests = () => {
         </>
       );
     };
-    const AppWithStore = connectStore(App, UserStore);
+    const AppWithStore = connect(App, UserStore);
     const { getByText } = render(<AppWithStore />);
 
     fireEvent.click(getByText(/Reset/i));
@@ -121,7 +132,7 @@ export const storePartTests = () => {
     expect(post).toBeDefined();
     expect(pre).toBe(post);
     expect(errorMock).toHaveBeenLastCalledWith(
-      "`validator` property key is reassigned. it isn't valid for propertyKeys which is declared for store part"
+      "`UserStore.validator` is decorated with `@Wire(...)` or `@AutoWire()`, so can't be mutated."
     );
   });
 
@@ -132,7 +143,8 @@ export const storePartTests = () => {
 
     @Store()
     class UserStore {
-      validator = new Validator();
+      @AutoWire()
+      validator: Validator;
     }
 
     const App = () => {
@@ -140,7 +152,7 @@ export const storePartTests = () => {
       validator = vm.validator;
       return <></>;
     };
-    const AppWithStore = connectStore(App, UserStore);
+    const AppWithStore = connect(App, UserStore);
     render(<AppWithStore />);
 
     expect(validator[IS_PROXIED]).toBeFalsy();

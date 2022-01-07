@@ -1,5 +1,4 @@
 import { ReactApplicationContext } from "../appContext";
-import { registerHandlers } from "../handlers/registerHandlers";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { StoreFactory } from "./storeFactory";
 import React, { useMemo } from "react";
@@ -33,7 +32,7 @@ export const StoreProvider = ({ type, render, props }: Props) => {
     return context;
   });
 
-  const { store, storeAdmin } = StoreFactory.create(type, props);
+  const storeAdmin = StoreFactory.create(type, props);
 
   const Component = useMemo(() => React.memo(render), []);
 

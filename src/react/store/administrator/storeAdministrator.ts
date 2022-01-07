@@ -1,8 +1,8 @@
 import { STORE_ADMINISTRATION } from "../../../constant";
 import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
+import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
-import { StorePropertyKeysManager } from "./storePropertyKeysManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
 
 export class StoreAdministrator {
@@ -24,30 +24,34 @@ export class StoreAdministrator {
 
   propertyKeysManager = new StorePropertyKeysManager(this);
 
+  reactHooks = new Set<StoreAdministratorReactHooks>();
+
   private isStoreMutated = false;
 
   private runningActionsCount = 0;
 
-  private constructor(type: Function, instance: any) {
-    this.instance = instance;
+  constructor(type: Function) {
     this.type = type;
+    this.storePartsManager.createInstances();
+  }
+
+  static get(store: object) {
+    return (store[STORE_ADMINISTRATION] as StoreAdministrator) || null;
+  }
+
+  setInstance(instance: any) {
+    this.instance = instance;
     this.instance[STORE_ADMINISTRATION] = this;
     this.instanceForComponents = new Proxy(
       this.instance,
       new StoreForComponentUsageProxy()
     );
 
-    this.storePartsManager.initEffectsContainers();
+    //Orders matter
+    this.storePartsManager.register();
+    this.propertyKeysManager.registerUseStates();
     this.propertyKeysManager.makeAllObservable();
     this.methodsManager.makeAllAsActions();
-  }
-
-  static register(type: Function, instance: any) {
-    Reflect.set(this, STORE_ADMINISTRATION, new StoreAdministrator(type, instance));
-  }
-
-  static get(store: object) {
-    return (store[STORE_ADMINISTRATION] as StoreAdministrator) || null;
   }
 
   runAction(action: Function) {
@@ -72,4 +76,10 @@ export class StoreAdministrator {
       );
     }
   }
+}
+
+export interface StoreAdministratorReactHooks {
+  hook: Function;
+  when: "BEFORE_INSTANCE" | "AFTER_INSTANCE";
+  result?: (result: any) => void;
 }

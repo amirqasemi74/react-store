@@ -1,12 +1,10 @@
-import { EnhancedStoreFactory } from "src/react/store/enhancedStoreFactory";
+import { Inject } from "..";
 
 export function StorePart(): ClassDecorator {
-  return function (StoreType: any) {
-    // TODO: must be removed
-    const EnhancedStoreType = EnhancedStoreFactory.create(StoreType);
-    StorePartMetadataUtils.set(EnhancedStoreType);
-    return EnhancedStoreType;
-  } as any;
+  return function (StorePartType: any) {
+    StorePartMetadataUtils.set(StorePartType);
+    Inject()(StorePartType);
+  };
 }
 
 export class StorePartMetadataUtils {

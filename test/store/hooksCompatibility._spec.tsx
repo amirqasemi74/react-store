@@ -1,4 +1,4 @@
-import { Store, connectStore, useStore } from "@react-store/core";
+import { Store, connect, useStore } from "@react-store/core";
 import { render, screen, waitFor } from "@testing-library/react";
 import React, { useEffect } from "react";
 
@@ -23,7 +23,7 @@ export const storeHooksCompatibilityTests = () => {
       return <>static content</>;
     };
 
-    const App = connectStore(() => {
+    const App = connect(() => {
       const st = useStore(SampleStore);
 
       return (

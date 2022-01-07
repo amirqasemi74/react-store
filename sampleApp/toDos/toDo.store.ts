@@ -1,5 +1,5 @@
 import { BaseStore } from "./base.store";
-import { Effect, Observable, Props, Store } from "@react-store/core";
+import { Effect, Props, Store } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 import { FormValidator } from "sampleApp/libs/formValidator";
 
@@ -10,13 +10,9 @@ export class ToDoStore extends BaseStore {
 
   todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
 
-  todo = new ToDo();
-
-  validator = new FormValidator(this.todo);
-
   d = new Date();
 
-  @Effect<ToDoStore>([])
+  @Effect([])
   init() {
     for (let i = 0; i < 10; i++) {
       this.todos.push({
@@ -64,11 +60,6 @@ export class ToDoStore extends BaseStore {
   removeTodo(id: number) {
     this.todos = this.todos.filter((item, i) => i !== id);
   }
-}
-
-@Observable()
-class ToDo {
-  value = "";
 }
 
 interface ToDoItem {

@@ -4,7 +4,7 @@ import { storeHooksCompatibilityTests } from "./hooksCompatibility._spec";
 import { storeInjectionTests } from "./injection._spec";
 import { storePropertiesObservability } from "./propertiesObservability._spec";
 import { storePartTests } from "./storePart._spec";
-import { Store, connectStore, useStore } from "@react-store/core";
+import { Store, connect, useStore } from "@react-store/core";
 import { render } from "@testing-library/react";
 import React from "react";
 import { clearContainer } from "src/container/container";
@@ -54,7 +54,7 @@ describe("Store", () => {
         </>
       );
     };
-    const AppWithStore = connectStore(App, UserStore);
+    const AppWithStore = connect(App, UserStore);
     const { getByText } = render(<AppWithStore />);
 
     expect(appStore).not.toBe(null);
