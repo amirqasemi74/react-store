@@ -3,7 +3,7 @@ import ToDos from "./toDos/ToDos";
 import { ToDoStore } from "./toDos/toDo.store";
 import { PureToDos } from "./todos-pure/PureToDos";
 import { PureToDosProvider } from "./todos-pure/PureToDosProvider";
-import { StoreProvider, connectStore, useStore } from "@react-store/core";
+import { StoreProvider, connect, useStore } from "@react-store/core";
 import React, { useState } from "react";
 
 const App = () => {
@@ -19,4 +19,4 @@ const App = () => {
   );
 };
 
-export default connectStore(App, ThemeStore);
+export default connect(App, ThemeStore);

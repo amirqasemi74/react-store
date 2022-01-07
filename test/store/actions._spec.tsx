@@ -1,4 +1,4 @@
-import { Effect, Store, connectStore, useStore } from "@react-store/core";
+import { Effect, Store, connect, useStore } from "@react-store/core";
 import { act, render } from "@testing-library/react";
 import React from "react";
 
@@ -31,7 +31,7 @@ export const storeActionsTest = () => {
       }
     }
 
-    const App = connectStore(() => {
+    const App = connect(() => {
       const st = useStore(SampleStore);
       renderCount++;
       return (
@@ -59,7 +59,7 @@ export const storeActionsTest = () => {
       onRender() {}
     }
 
-    const App = connectStore(() => {
+    const App = connect(() => {
       const st = useStore(SampleStore);
       renderCount++;
       return (

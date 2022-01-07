@@ -1,26 +1,24 @@
 import { ReactApplicationContext } from "../appContext";
 import { registerHandlers } from "../handlers/registerHandlers";
-import { StoreAdministrator } from "./administrator/storeAdministrator";
-import { EnhancedStoreFactory } from "./enhancedStoreFactory";
-import { StorePropertyKey } from "./storePropertyKey";
-import { useContext, useState } from "react";
+import {
+  StoreAdministrator,
+  StoreAdministratorReactHooks,
+} from "./administrator/storeAdministrator";
+import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
+import { useWillMount } from "src/utils/useWillMount";
 
 export class StoreFactory {
   static create(StoreType: ClassType, props: any) {
-    const EnhancedStoreType = useFixedLazyRef(() =>
-      EnhancedStoreFactory.create(StoreType)
-    );
+    // Has React.UseContext
+    // So must be in render
+    const deps = this.resolveStoreDeps(StoreType);
 
-    const deps = this.resolveStoreDeps(EnhancedStoreType);
-
-    const store = useFixedLazyRef(() => {
-      const store = new EnhancedStoreType(...deps);
-      const storeAdmin = StoreAdministrator.get(store);
-
+    const storeAdmin = useFixedLazyRef(() => {
+      const storeAdmin = new StoreAdministrator(StoreType);
       // for example if we inject store A into other store B
       // if then injected store A change all store b consumer must be
       // notified to rerender base of their deps
@@ -32,18 +30,27 @@ export class StoreFactory {
           sourceStoreAdmin?.injectedInTos.add(storeAdmin)
         );
 
-      return store;
+      return storeAdmin;
     });
 
-    const storeAdmin = StoreAdministrator.get(store);
-    this.registerUseStateForStore(storeAdmin);
-    this.registerUseStateForStoreParts(storeAdmin);
+    //Store Part will init here
+    //So must be come first
+    this.runHooks(storeAdmin, "BEFORE_INSTANCE");
+    useWillMount(() => {
+      storeAdmin.setInstance(new StoreType(...deps));
+    });
+    this.runHooks(storeAdmin, "AFTER_INSTANCE");
 
+    //TODO: move to Hooks
     registerHandlers(storeAdmin, props);
 
-    return { store, storeAdmin };
+    return storeAdmin;
   }
 
+  /**
+   * *********************** Dependency Injection *******************
+   */
+  //TODO: merge with store part resolve deps
   private static resolveStoreDeps(storeType: ClassType) {
     const storeDeps = useFixedLazyRef(() =>
       InjectMetadataUtils.getDependenciesDecoratedWith(storeType, "STORE")
@@ -94,27 +101,21 @@ export class StoreFactory {
     );
   }
 
-  private static registerUseStateForStore(storeAdmin: StoreAdministrator) {
-    Array.from(storeAdmin.propertyKeysManager.propertyKeys.values()).forEach(
-      StoreFactory.createUseStateForPropertyKey
+  /**
+   * ************** Hooks *************
+   */
+  static runHooks(
+    storeAdmin: StoreAdministrator,
+    when: StoreAdministratorReactHooks["when"]
+  ) {
+    Array.from(storeAdmin.reactHooks.values())
+      .filter(({ when: _when }) => _when === when)
+      .forEach(({ hook, result }) => {
+        const res = hook();
+        result?.(res);
+      });
+    Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach((spa) =>
+      this.runHooks(spa, when)
     );
-  }
-  private static registerUseStateForStoreParts(storeAdmin: StoreAdministrator) {
-    Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach((sp) => {
-      Array.from(sp.propertyKeysManager.propertyKeys.values()).forEach(
-        this.createUseStateForPropertyKey
-      );
-      this.registerUseStateForStoreParts(sp);
-    });
-  }
-
-  private static createUseStateForPropertyKey(info: StorePropertyKey) {
-    const [state, setState] = useState(() =>
-      info.isPrimitive ? info.getValue("Store") : { $: info.getValue("Store") }
-    );
-    info.setValue(state, "State");
-    info.reactSetState = setState;
   }
 }
-
-const appContext = getFromContainer(ReactApplicationContext);

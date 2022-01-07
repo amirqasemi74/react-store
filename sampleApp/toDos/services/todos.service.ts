@@ -1,5 +1,5 @@
 import { UserService } from "./userService";
-import { Inject, Injectable, Injector } from "@react-store/core";
+import { Injectable, Injector } from "@react-store/core";
 
 @Injectable()
 export class ToDoService {
@@ -12,6 +12,6 @@ export class ToDoService {
   }
 
   toDos() {
-    console.log("Gettig todos for user", this.userService.username);
+    console.log("Getting todos for user", this.userService.username);
   }
 }

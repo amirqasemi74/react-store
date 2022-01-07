@@ -1,10 +1,4 @@
-import {
-  Effect,
-  Observable,
-  Store,
-  connectStore,
-  useStore,
-} from "@react-store/core";
+import { Effect, Observable, Store, connect, useStore } from "@react-store/core";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
 import { clearContainer } from "src/container/container";
@@ -31,7 +25,7 @@ export const storeEffectTests = () => {
       }
     }
 
-    const User = connectStore(() => {
+    const User = connect(() => {
       const vm = useStore(UserStore);
       return (
         <>
@@ -94,7 +88,7 @@ export const storeEffectTests = () => {
       }
     }
 
-    const User = connectStore(() => {
+    const User = connect(() => {
       const vm = useStore(UserStore);
       return (
         <>
@@ -168,7 +162,7 @@ export const storeEffectTests = () => {
       }
     }
 
-    const App = connectStore(() => {
+    const App = connect(() => {
       const vm = useStore(UserStore);
       return (
         <>
@@ -226,7 +220,7 @@ export const storeEffectTests = () => {
       }
     }
 
-    const App = connectStore(() => {
+    const App = connect(() => {
       const vm = useStore(UserStore);
       return (
         <>
@@ -270,7 +264,7 @@ export const storeEffectTests = () => {
     @Store()
     class B extends A {}
 
-    const App = connectStore(() => {
+    const App = connect(() => {
       useStore(B);
       return <></>;
     }, B);

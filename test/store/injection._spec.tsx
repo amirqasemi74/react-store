@@ -3,7 +3,7 @@ import {
   Injectable,
   Store,
   StoreProvider,
-  connectStore,
+  connect,
   useStore,
 } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
@@ -52,7 +52,7 @@ export const storeInjectionTests = () => {
         </div>
       );
     };
-    const AppWithStore = connectStore(connectStore(App, UserStore), PostStore);
+    const AppWithStore = connect(connect(App, UserStore), PostStore);
     render(<AppWithStore />);
   });
 
@@ -90,7 +90,7 @@ export const storeInjectionTests = () => {
       appStore = vm;
       return <StoreProvider type={UserStore} render={User} />;
     };
-    const AppWithStore = connectStore(App, AppStore);
+    const AppWithStore = connect(App, AppStore);
     const { getByText } = render(<AppWithStore />);
 
     expect(appStore).not.toBe(null);
@@ -143,7 +143,7 @@ export const storeInjectionTests = () => {
         </>
       );
     };
-    const AppWithStore = connectStore(App, AppStore);
+    const AppWithStore = connect(App, AppStore);
     const { getByText } = render(<AppWithStore />);
 
     fireEvent.click(getByText("change Theme"));
@@ -165,7 +165,7 @@ export const storeInjectionTests = () => {
       @Store()
       class MainStore extends BaseStore {}
 
-      const App = connectStore(() => {
+      const App = connect(() => {
         mainStore = useStore(MainStore);
         return <></>;
       }, MainStore);
@@ -195,7 +195,7 @@ export const storeInjectionTests = () => {
         }
       }
 
-      const App = connectStore(() => {
+      const App = connect(() => {
         mainStore = useStore(MainStore);
         return <></>;
       }, MainStore);

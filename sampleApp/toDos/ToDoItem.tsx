@@ -7,7 +7,7 @@ interface Props {
   itemIndex: number;
 }
 
-const ToDoItem: React.FC<Props> = React.memo(({ itemIndex }) => {
+const ToDoItem: React.FC<Props> = ({ itemIndex }) => {
   const vm = useStore(ToDoStore, ({ todos }) => [todos[itemIndex]]);
 
   return (
@@ -29,7 +29,7 @@ const ToDoItem: React.FC<Props> = React.memo(({ itemIndex }) => {
       </ActionWrapper>
     </ToDoItemWrapper>
   );
-});
+};
 
 export default ToDoItem;
 

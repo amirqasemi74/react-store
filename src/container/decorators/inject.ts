@@ -1,5 +1,6 @@
 import { StoreMetadataUtils } from "../../decorators/store";
 import { InjectableMetadataUtils } from "./Injectable";
+import { StorePartMetadataUtils } from "src/decorators/storePart";
 
 export function Inject(...deps: any[]) {
   return function (...args: [Function] | [Function, undefined, number]) {
@@ -103,6 +104,8 @@ export class InjectMetadataUtils {
       const isDecorated =
         decoratedWith === "STORE"
           ? StoreMetadataUtils.is(target)
+          : decoratedWith === "STORE_PART"
+          ? StorePartMetadataUtils.is(target)
           : InjectableMetadataUtils.is(target);
 
       const ownDeps = this.getOwnDependencies(target);
@@ -126,5 +129,5 @@ interface ConstructorDependency {
   injectType: InjectType;
 }
 
-type DecoratedWith = "STORE" | "INJECTABLE";
+export type DecoratedWith = "STORE" | "STORE_PART" | "INJECTABLE";
 type InjectType = "CLASS" | "CLASS_METADATA" | "PARAMETER";

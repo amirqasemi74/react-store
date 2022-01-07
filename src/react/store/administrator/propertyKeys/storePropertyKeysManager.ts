@@ -1,7 +1,8 @@
-import { StorePropertyKey } from "../storePropertyKey";
-import type { StoreAdministrator } from "./storeAdministrator";
+import type { StoreAdministrator } from "../storeAdministrator";
+import { StorePropertyKey } from "./storePropertyKey";
+import { useState } from "react";
 import { StorePropsMetadataUtils } from "src/decorators/props";
-import { StorePartMetadataUtils } from "src/decorators/storePart";
+import { WireMetadataUtils } from "src/decorators/wire";
 import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { isPrimitive } from "src/utils/isPrimitive";
 
@@ -11,6 +12,7 @@ export class StorePropertyKeysManager {
   private policies: SetPropertyPolicy[] = [];
 
   constructor(private storeAdmin: StoreAdministrator) {
+    // @Props
     this.policies.push({
       matcher: (propertyKey) =>
         StorePropsMetadataUtils.is(storeAdmin.type, propertyKey),
@@ -18,23 +20,23 @@ export class StorePropertyKeysManager {
       set: "ORIGINAL",
     });
 
+    //@Wire
     this.policies.push({
       matcher: (propertyKey) =>
-        storeAdmin.instance[propertyKey] &&
-        StorePartMetadataUtils.is(storeAdmin.instance[propertyKey]?.constructor),
+        WireMetadataUtils.is(this.storeAdmin.type, propertyKey),
       render: false,
       set: "NONE",
       onSet: (propertyKey) =>
         console.error(
-          `\`${propertyKey.toString()}\` property key is reassigned. it isn't valid for propertyKeys which is declared for store part`
+          `\`${
+            this.storeAdmin.type.name
+          }.${propertyKey.toString()}\` is decorated with \`@Wire(...)\` or \`@AutoWire()\`, so can't be mutated.`
         ),
     });
   }
 
   makeAllObservable() {
     Object.keys(this.storeAdmin.instance).forEach((propertyKey) => {
-      const self = this;
-
       const policy = this.policies.find(({ matcher }) => matcher(propertyKey));
       let value = this.storeAdmin.instance[propertyKey];
 
@@ -55,8 +57,8 @@ export class StorePropertyKeysManager {
       Object.defineProperty(this.storeAdmin.instance, propertyKey, {
         enumerable: true,
         configurable: true,
-        get: () => self.onGetPropertyKey(propertyKey),
-        set: (value: any) => self.onSetPropertyKey(propertyKey, value),
+        get: () => this.onGetPropertyKey(propertyKey),
+        set: (value: any) => this.onSetPropertyKey(propertyKey, value),
       });
     });
   }
@@ -108,6 +110,26 @@ export class StorePropertyKeysManager {
         const info = this.propertyKeys.get(propertyKey);
         info?.reactSetState(info.getValue("Store"));
         this.storeAdmin.renderConsumers(true);
+      },
+    });
+  }
+
+  /**
+   * *********************** Store UseStates ******************************
+   */
+  registerUseStates() {
+    this.storeAdmin.reactHooks.add({
+      when: "AFTER_INSTANCE",
+      hook: () => {
+        Array.from(
+          this.storeAdmin.propertyKeysManager.propertyKeys.values()
+        ).forEach((info) => {
+          const [state, setState] = useState(() =>
+            info.isPrimitive ? info.getValue("Store") : { $: info.getValue("Store") }
+          );
+          info.setValue(state, "State");
+          info.reactSetState = setState;
+        });
       },
     });
   }
