@@ -8,7 +8,7 @@ export class StorePropertyKey {
     state?: unknown;
   };
 
-  private _reactSetState: React.Dispatch<React.SetStateAction<any>>;
+  private _reactSetState?: React.Dispatch<React.SetStateAction<any>>;
 
   constructor(value: any) {
     this.isPrimitive = isPrimitive(value);
@@ -22,7 +22,7 @@ export class StorePropertyKey {
   set reactSetState(setState) {
     this._reactSetState = (newValue) => {
       this.isPrimitive = isPrimitive(newValue);
-      setState(this.isPrimitive ? newValue : { $: newValue });
+      setState?.(this.isPrimitive ? newValue : { $: newValue });
     };
   }
 

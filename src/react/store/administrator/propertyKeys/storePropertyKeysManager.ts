@@ -5,6 +5,7 @@ import { StorePropsMetadataUtils } from "src/decorators/props";
 import { WireMetadataUtils } from "src/decorators/wire";
 import adtProxyBuilder from "src/proxy/adtProxy/adtProxyBuilder";
 import { isPrimitive } from "src/utils/isPrimitive";
+import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
   propertyKeys = new Map<PropertyKey, StorePropertyKey>();
@@ -92,7 +93,7 @@ export class StorePropertyKeysManager {
     // Props property key must not affect renders status at all.
     if (!matchedPolicy || matchedPolicy.render) {
       const info = this.propertyKeys.get(propertyKey);
-      info?.reactSetState(info.getValue("Store"));
+      info?.reactSetState?.(info.getValue("Store"));
       if (isPrimitive(value)) {
         if (preValue !== value) {
           this.storeAdmin.renderConsumers(true);
@@ -108,7 +109,7 @@ export class StorePropertyKeysManager {
       value,
       onSet: () => {
         const info = this.propertyKeys.get(propertyKey);
-        info?.reactSetState(info.getValue("Store"));
+        info?.reactSetState?.(info.getValue("Store"));
         this.storeAdmin.renderConsumers(true);
       },
     });
@@ -121,9 +122,15 @@ export class StorePropertyKeysManager {
     this.storeAdmin.reactHooks.add({
       when: "AFTER_INSTANCE",
       hook: () => {
-        Array.from(
-          this.storeAdmin.propertyKeysManager.propertyKeys.values()
-        ).forEach((info) => {
+        const propertyKeysInfo = useFixedLazyRef(() =>
+          Array.from(
+            this.storeAdmin.propertyKeysManager.propertyKeys.entries()
+          ).filter(
+            ([propertyKey]) =>
+              !WireMetadataUtils.is(this.storeAdmin.type, propertyKey)
+          )
+        );
+        propertyKeysInfo.forEach(([, info]) => {
           const [state, setState] = useState(() =>
             info.isPrimitive ? info.getValue("Store") : { $: info.getValue("Store") }
           );

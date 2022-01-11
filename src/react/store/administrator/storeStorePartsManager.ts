@@ -36,7 +36,6 @@ export class StoreStorePartsManager {
               wire.propertyKey,
               new StorePropertyKey(instance)
             );
-          } else {
             initiatedStorePart.add(wire.propertyKey);
           }
         },
