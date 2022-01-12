@@ -16,15 +16,7 @@ export const runEffect = ({ effectKey, storeAdmin }: RunEffectArgs) => {
     []
   );
 
-  if (isPromise(clearEffect)) {
-    throw new Error("Async function for effect is invalid!");
-  }
-
-  if (clearEffect && typeof clearEffect !== "function") {
-    throw new Error("Only return function from effect as it's clearEffect");
-  }
-
-  if (clearEffect) {
+  if (clearEffect && !isPromise(clearEffect) && typeof clearEffect === "function") {
     storeAdmin.effectsManager.setClearEffect(effectKey, clearEffect);
   }
 };
