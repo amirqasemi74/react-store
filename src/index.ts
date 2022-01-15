@@ -10,7 +10,6 @@ export { Effect } from "./decorators/effect";
 export { Store } from "./decorators/store";
 export { Inject } from "./container/decorators/inject";
 export { StorePart } from "./decorators/storePart";
-export { Action } from "./decorators/action";
 export { Observable } from "./decorators/observable";
 export { Wire } from "./decorators/wire";
 export { AutoWire } from "./decorators/autoWire";

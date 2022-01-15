@@ -1,5 +1,6 @@
 import { STORE_ADMINISTRATION } from "../../../constant";
 import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
+import { StoreGettersManager } from "./getters/storeGettersManager";
 import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
@@ -23,6 +24,8 @@ export class StoreAdministrator {
   storePartsManager = new StoreStorePartsManager(this);
 
   propertyKeysManager = new StorePropertyKeysManager(this);
+
+  gettersManager = new StoreGettersManager(this);
 
   reactHooks = new Set<StoreAdministratorReactHooks>();
 
@@ -51,17 +54,8 @@ export class StoreAdministrator {
     this.storePartsManager.register();
     this.propertyKeysManager.registerUseStates();
     this.propertyKeysManager.makeAllObservable();
+    this.gettersManager.makeAllGettersAsComputed();
     this.methodsManager.makeAllAsActions();
-  }
-
-  runAction(action: Function) {
-    this.runningActionsCount++;
-    const res = action();
-    this.runningActionsCount--;
-    if (this.runningActionsCount === 0) {
-      this.renderConsumers();
-    }
-    return res;
   }
 
   renderConsumers(isStoreMutated?: true) {

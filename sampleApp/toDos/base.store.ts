@@ -15,7 +15,6 @@ export class BaseStore {
   @Effect([])
   onMount() {
     this.validator.form = this.todo;
-    console.log("mounted");
   }
 }
 

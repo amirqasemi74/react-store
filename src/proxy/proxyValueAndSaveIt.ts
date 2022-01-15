@@ -1,9 +1,7 @@
 import adtProxyBuilder, {
   BaseAdtProxyBuilderArgs,
 } from "./adtProxy/adtProxyBuilder";
-import { IS_PROXIED, STORE_ADMINISTRATION } from "src/constant";
-import { StorePartMetadataUtils } from "src/decorators/storePart";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { STORE_ADMINISTRATION } from "src/constant";
 
 /**
  * Proxy value if need and then proxied value for next usage
@@ -16,10 +14,6 @@ export function proxyValueAndSaveIt(
   receiver: any,
   adtProxyBuilderArgs: BaseAdtProxyBuilderArgs
 ) {
-  if (propertyKey === IS_PROXIED) {
-    return true;
-  }
-
   const value = Reflect.get(target, propertyKey, receiver);
 
   if (propertyKey === PROXIED_VALUE) {
@@ -32,9 +26,7 @@ export function proxyValueAndSaveIt(
     // Frozen Object does not need to be proxied (observable) like React Props
     !Object.isFrozen(value) &&
     !isInArrayOrObjectPrototype(target, propertyKey) &&
-    ([Object, Array, Map].includes(value.constructor) ||
-      value instanceof Function ||
-      (value instanceof Object && StorePartMetadataUtils.is(value.constructor)))
+    [Object, Array, Map].includes(value.constructor)
   ) {
     const proxiedValue = () =>
       adtProxyBuilder({
@@ -42,19 +34,6 @@ export function proxyValueAndSaveIt(
         context: receiver,
         ...adtProxyBuilderArgs,
       });
-
-    // Storing bound method in it self
-    // cause to store it for store type not
-    // store instance
-    if (value instanceof Function) {
-      const propertyKeysValue =
-        StoreAdministrator.get(target)?.propertyKeysManager.propertyKeys;
-
-      return propertyKeysValue
-        ? propertyKeysValue.get(propertyKey) ||
-            propertyKeysValue.set(propertyKey, proxiedValue()).get(propertyKey)
-        : value;
-    }
 
     return value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue());
   }

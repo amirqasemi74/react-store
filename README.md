@@ -6,7 +6,17 @@ It facilitates to split components into smaller and maintainable ones then share
 It also covers shortcomings of react hooks (believe me!) and let developers to use `class`es to manage their components logic and using it's IOC container.
 <br>The ability to separate components logics and jsx is one of other benefits of this library.
 
-## Usage
+## Table of content
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [Effects](#effects)
+- [Props](#props)
+- [Store Part](#store-part)
+- [Computed Property](#computed-property)
+- [Dependency Injection](#dependency-injection)
+
+## Installation
 
 First install core library:
 
@@ -22,6 +32,8 @@ Then enable **decorators** in typescript:
 ```
 
 You can also use other javascript transpilers such as babel.
+
+## Usage
 
 Now it's ready. First create a `Store`:
 
@@ -43,13 +55,13 @@ Then connect it to the component **Tree** by using `connect`:
 
 ```tsx
 // App.tsx
-import { connectToStore, useStore } from "@react-store/core";
+import { connect, useStore } from "@react-store/core";
 
 interface Props {
   p1: string;
 }
 
-function App(props: Props) {
+export const App = connect((props: Props) => {
   const st = useStore(UserStore);
   return (
     <div>
@@ -57,8 +69,7 @@ function App(props: Props) {
       <Input />
     </div>
   );
-}
-export default connect(App, UserStore);
+}, UserStore);
 ```
 
 And enjoy to use store in child components by `useStore` hook. pass **Store Class** as first parameter:
@@ -66,7 +77,7 @@ And enjoy to use store in child components by `useStore` hook. pass **Store Clas
 ```jsx
 import { useStore } from "@react-store/core";
 
-export default function Input() {
+export function Input() {
   const st = useStore(UserStore);
   return (
     <div>
@@ -79,8 +90,8 @@ export default function Input() {
 
 ## Effects
 
-You can manage side effects with `@Effect()` decorator. Like react dependency array you must return array of dependency.
-<br>For **clear effects** again like React useEffect you can return a function from methods which is decorated with @Effect.
+You can manage side effects with `@Effect()` decorator. Like react dependency array you must define array of dependencies.
+<br>For **clear effects** again like React `useEffect` you can return a function from methods which is decorated with `@Effect`.
 
 ```ts
 @Store()
@@ -126,7 +137,9 @@ export class UserStore {
 }
 ```
 
-## Props in store
+> Methods which decorate with `@Effect()` can be async, but if you want to return `clear effect` function make it sync method
+
+## Props
 
 To have store parent component props (the component directly connected to store by using `connect`) inside store class use `@Props()`:
 
@@ -139,6 +152,63 @@ import { Props, Store } from "@react-store/core";
 export class UserStore {
   @Props()
   props: AppProps;
+}
+```
+
+## Store Part
+
+`Store Part` like store is a class which is decorated with `@StorePart()` and can **only** be connected to a store with `@Wire()` decorator.
+
+```ts
+@StorePart()
+class Validator {
+  object: Record<string, unknown>;
+
+  hasError = false;
+
+  @Effect("object", true)
+  validate() {
+    this.hasError = someValidator(object).hasError;
+  }
+}
+
+@Store()
+class UserForm {
+  user: User;
+
+  @Wire(Validator)
+  validator: Validator;
+
+  @Effect([])
+  onMount() {
+    this.validator.object = this.user;
+  }
+
+  onUsernameChange(username) {
+    this.user.username = username;
+  }
+}
+```
+
+- Store part **can not** be used directly with `useStore` and must be wired to a store.
+- Like store, store part can have it's effects, dependency injection.
+- Store part is piece of logics and states can be wired to any other store and play a role like React `custom hooks`
+
+## Computed Property
+
+You can define getter in store class and automatically it will be a `computed` value. it means that if any underlying class properties which is used in
+getter change, we will recompute getter value and cache it.
+
+```ts
+@Store()
+class BoxStore {
+  width: number;
+
+  height: number;
+
+  get area() {
+    return (this.width + this.height) * 2;
+  }
 }
 ```
 

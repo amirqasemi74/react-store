@@ -58,10 +58,5 @@ export const removeFromContainer = (
   container = defaultContainer
 ) => container.remove(someClass);
 
-export const resolveDepsFromContainer = (
-  someClass: ClassType,
-  container = defaultContainer
-) => container.resolveDependencies(someClass);
-
 export const clearContainer = (container = defaultContainer) =>
   container.clearContainer();

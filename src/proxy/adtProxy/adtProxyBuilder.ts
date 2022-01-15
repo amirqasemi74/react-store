@@ -1,12 +1,13 @@
 import arrayProxyBuilder from "./array.proxyBuilder";
-import functionProxyBuilder from "./function.proxyBuilder";
 import { mapProxyBuilder } from "./map.proxyBuilder";
 import objectProxyBuilder from "./object.proxyBuilder";
 import { ObservableMetadataUtils } from "src/decorators/observable";
+import { AccessedProperty } from "src/react/store/administrator/propertyKeys/storePropertyKeysManager";
 
 export interface BaseAdtProxyBuilderArgs {
+  proxyTypes?: Array<"Array" | "Object" | "Map">;
   onSet?: () => void;
-  proxyTypes?: Array<"Function" | "Array" | "Object" | "Map">;
+  onAccess?: (accessPath: AccessedProperty) => void;
 }
 
 interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
@@ -20,7 +21,6 @@ const adtProxyBuilder = ({ value, context, ...restOfArgs }: AdtProxyBuilderArgs)
   const doMapProxy = proxyTypes?.includes("Map") ?? true;
   const doArrayProxy = proxyTypes?.includes("Array") ?? true;
   const doObjectProxy = proxyTypes?.includes("Object") ?? true;
-  const doFunctionProxy = proxyTypes?.includes("Function") ?? true;
 
   try {
     if (
@@ -38,13 +38,6 @@ const adtProxyBuilder = ({ value, context, ...restOfArgs }: AdtProxyBuilderArgs)
       return arrayProxyBuilder({
         array: value,
         ...restOfArgs,
-      });
-    }
-
-    if (value instanceof Function && doFunctionProxy) {
-      return functionProxyBuilder({
-        func: value,
-        context,
       });
     }
 

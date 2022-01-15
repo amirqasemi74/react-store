@@ -1,7 +1,7 @@
-import { StorePropertyKey } from "./propertyKeys/storePropertyKey";
+import { ObservableProperty } from "./propertyKeys/observableProperty";
 import { StoreAdministrator } from "./storeAdministrator";
-import { getFromContainer } from "@react-store/core";
 import { useContext } from "react";
+import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
 import { WireMetadataUtils } from "src/decorators/wire";
@@ -34,7 +34,7 @@ export class StoreStorePartsManager {
             storePartAdmin.setInstance(instance);
             this.storeAdmin.propertyKeysManager.propertyKeys.set(
               wire.propertyKey,
-              new StorePropertyKey(instance)
+              new ObservableProperty(instance)
             );
             initiatedStorePart.add(wire.propertyKey);
           }

@@ -1,4 +1,4 @@
-import objectPath from "object-path";
+import lodashGet from "lodash/get";
 import type { ClassType } from "src/types";
 
 export function Effect<T extends object = any>(
@@ -11,9 +11,9 @@ export function Effect<T extends object = any>(
     if (typeof deps === "function") {
       depsFn = deps;
     } else if (Array.isArray(deps)) {
-      depsFn = (o) => deps.map((d) => objectPath.withInheritedProps.get(o, d));
+      depsFn = (o) => deps.map((d) => lodashGet(o, d));
     } else if (typeof deps === "string") {
-      depsFn = (o) => [objectPath.withInheritedProps.get(o, deps)];
+      depsFn = (o) => [lodashGet(o, deps)];
     }
 
     EffectsMetadataUtils.add(target.constructor, {

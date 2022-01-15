@@ -1,7 +1,6 @@
 import { BaseStore } from "./base.store";
 import { Effect, Props, Store } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
-import { FormValidator } from "sampleApp/libs/formValidator";
 
 @Store()
 export class ToDoStore extends BaseStore {
@@ -11,6 +10,8 @@ export class ToDoStore extends BaseStore {
   todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
 
   d = new Date();
+  a = 1;
+  b = 2;
 
   @Effect([])
   init() {

@@ -1,4 +1,4 @@
-import { storeActionsTest } from "./actions._spec";
+import { storeComputedTests } from "./computed._spec";
 import { storeEffectTests } from "./effects._spec";
 import { storeHooksCompatibilityTests } from "./hooksCompatibility._spec";
 import { storeInjectionTests } from "./injection._spec";
@@ -15,8 +15,8 @@ describe("Store", () => {
     jest.restoreAllMocks();
   });
 
+  describe("Computed Getters", storeComputedTests);
   describe("Effects", storeEffectTests);
-  describe("Actions", storeActionsTest);
   describe("Injections", storeInjectionTests);
   describe("StoreParts", storePartTests);
   describe("Properties Observability", storePropertiesObservability);

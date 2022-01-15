@@ -1,6 +1,6 @@
 import { isPrimitive } from "src/utils/isPrimitive";
 
-export class StorePropertyKey {
+export class ObservableProperty {
   isPrimitive: boolean;
 
   private value: {
