@@ -3,7 +3,6 @@ import { storeEffectTests } from "./effects._spec";
 import { storeHooksCompatibilityTests } from "./hooksCompatibility._spec";
 import { storeInjectionTests } from "./injection._spec";
 import { storePropertiesObservability } from "./propertiesObservability._spec";
-import { storePartTests } from "./storePart._spec";
 import { Store, connect, useStore } from "@react-store/core";
 import { render } from "@testing-library/react";
 import React from "react";
@@ -18,7 +17,6 @@ describe("Store", () => {
   describe("Computed Getters", storeComputedTests);
   describe("Effects", storeEffectTests);
   describe("Injections", storeInjectionTests);
-  describe("StoreParts", storePartTests);
   describe("Properties Observability", storePropertiesObservability);
   describe("Pure React Hook Compatibility", storeHooksCompatibilityTests);
 

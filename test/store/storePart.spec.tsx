@@ -1,16 +1,18 @@
 import {
   AutoWire,
   Effect,
+  Injectable,
   Store,
   StorePart,
   connect,
   useStore,
 } from "@react-store/core";
+import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
-export const storePartTests = () => {
+describe("Store Parts", () => {
   it("should store part state change rerender it's consumers", () => {
     let storePartRef: Validator | null = null;
 
@@ -135,25 +137,38 @@ export const storePartTests = () => {
     );
   });
 
-  it.skip("should not be observable the store part in store propertyKey", () => {
-    let validator;
-    @StorePart()
-    class Validator {}
+  it("should inject dependencies", () => {
+    let lowerStoreRef!: LowerStore;
+
+    @Injectable()
+    class A {}
 
     @Store()
-    class UserStore {
+    class UpperStore {}
+
+    @StorePart()
+    class BStorePart {
+      message = "hi";
+      constructor(public upperStore: UpperStore, public a: A) {}
+    }
+    @Store()
+    class LowerStore {
       @AutoWire()
-      validator: Validator;
+      part: BStorePart;
     }
 
-    const App = () => {
-      const vm = useStore(UserStore);
-      validator = vm.validator;
-      return <></>;
-    };
-    const AppWithStore = connect(App, UserStore);
-    render(<AppWithStore />);
+    const App = connect(
+      connect(() => {
+        const st = useStore(LowerStore);
+        lowerStoreRef = st;
+        return <>{st.part.message}</>;
+      }, LowerStore),
+      UpperStore
+    );
 
-    expect(validator).toBeFalsy();
+    render(<App />);
+
+    expect(lowerStoreRef.part.a).toBeInstanceOf(A);
+    expect(lowerStoreRef.part.upperStore).toBeInstanceOf(UpperStore);
   });
-};
+});
