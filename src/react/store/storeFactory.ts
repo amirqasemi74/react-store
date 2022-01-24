@@ -1,5 +1,4 @@
 import { ReactApplicationContext } from "../appContext";
-import { registerHandlers } from "../handlers/registerHandlers";
 import {
   StoreAdministrator,
   StoreAdministratorReactHooks,
@@ -35,14 +34,11 @@ export class StoreFactory {
 
     //Store Part will init here
     //So must be come first
-    this.runHooks(storeAdmin, "BEFORE_INSTANCE");
+    this.runHooks("BEFORE_INSTANCE", storeAdmin, props);
     useWillMount(() => {
       storeAdmin.setInstance(new StoreType(...deps));
     });
-    this.runHooks(storeAdmin, "AFTER_INSTANCE");
-
-    //TODO: move to Hooks
-    registerHandlers(storeAdmin, props);
+    this.runHooks("AFTER_INSTANCE", storeAdmin, props);
 
     return storeAdmin;
   }
@@ -105,17 +101,18 @@ export class StoreFactory {
    * ************** Hooks *************
    */
   static runHooks(
+    when: StoreAdministratorReactHooks["when"],
     storeAdmin: StoreAdministrator,
-    when: StoreAdministratorReactHooks["when"]
+    props: any
   ) {
     Array.from(storeAdmin.reactHooks.values())
       .filter(({ when: _when }) => _when === when)
       .forEach(({ hook, result }) => {
-        const res = hook();
+        const res = hook(storeAdmin, props);
         result?.(res);
       });
     Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach((spa) =>
-      this.runHooks(spa, when)
+      this.runHooks(when, spa, props)
     );
   }
 }

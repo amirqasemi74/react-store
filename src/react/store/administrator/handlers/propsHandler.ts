@@ -1,4 +1,4 @@
-import { StoreAdministrator } from "../store/administrator/storeAdministrator";
+import { StoreAdministrator } from "../storeAdministrator";
 import { StorePropsMetadataUtils } from "src/decorators/props";
 
 export function propsHandler(storeAdministrator: StoreAdministrator, props: object) {

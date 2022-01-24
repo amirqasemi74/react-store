@@ -6,7 +6,7 @@ export class StoreGettersManager {
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
-  makeAllGettersAsComputed() {
+  makeAllAsComputed() {
     Object.entries(
       Object.getOwnPropertyDescriptors(
         Object.getPrototypeOf(this.storeAdmin.instance)

@@ -5,7 +5,7 @@ export class StoreMethodsManager {
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
-  makeAllAsActions() {
+  makeAllAutoBound() {
     Object.entries(this.getMethodsPropertyDescriptors(this.storeAdmin.instance))
       .filter(([key]) => key !== "constructor")
       .filter(([, desc]) => desc.value) // only methods not getter or setter

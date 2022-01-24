@@ -1,6 +1,8 @@
 import { STORE_ADMINISTRATION } from "../../../constant";
 import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
 import { StoreGettersManager } from "./getters/storeGettersManager";
+import { effectHandler } from "./handlers/effectHandler";
+import { propsHandler } from "./handlers/propsHandler";
 import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
@@ -29,13 +31,13 @@ export class StoreAdministrator {
 
   reactHooks = new Set<StoreAdministratorReactHooks>();
 
-  private isStoreMutated = false;
-
-  private runningActionsCount = 0;
-
   constructor(type: Function) {
     this.type = type;
     this.storePartsManager.createInstances();
+    this.reactHooks.add({
+      when: "AFTER_INSTANCE",
+      hook: propsHandler,
+    });
   }
 
   static get(store: object) {
@@ -50,30 +52,23 @@ export class StoreAdministrator {
       new StoreForComponentUsageProxy()
     );
 
-    //Orders matter
+    // !!!! Orders matter !!!!
     this.storePartsManager.register();
     this.propertyKeysManager.registerUseStates();
     this.propertyKeysManager.makeAllObservable();
-    this.gettersManager.makeAllGettersAsComputed();
-    this.methodsManager.makeAllAsActions();
+    this.effectsManager.registerEffects();
+    this.gettersManager.makeAllAsComputed();
+    this.methodsManager.makeAllAutoBound();
   }
 
-  renderConsumers(isStoreMutated?: true) {
-    if (isStoreMutated !== undefined) {
-      this.isStoreMutated = isStoreMutated;
-    }
-    if (this.isStoreMutated && this.runningActionsCount == 0) {
-      this.isStoreMutated = false;
-      this.consumers.forEach((render) => render());
-      Array.from(this.injectedInTos.values()).forEach((st) =>
-        st.renderConsumers(true)
-      );
-    }
+  renderConsumers() {
+    this.consumers.forEach((render) => render());
+    Array.from(this.injectedInTos.values()).forEach((st) => st.renderConsumers());
   }
 }
 
 export interface StoreAdministratorReactHooks {
-  hook: Function;
+  hook: (storeAdmin: StoreAdministrator, props: any) => void;
   when: "BEFORE_INSTANCE" | "AFTER_INSTANCE";
   result?: (result: any) => void;
 }

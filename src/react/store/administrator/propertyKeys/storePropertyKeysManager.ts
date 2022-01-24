@@ -114,10 +114,10 @@ export class StorePropertyKeysManager {
       info?.reactSetState?.(info.getValue("Store"));
       if (isPrimitive(value)) {
         if (preValue !== value) {
-          this.storeAdmin.renderConsumers(true);
+          this.storeAdmin.renderConsumers();
         }
       } else {
-        this.storeAdmin.renderConsumers(true);
+        this.storeAdmin.renderConsumers();
       }
     }
   }
@@ -130,7 +130,7 @@ export class StorePropertyKeysManager {
         this.storeAdmin.gettersManager.recomputedGetters();
         const info = this.propertyKeys.get(propertyKey);
         info?.reactSetState?.(info.getValue("Store"));
-        this.storeAdmin.renderConsumers(true);
+        this.storeAdmin.renderConsumers();
       },
     });
   }
