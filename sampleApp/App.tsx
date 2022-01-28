@@ -11,7 +11,7 @@ const App = () => {
   return (
     <>
       <button onClick={vm.changePrimary}>change theme</button>
-      <StoreProvider type={ToDoStore} render={ToDos} />
+      <StoreProvider type={ToDoStore} render={ToDos} props={{ a: 1 }} />
       {/* <PureToDosProvider>
         <PureToDos />
       </PureToDosProvider> */}

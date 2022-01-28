@@ -38,7 +38,7 @@ export const StoreProvider = ({ type, render, props }: Props) => {
 
   return (
     <TheContext.Provider value={storeAdmin}>
-      <Component />
+      <Component {...props} />
     </TheContext.Provider>
   );
 };
