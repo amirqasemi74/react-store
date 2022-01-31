@@ -185,7 +185,10 @@ export class StorePropertyKeysManager {
           path = [];
         }
         if (
-          !Object.getPrototypeOf(ap.target).hasOwnProperty(ap.propertyKey) &&
+          !Object.prototype.hasOwnProperty.call(
+            Object.getPrototypeOf(ap.target),
+            ap.propertyKey
+          ) &&
           path.length
         ) {
           path.push(ap.propertyKey);

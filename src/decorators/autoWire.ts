@@ -7,7 +7,7 @@ export function AutoWire(): PropertyDecorator {
       throw new Error(
         `AutoWire for ${
           target.constructor.name
-        }.${propertyKey.toString()} can't detect type. use \`@Wire(...) instead.\'`
+        }.${propertyKey.toString()} can't detect type. use \`@Wire(...) instead.`
       );
     }
     Wire(type)(target, propertyKey);
