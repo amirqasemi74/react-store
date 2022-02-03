@@ -1,6 +1,6 @@
 {
   "name": "@react-store/core",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "dist/index.js",
   "repository": "https://github.com/sahabpardaz/react-store.git",
   "author": "Amir Hossein Qasemi Moqaddam <amir.qasemi74@gmail.com>",
@@ -68,7 +68,10 @@
     "lint": "yarn eslint 'src/**/*.{ts,tsx}'"
   },
   "lint-staged": {
-    "*.{js,css,ts,tsx}": ["yarn format", "yarn eslint"]
+    "*.{js,css,ts,tsx}": [
+      "yarn format",
+      "yarn eslint"
+    ]
   },
   "prettier": {
     "printWidth": 85,

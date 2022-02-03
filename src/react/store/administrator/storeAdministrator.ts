@@ -1,12 +1,12 @@
 import { STORE_ADMINISTRATION } from "../../../constant";
 import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
 import { StoreGettersManager } from "./getters/storeGettersManager";
-import { effectHandler } from "./handlers/effectHandler";
 import { propsHandler } from "./handlers/propsHandler";
 import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
+import ReactDOM from "react-dom";
 
 export class StoreAdministrator {
   type: Function;
@@ -62,8 +62,10 @@ export class StoreAdministrator {
   }
 
   renderConsumers() {
-    this.consumers.forEach((render) => render());
-    Array.from(this.injectedInTos.values()).forEach((st) => st.renderConsumers());
+    ReactDOM.unstable_batchedUpdates(() => {
+      this.consumers.forEach((render) => render());
+      Array.from(this.injectedInTos.values()).forEach((st) => st.renderConsumers());
+    });
   }
 }
 
