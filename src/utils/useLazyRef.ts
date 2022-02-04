@@ -5,16 +5,20 @@ import { MutableRefObject, useRef } from "react";
  * @param initValFunc
  */
 export const useLazyRef = <T>(initValFunc: () => T) => {
-  const ref: MutableRefObject<T> = useRef(null) as any;
-  if (ref.current === null) {
+  const inited = useRef(false);
+  const ref = useRef() as MutableRefObject<T>;
+  if (!inited.current) {
+    inited.current = true;
     ref.current = initValFunc();
   }
   return ref;
 };
 
 export const useFixedLazyRef = <T>(initValFunc: () => T) => {
-  const ref: MutableRefObject<T> = useRef(null) as any;
-  if (ref.current === null) {
+  const inited = useRef(false);
+  const ref = useRef() as MutableRefObject<T>;
+  if (!inited.current) {
+    inited.current = true;
     ref.current = initValFunc();
   }
   return ref.current;

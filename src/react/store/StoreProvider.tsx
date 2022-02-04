@@ -8,9 +8,9 @@ import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 interface Props {
-  props?: any;
+  props?: object;
   type: ClassType;
-  render: React.FC<any>;
+  render: React.FC;
 }
 
 export const StoreProvider = ({ type, render, props }: Props) => {

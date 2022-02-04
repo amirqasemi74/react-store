@@ -27,7 +27,7 @@ export class StoreStorePartsManager {
       this.storeAdmin.reactHooks.add({
         when: "BEFORE_INSTANCE",
         hook: () => this.resolveStorePartsDeps(StorePart),
-        result: (depsValue: any[]) => {
+        result: (depsValue: unknown[]) => {
           if (!initiatedStorePart.has(wire.propertyKey)) {
             const instance = new StorePart(...depsValue);
             const storePartAdmin = new StoreAdministrator(StorePart);
@@ -50,7 +50,7 @@ export class StoreStorePartsManager {
 
     const storePartDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<
-        Function,
+        ClassType,
         React.Context<StoreAdministrator | null>
       >();
       const appContext = getFromContainer(ReactApplicationContext);
@@ -96,7 +96,7 @@ export class StoreStorePartsManager {
     this.storePartWires.forEach(({ propertyKey }) => {
       const value = this.storeAdmin.propertyKeysManager.propertyKeys
         .get(propertyKey)
-        ?.getValue("Store") as any;
+        ?.getValue("Store") as object;
       this.storeAdmin.instance[propertyKey] = value;
       const storePartAdmin = StoreAdministrator.get(value);
       storePartAdmin.injectedInTos.add(this.storeAdmin);

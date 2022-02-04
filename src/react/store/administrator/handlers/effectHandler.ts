@@ -1,7 +1,7 @@
-import { useEnhancedEffect } from "../../../../utils/useEnhancedEffect";
 import isPromise from "is-promise";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 import { Func } from "src/types";
+import { useEnhancedEffect } from "src/utils/useEnhancedEffect";
 
 export const effectHandler = (storeAdmin: StoreAdministrator) => {
   storeAdmin.effectsManager.effectsMetaData.forEach(
@@ -28,7 +28,7 @@ interface RunEffectArgs {
 
 const runEffect = ({ effectKey, storeAdmin }: RunEffectArgs) => {
   //run ...
-  const clearEffect: Func | undefined = Reflect.apply(
+  const clearEffect: Func<void> | undefined = Reflect.apply(
     storeAdmin.instanceForComponents[effectKey],
     storeAdmin.instanceForComponents,
     []

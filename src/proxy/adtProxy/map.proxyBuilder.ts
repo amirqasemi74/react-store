@@ -1,8 +1,8 @@
-import { PROXIED_VALUE } from "../proxyValueAndSaveIt";
-import adtProxyBuilder, { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
+import { BaseAdtProxyBuilderArgs, adtProxyBuilder } from "./adtProxyBuilder";
+import { Func } from "src/types";
 
 interface MapProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
-  map: Map<any, any>;
+  map: Map<unknown, unknown>;
 }
 
 export const mapProxyBuilder = ({
@@ -10,51 +10,40 @@ export const mapProxyBuilder = ({
   ...restOfArgs
 }: MapProxyBuilderArgs): object => {
   const { onSet } = restOfArgs;
-
   return new Proxy(map, {
-    get(target: any, propertyKey: PropertyKey) {
+    get(target: Map<unknown, unknown>, propertyKey: PropertyKey) {
       const value = target[propertyKey];
-
       switch (propertyKey) {
         case "get": {
-          return function (mapKey: any) {
-            const _val = (value as Function).bind(target)(mapKey);
-
-            if (
-              _val &&
-              !Object.isFrozen(_val) &&
-              [Object, Array, Map].includes(_val.constructor)
-            ) {
-              return (
-                _val[PROXIED_VALUE] ||
-                (_val[PROXIED_VALUE] = adtProxyBuilder({
-                  onSet,
-                  value: _val,
-                  context: _val,
-                }))
-              );
-            }
-            return _val;
+          return function (mapKey: unknown) {
+            return (value as Func).call(target, mapKey);
           };
         }
 
         case "set": {
-          return function (mapKey: any, mapValue: any) {
-            (value as Function).bind(target)(mapKey, mapValue);
+          return function (mapKey: unknown, mapValue: unknown) {
+            (value as Func).call(
+              target,
+              mapKey,
+              adtProxyBuilder({
+                onSet,
+                value: mapValue,
+              })
+            );
             onSet?.();
           };
         }
 
         case "delete": {
-          return function (mapKey: any) {
-            (value as Function).bind(target)(mapKey);
+          return function (mapKey: unknown) {
+            (value as Func).call(target, mapKey);
             onSet?.();
           };
         }
 
         case "clear": {
           return function () {
-            (value as Function).bind(target)();
+            (value as Func).call(target);
             onSet?.();
           };
         }

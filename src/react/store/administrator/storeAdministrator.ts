@@ -7,15 +7,16 @@ import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
 import ReactDOM from "react-dom";
+import { ClassType } from "src/types";
 
 export class StoreAdministrator {
-  type: Function;
+  type: ClassType;
 
-  instance: any;
+  instance: InstanceType<ClassType>;
 
-  instanceForComponents: any;
+  instanceForComponents: InstanceType<ClassType>;
 
-  consumers = new Set<Function>();
+  consumers = new Set<() => void>();
 
   injectedInTos = new Set<StoreAdministrator>();
 
@@ -31,7 +32,7 @@ export class StoreAdministrator {
 
   reactHooks = new Set<StoreAdministratorReactHooks>();
 
-  constructor(type: Function) {
+  constructor(type: ClassType) {
     this.type = type;
     this.storePartsManager.createInstances();
     this.reactHooks.add({
@@ -44,7 +45,7 @@ export class StoreAdministrator {
     return (store[STORE_ADMINISTRATION] as StoreAdministrator) || null;
   }
 
-  setInstance(instance: any) {
+  setInstance(instance: InstanceType<ClassType>) {
     this.instance = instance;
     this.instance[STORE_ADMINISTRATION] = this;
     this.instanceForComponents = new Proxy(
@@ -70,7 +71,7 @@ export class StoreAdministrator {
 }
 
 export interface StoreAdministratorReactHooks {
-  hook: (storeAdmin: StoreAdministrator, props: any) => void;
+  hook: (storeAdmin: StoreAdministrator, props?: object) => void;
   when: "BEFORE_INSTANCE" | "AFTER_INSTANCE";
-  result?: (result: any) => void;
+  result?: (...args: any[]) => void;
 }

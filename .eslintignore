@@ -1,3 +1,7 @@
 dist
 coverage
 *.config.js
+*.spec.ts
+*.spec.tsx
+*._spec.tsx
+*._spec.ts

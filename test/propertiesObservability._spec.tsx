@@ -1,4 +1,4 @@
-import { Observable, Store, connect, useStore } from "@react-store/core";
+import { Effect, Observable, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
@@ -112,9 +112,11 @@ export const storePropertiesObservability = () => {
           d: 1,
         },
       };
+
       map = new Map<string, any>();
 
-      constructor() {
+      @Effect([])
+      onMount() {
         this.map.set("a", "map");
         this.map.set("b", { map: 1 });
       }

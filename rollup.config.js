@@ -1,5 +1,6 @@
-import typescript from "@rollup/plugin-typescript";
+// import typescript from "@rollup/plugin-typescript";
 import { resolve } from "path";
+import typescript from "rollup-plugin-typescript2";
 import ttypescript from "ttypescript";
 
 const tsconfig = resolve(__dirname, "tsconfig.build.json");
@@ -14,9 +15,10 @@ export default {
   external: [
     "dequal",
     "react",
+    "react-dom",
+    "lodash/get",
     "is-promise",
     "clone-deep",
-    "object-path",
     "reflect-metadata",
   ],
 };

@@ -3,12 +3,13 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v1
       - name: Run a one-line script
         run: |
-         yarn install
-         yarn test
+          yarn install
+          yarn test
+          yarn build

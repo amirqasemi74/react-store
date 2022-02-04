@@ -8,13 +8,16 @@ export class ComputedProperty {
   private hasStoreValCopiedToStateVal = false;
 
   private readonly lastValue: {
-    store: any;
-    state: any;
+    store: unknown;
+    state: unknown;
   } = { state: null, store: null };
 
   deps: PropertyKey[][] = [];
 
-  constructor(private storeAdmin: StoreAdministrator, public getterFn: () => any) {}
+  constructor(
+    private storeAdmin: StoreAdministrator,
+    public getterFn: () => unknown
+  ) {}
 
   getValue(from: "State" | "Store") {
     if (!this.inited) {

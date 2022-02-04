@@ -13,7 +13,7 @@ const objectProxyBuilder = ({
   const { onSet } = restOfArgs;
 
   return new Proxy(object, {
-    get(target: any, propertyKey: PropertyKey, receiver: any) {
+    get(target: object, propertyKey: PropertyKey, receiver: unknown) {
       if (propertyKey === TARGET) {
         return target;
       }
@@ -28,7 +28,12 @@ const objectProxyBuilder = ({
       return value;
     },
 
-    set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {
+    set(
+      target: object,
+      propertyKey: PropertyKey,
+      value: unknown,
+      receiver: unknown
+    ) {
       // console.log("Object::set", target, propertyKey, value);
       restOfArgs.onAccess?.({
         target,

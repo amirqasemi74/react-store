@@ -1,11 +1,11 @@
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 
 export class StoreForComponentUsageProxy implements ProxyHandler<object> {
-  get(target: object, propertyKey: PropertyKey, receiver: any) {
+  get(target: object, propertyKey: PropertyKey, receiver: unknown) {
     const storeAdmin = StoreAdministrator.get(target);
 
     if (storeAdmin?.propertyKeysManager.propertyKeys.has(propertyKey)) {
-      const value: any = storeAdmin?.propertyKeysManager.propertyKeys
+      const value = storeAdmin?.propertyKeysManager.propertyKeys
         .get(propertyKey)
         ?.getValue("State");
 

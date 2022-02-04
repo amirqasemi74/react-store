@@ -3,9 +3,9 @@ import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { ClassType } from "src/types";
 
 class Container {
-  private instances = new Map<Function, object>();
+  private instances = new Map<ClassType, InstanceType<ClassType>>();
 
-  resolve(SomeClass: ClassType): InstanceType<ClassType> {
+  resolve<T>(SomeClass: ClassType<T>): InstanceType<ClassType<T>> {
     const scope = InjectableMetadataUtils.get(SomeClass);
 
     if (!scope) {
@@ -23,9 +23,9 @@ class Container {
         let instance = this.instances.get(SomeClass);
         if (!instance) {
           instance = new SomeClass(...this.resolveDependencies(SomeClass));
-          this.instances.set(SomeClass, instance!);
+          this.instances.set(SomeClass, instance);
         }
-        return instance;
+        return instance as InstanceType<ClassType<T>>;
       }
     }
   }
@@ -34,7 +34,7 @@ class Container {
     return InjectMetadataUtils.getDependenciesDecoratedWith(
       someClass,
       "INJECTABLE"
-    ).map((dep) => this.resolve(dep.type as ClassType));
+    ).map((dep) => this.resolve(dep.type));
   }
 
   remove(someClass: ClassType) {
@@ -51,7 +51,7 @@ export const defaultContainer = new Container();
 export const getFromContainer = <T extends ClassType>(
   someClass: T,
   container = defaultContainer
-): InstanceType<T> => container.resolve(someClass);
+): InstanceType<T> => container.resolve(someClass) as InstanceType<T>;
 
 export const removeFromContainer = (
   someClass: ClassType,

@@ -1,9 +1,10 @@
 import { effectHandler } from "./handlers/effectHandler";
 import type { StoreAdministrator } from "./storeAdministrator";
+import React from "react";
 import { EffectsMetadataUtils } from "src/decorators/effect";
 
 export class StoreEffectsManager {
-  private clearEffects = new Map<PropertyKey, Function>();
+  private clearEffects = new Map<PropertyKey, ReturnType<React.EffectCallback>>();
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
@@ -18,11 +19,11 @@ export class StoreEffectsManager {
     return EffectsMetadataUtils.get(this.storeAdmin.type);
   }
 
-  setClearEffect(effectKey: PropertyKey, clear: Function) {
+  setClearEffect(effectKey: PropertyKey, clear: ReturnType<React.EffectCallback>) {
     this.clearEffects.set(effectKey, clear);
   }
 
-  getClearEffect(effectKey: PropertyKey) {
+  getClearEffect(effectKey: PropertyKey): ReturnType<React.EffectCallback> {
     return this.clearEffects.get(effectKey);
   }
 }

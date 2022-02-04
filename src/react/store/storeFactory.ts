@@ -11,7 +11,7 @@ import { useFixedLazyRef } from "src/utils/useLazyRef";
 import { useWillMount } from "src/utils/useWillMount";
 
 export class StoreFactory {
-  static create(StoreType: ClassType, props: any) {
+  static create(StoreType: ClassType, props?: object) {
     // Has React.UseContext
     // So must be in render
     const deps = this.resolveStoreDeps(StoreType);
@@ -54,7 +54,7 @@ export class StoreFactory {
 
     const storeDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<
-        Function,
+        ClassType,
         React.Context<StoreAdministrator | null>
       >();
       const appContext = getFromContainer(ReactApplicationContext);
@@ -103,7 +103,7 @@ export class StoreFactory {
   static runHooks(
     when: StoreAdministratorReactHooks["when"],
     storeAdmin: StoreAdministrator,
-    props: any
+    props?: object
   ) {
     Array.from(storeAdmin.reactHooks.values())
       .filter(({ when: _when }) => _when === when)

@@ -1,5 +1,6 @@
-import adtProxyBuilder, {
+import {
   BaseAdtProxyBuilderArgs,
+  adtProxyBuilder,
 } from "./adtProxy/adtProxyBuilder";
 import { STORE_ADMINISTRATION } from "src/constant";
 
@@ -9,9 +10,9 @@ import { STORE_ADMINISTRATION } from "src/constant";
  * - Object & Array & Function proxied values only will save
  */
 export function proxyValueAndSaveIt(
-  target: any,
+  target: object,
   propertyKey: PropertyKey,
-  receiver: any,
+  receiver: unknown,
   adtProxyBuilderArgs: BaseAdtProxyBuilderArgs
 ) {
   const value = Reflect.get(target, propertyKey, receiver);
@@ -31,7 +32,6 @@ export function proxyValueAndSaveIt(
     const proxiedValue = () =>
       adtProxyBuilder({
         value,
-        context: receiver,
         ...adtProxyBuilderArgs,
       });
 
@@ -43,6 +43,6 @@ export function proxyValueAndSaveIt(
 
 export const PROXIED_VALUE = Symbol("PROXIED_VALUE");
 
-const isInArrayOrObjectPrototype = (target: any, propertyKey: PropertyKey) =>
+const isInArrayOrObjectPrototype = (target: object, propertyKey: PropertyKey) =>
   (target.constructor === Object && Object.prototype[propertyKey]) ||
   (target.constructor === Array && Array.prototype[propertyKey]);

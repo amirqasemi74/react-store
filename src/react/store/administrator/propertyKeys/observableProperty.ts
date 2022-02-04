@@ -8,9 +8,9 @@ export class ObservableProperty {
     state?: unknown;
   };
 
-  private _reactSetState?: React.Dispatch<React.SetStateAction<any>>;
+  private _reactSetState?: React.Dispatch<React.SetStateAction<unknown>>;
 
-  constructor(value: any) {
+  constructor(value: unknown) {
     this.isPrimitive = isPrimitive(value);
     const _val = this.isPrimitive ? value : { $: value };
     this.value = {
@@ -30,7 +30,7 @@ export class ObservableProperty {
     return this._reactSetState;
   }
 
-  setValue(value: any, to: "State" | "Store") {
+  setValue(value: unknown, to: "State" | "Store") {
     this.isPrimitive = isPrimitive(value);
     switch (to) {
       case "State":

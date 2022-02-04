@@ -1,9 +1,10 @@
 import { StoreMetadataUtils } from "../../decorators/store";
 import { InjectableMetadataUtils } from "./Injectable";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
+import { ClassType } from "src/types";
 
 export function Inject(...deps: any[]) {
-  return function (...args: [Function] | [Function, undefined, number]) {
+  return function (...args: [ClassType] | [ClassType, undefined, number]) {
     const [target, , paramIndex] = args;
     let injectType: InjectType;
 
@@ -26,7 +27,7 @@ export function Inject(...deps: any[]) {
 export class InjectMetadataUtils {
   private static readonly DEP_TYPES = Symbol();
 
-  private static hasInjectType(target: Function, type: InjectType) {
+  private static hasInjectType(target: ClassType, type: InjectType) {
     return this.getOwnDependencies(target).some((d) => d.injectType === type);
   }
   static setDependencies({
@@ -35,8 +36,8 @@ export class InjectMetadataUtils {
     target,
     paramIndex,
   }: {
-    deps: any[];
-    target: Function;
+    deps: ClassType[];
+    target: ClassType;
     type: InjectType;
     paramIndex?: number;
   }) {
@@ -89,7 +90,7 @@ export class InjectMetadataUtils {
     }
   }
 
-  private static getOwnDependencies(target: Function): ConstructorDependency[] {
+  private static getOwnDependencies(target: ClassType): ConstructorDependency[] {
     return (
       (Reflect.getOwnMetadata(this.DEP_TYPES, target) ||
         []) as ConstructorDependency[]
@@ -97,7 +98,7 @@ export class InjectMetadataUtils {
   }
 
   static getDependenciesDecoratedWith(
-    target: Function | null,
+    target: ClassType | null,
     decoratedWith: DecoratedWith
   ): ConstructorDependency[] {
     if (target) {
@@ -113,7 +114,7 @@ export class InjectMetadataUtils {
         return ownDeps;
       } else {
         return this.getDependenciesDecoratedWith(
-          Reflect.getPrototypeOf(target) as any,
+          Reflect.getPrototypeOf(target) as ClassType,
           decoratedWith
         );
       }
@@ -124,7 +125,7 @@ export class InjectMetadataUtils {
 }
 
 interface ConstructorDependency {
-  type: Function;
+  type: ClassType;
   paramIndex: number;
   injectType: InjectType;
 }

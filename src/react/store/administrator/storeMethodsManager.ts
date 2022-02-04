@@ -1,7 +1,7 @@
 import type { StoreAdministrator } from "./storeAdministrator";
 
 export class StoreMethodsManager {
-  methods = new Map<PropertyKey, Function | null>();
+  methods = new Map<PropertyKey, (...args: any[]) => unknown | null>();
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
@@ -16,19 +16,19 @@ export class StoreMethodsManager {
           enumerable: false,
           configurable: true,
           get: () => this.methods.get(methodKey),
-          set: (value: any) => this.methods.set(methodKey, value),
+          // set: (value: unknown) => this.methods.set(methodKey, value),
         });
       });
   }
 
-  createMethod(fn: () => any) {
+  createMethod(fn: () => unknown) {
     return fn.bind(this.storeAdmin.instance);
   }
 
   private getMethodsPropertyDescriptors(
-    o: any
+    o: unknown
   ): Record<PropertyKey, PropertyDescriptor> {
-    const _get = (o: any, methods = {}) => {
+    const _get = (o: unknown, methods = {}) => {
       const proto = Object.getPrototypeOf(o);
       if (proto && proto !== Object.prototype) {
         methods = { ...methods, ...Object.getOwnPropertyDescriptors(proto) };

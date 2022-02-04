@@ -1,12 +1,12 @@
 import lodashGet from "lodash/get";
 import type { ClassType } from "src/types";
 
-export function Effect<T extends object = any>(
-  deps?: ((_: T) => Array<any>) | Array<string> | string,
+export function Effect<T extends object>(
+  deps?: ((_: T) => Array<unknown>) | Array<string> | string,
   dequal?: boolean
 ): MethodDecorator {
   return function (target, propertyKey, descriptor) {
-    let depsFn!: (_: T) => Array<any>;
+    let depsFn!: (_: T) => Array<unknown>;
 
     if (typeof deps === "function") {
       depsFn = deps;
@@ -16,7 +16,7 @@ export function Effect<T extends object = any>(
       depsFn = (o) => [lodashGet(o, deps)];
     }
 
-    EffectsMetadataUtils.add(target.constructor, {
+    EffectsMetadataUtils.add(target.constructor as ClassType, {
       options: {
         deps: depsFn,
         dequal,
@@ -30,7 +30,7 @@ export function Effect<T extends object = any>(
 export class EffectsMetadataUtils {
   private static readonly KEY = Symbol();
 
-  static getOwn(storeType: Function): EffectMetaData[] {
+  static getOwn<T extends object>(storeType: ClassType): EffectMetaData<T>[] {
     let effects = Reflect.getOwnMetadata(this.KEY, storeType);
     if (!effects) {
       effects = [];
@@ -39,7 +39,7 @@ export class EffectsMetadataUtils {
     return effects;
   }
 
-  static get(storeType: Function): EffectMetaData[] {
+  static get<T extends object>(storeType: ClassType): EffectMetaData<T>[] {
     // TODO: Effects must be returns only for @Store & @StorePart
     let effects = this.getOwn(storeType);
     const parentClass = Reflect.getPrototypeOf(storeType) as ClassType;
@@ -49,17 +49,17 @@ export class EffectsMetadataUtils {
     return effects;
   }
 
-  static add(storeType: Function, metadata: EffectMetaData) {
-    this.getOwn(storeType).push(metadata);
+  static add<T extends object>(storeType: ClassType, metadata: EffectMetaData<T>) {
+    this.getOwn<T>(storeType).push(metadata);
   }
 }
 
-interface EffectOptions<T extends {} = any> {
-  deps?: (_: T) => Array<any>;
+interface EffectOptions<T extends object> {
+  deps?: (_: T) => Array<unknown>;
   dequal?: boolean;
 }
 
-export interface EffectMetaData {
+export interface EffectMetaData<T extends object> {
   propertyKey: PropertyKey;
-  options: EffectOptions;
+  options: EffectOptions<T>;
 }

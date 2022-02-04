@@ -1,20 +1,21 @@
 import { Inject } from "..";
+import { ClassType } from "src/types";
 
-export function StorePart(): ClassDecorator {
-  return function (StorePartType: any) {
+export function StorePart() {
+  return function (StorePartType: ClassType) {
     StorePartMetadataUtils.set(StorePartType);
     Inject()(StorePartType);
-  };
+  } as ClassDecorator;
 }
 
 export class StorePartMetadataUtils {
   private static readonly KEY = Symbol();
 
-  static set(storeType: Function) {
+  static set(storeType: ClassType) {
     Reflect.defineMetadata(this.KEY, {}, storeType);
   }
 
-  static is(storeType: Function) {
+  static is(storeType: ClassType) {
     return !!Reflect.getOwnMetadata(this.KEY, storeType);
   }
 }

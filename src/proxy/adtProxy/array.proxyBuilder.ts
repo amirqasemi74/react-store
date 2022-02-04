@@ -3,16 +3,16 @@ import { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
 import { TARGET } from "src/constant";
 
 interface ArrayProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
-  array: any[];
+  array: unknown[];
 }
 
 const arrayProxyBuilder = ({
   array,
   ...restOfArgs
-}: ArrayProxyBuilderArgs): any[] => {
+}: ArrayProxyBuilderArgs): unknown[] => {
   const { onSet } = restOfArgs;
   return new Proxy(array, {
-    get(target: any, propertyKey: PropertyKey, receiver: any): any {
+    get(target: unknown[], propertyKey: PropertyKey, receiver: unknown) {
       if (propertyKey === TARGET) {
         return target;
       }
@@ -32,7 +32,12 @@ const arrayProxyBuilder = ({
       return value;
     },
 
-    set(target: any, propertyKey: PropertyKey, value: any, receiver: any) {
+    set(
+      target: unknown[],
+      propertyKey: PropertyKey,
+      value: unknown,
+      receiver: unknown
+    ) {
       // console.log("Array::set", target, propertyKey, value);
       restOfArgs.onAccess?.({
         target,

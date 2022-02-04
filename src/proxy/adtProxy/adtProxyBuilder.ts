@@ -11,12 +11,12 @@ export interface BaseAdtProxyBuilderArgs {
 }
 
 interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
-  value: any;
-  context?: any;
+  value: unknown;
 }
 
-const adtProxyBuilder = ({ value, context, ...restOfArgs }: AdtProxyBuilderArgs) => {
-  const valType = value?.constructor;
+export const adtProxyBuilder = ({ value, ...restOfArgs }: AdtProxyBuilderArgs) => {
+  // eslint-disable-next-line
+  const valType = (value as any)?.constructor;
   const { proxyTypes } = restOfArgs;
   const doMapProxy = proxyTypes?.includes("Map") ?? true;
   const doArrayProxy = proxyTypes?.includes("Array") ?? true;
@@ -29,14 +29,14 @@ const adtProxyBuilder = ({ value, context, ...restOfArgs }: AdtProxyBuilderArgs)
       doObjectProxy
     ) {
       return objectProxyBuilder({
-        object: value,
+        object: value as object,
         ...restOfArgs,
       });
     }
 
     if (valType === Array && doArrayProxy) {
       return arrayProxyBuilder({
-        array: value,
+        array: value as unknown[],
         ...restOfArgs,
       });
     }
@@ -52,5 +52,3 @@ const adtProxyBuilder = ({ value, context, ...restOfArgs }: AdtProxyBuilderArgs)
   }
   return value;
 };
-
-export default adtProxyBuilder;
