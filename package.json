@@ -1,6 +1,6 @@
 {
   "name": "@react-store/core",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "main": "dist/index.js",
   "repository": "https://github.com/sahabpardaz/react-store.git",
   "author": "Amir Hossein Qasemi Moqaddam <amir.qasemi74@gmail.com>",
@@ -65,7 +65,7 @@
     "start:app": "webpack serve --config sampleApp/webpack.config.js",
     "test": "jest",
     "build": "rm -rf dist && rollup -c rollup.config.js",
-    "prepare": "husky install",
+    "prepare": "yarn lint && yarn test && yarn build && husky install",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "pub": "npm publish --access public",
     "format": "yarn prettier --write",

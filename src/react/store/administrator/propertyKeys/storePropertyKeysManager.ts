@@ -40,31 +40,36 @@ export class StorePropertyKeysManager {
   }
 
   makeAllObservable() {
-    Object.keys(this.storeAdmin.instance).forEach((propertyKey) => {
-      const policy = this.policies.find(({ matcher }) => matcher(propertyKey));
-      let value = this.storeAdmin.instance[propertyKey];
+    Object.keys(this.storeAdmin.instance)
+      .filter(
+        (propertyKey) =>
+          this.policies.find((p) => p.matcher(propertyKey))?.set !== "ORIGINAL"
+      )
+      .forEach((propertyKey) => {
+        const policy = this.policies.find(({ matcher }) => matcher(propertyKey));
+        let value = this.storeAdmin.instance[propertyKey];
 
-      switch (policy?.set) {
-        case "ORIGINAL":
-        case "NONE":
-          break;
-        case "OBSERVABLE":
-        case undefined:
-          value = this.makeDeepObservable(propertyKey, value);
-          break;
-      }
-      this.propertyKeys.set(propertyKey, new ObservableProperty(value));
+        switch (policy?.set) {
+          case "ORIGINAL":
+          case "NONE":
+            break;
+          case "OBSERVABLE":
+          case undefined:
+            value = this.makeDeepObservable(propertyKey, value);
+            break;
+        }
+        this.propertyKeys.set(propertyKey, new ObservableProperty(value));
 
-      // Define setter and getter
-      // to intercept this props getting and
-      // return proxied value
-      Object.defineProperty(this.storeAdmin.instance, propertyKey, {
-        enumerable: true,
-        configurable: true,
-        get: () => this.onGetPropertyKey(propertyKey),
-        set: (value: unknown) => this.onSetPropertyKey(propertyKey, value),
+        // Define setter and getter
+        // to intercept this props getting and
+        // return proxied value
+        Object.defineProperty(this.storeAdmin.instance, propertyKey, {
+          enumerable: true,
+          configurable: true,
+          get: () => this.onGetPropertyKey(propertyKey),
+          set: (value: unknown) => this.onSetPropertyKey(propertyKey, value),
+        });
       });
-    });
   }
 
   private onGetPropertyKey(propertyKey: PropertyKey) {

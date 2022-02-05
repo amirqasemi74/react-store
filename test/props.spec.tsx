@@ -1,4 +1,5 @@
-import { Props, Store, connect, useStore } from "@react-store/core";
+import { Effect, Props, Store, connect, useStore } from "@react-store/core";
+import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import React from "react";
 
@@ -39,5 +40,38 @@ describe("Store Props", () => {
 
     expect(userStoreFromThis.props.username).toBe("amir");
     expect(userStoreFromUse.props.username).toBe("amir");
+  });
+
+  it("should effect be called on props change", () => {
+    const effectCalled = jest.fn();
+    @Store()
+    class UserStore {
+      @Props()
+      props: any;
+
+      @Effect("props.username")
+      onPropUsernameChange() {
+        effectCalled(this.props.username);
+      }
+    }
+
+    const App: React.FC<{ username: string }> = connect((props) => {
+      return (
+        <>
+          <span>{props.username}</span>
+        </>
+      );
+    }, UserStore);
+
+    const { getByText, rerender } = render(<App username="amir" />);
+
+    expect(getByText("amir")).toBeInTheDocument();
+    expect(effectCalled).toBeCalledTimes(1);
+    expect(effectCalled).toBeCalledWith("amir");
+
+    rerender(<App username="amirhossein" />);
+    expect(getByText("amirhossein")).toBeInTheDocument();
+    expect(effectCalled).toBeCalledTimes(2);
+    expect(effectCalled).toBeCalledWith("amirhossein");
   });
 });
