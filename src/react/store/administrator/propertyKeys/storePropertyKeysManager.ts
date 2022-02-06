@@ -90,7 +90,6 @@ export class StorePropertyKeysManager {
       type: "SET",
       target: this.storeAdmin.instance,
     });
-    // TODO write test for props
     const info = this.propertyKeys.get(propertyKey);
     const preValue = info?.getValue("Store");
 
@@ -122,7 +121,10 @@ export class StorePropertyKeysManager {
           this.storeAdmin.renderConsumers();
         }
       } else {
-        this.storeAdmin.renderConsumers();
+        // check same object reference assignment
+        if (preValue && value && Reflect.get(preValue as object, TARGET) !== value) {
+          this.storeAdmin.renderConsumers();
+        }
       }
     }
   }
