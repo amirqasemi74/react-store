@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
 
-export const storePropertiesObservability = () => {
+describe("Properties Observability", () => {
   it("should observe primitive types", () => {
     let store!: PrimitiveTypesStore;
 
@@ -304,31 +304,68 @@ export const storePropertiesObservability = () => {
     expect(store.onChange).not.toBe(preOnChange);
   });
 
-  it("should not rerender on set same value for primitive types", () => {
-    let store!: PrimitiveTypesStore;
-    let renderCount = 0;
-    @Store()
-    class PrimitiveTypesStore {
-      number = 1;
-    }
+  describe("Same value assignment to observable properties", () => {
+    it("should not rerender on set same value for primitive types", () => {
+      let store!: PrimitiveTypesStore;
+      let renderCount = 0;
+      @Store()
+      class PrimitiveTypesStore {
+        number = 1;
+      }
 
-    const App: React.FC = connect(() => {
-      const vm = useStore(PrimitiveTypesStore);
-      store = vm;
-      renderCount++;
-      return (
-        <div>
-          <span>{vm.number}</span>
-        </div>
-      );
-    }, PrimitiveTypesStore);
+      const App: React.FC = connect(() => {
+        const vm = useStore(PrimitiveTypesStore);
+        store = vm;
+        renderCount++;
+        return (
+          <div>
+            <span>{vm.number}</span>
+          </div>
+        );
+      }, PrimitiveTypesStore);
 
-    render(<App />);
+      render(<App />);
 
-    act(() => {
-      store.number = 1;
+      act(() => {
+        store.number = 1;
+      });
+
+      expect(renderCount).toBe(1);
     });
 
-    expect(renderCount).toBe(1);
+    it("should not rerender on set same value for non-primitive types", () => {
+      let store!: NonPrimitiveTypesStore;
+      let renderCount = 0;
+      const constObj = { a: 1 };
+      const constArr = [1];
+      @Store()
+      class NonPrimitiveTypesStore {
+        object = constObj;
+        array = constArr;
+      }
+
+      const App: React.FC = connect(() => {
+        const vm = useStore(NonPrimitiveTypesStore);
+        store = vm;
+        renderCount++;
+        return (
+          <div>
+            <span>{JSON.stringify(vm.object)}</span>
+            <span>{JSON.stringify(vm.array)}</span>
+          </div>
+        );
+      }, NonPrimitiveTypesStore);
+
+      render(<App />);
+
+      act(() => {
+        store.object = constObj;
+      });
+      act(() => {
+        store.array = constArr;
+      });
+
+      expect(renderCount).toBe(1);
+    });
   });
-};
+});
