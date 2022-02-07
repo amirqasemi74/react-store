@@ -5,7 +5,6 @@ import { TARGET } from "src/constant";
 import { StorePropsMetadataUtils } from "src/decorators/props";
 import { WireMetadataUtils } from "src/decorators/wire";
 import { adtProxyBuilder } from "src/proxy/adtProxy/adtProxyBuilder";
-import { isPrimitive } from "src/utils/isPrimitive";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
@@ -116,15 +115,10 @@ export class StorePropertyKeysManager {
     if (!matchedPolicy || matchedPolicy.render) {
       const info = this.propertyKeys.get(propertyKey);
       info?.reactSetState?.(info.getValue("Store"));
-      if (isPrimitive(value)) {
-        if (preValue !== value) {
-          this.storeAdmin.renderConsumers();
-        }
-      } else {
-        // check same object reference assignment
-        if (preValue && value && Reflect.get(preValue as object, TARGET) !== value) {
-          this.storeAdmin.renderConsumers();
-        }
+
+      const purePreValue = Reflect.get(Object(preValue), TARGET) || preValue;
+      if (purePreValue !== value) {
+        this.storeAdmin.renderConsumers();
       }
     }
   }

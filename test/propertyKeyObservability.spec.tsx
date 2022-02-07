@@ -304,6 +304,45 @@ describe("Properties Observability", () => {
     expect(store.onChange).not.toBe(preOnChange);
   });
 
+  it("should rerender if primitive store property change to non one or vice versa", () => {
+    let store!: PropertyTypesStore;
+    let renderCount = 0;
+    @Store()
+    class PropertyTypesStore {
+      undefinedToObject?: any;
+
+      objectToUndefined?: any = {};
+    }
+
+    const App: React.FC = connect(() => {
+      const vm = useStore(PropertyTypesStore);
+      store = vm;
+      renderCount++;
+      return (
+        <div>
+          <span>{JSON.stringify(vm.objectToUndefined)}</span>
+          <span>{JSON.stringify(vm.undefinedToObject)}</span>
+        </div>
+      );
+    }, PropertyTypesStore);
+
+    render(<App />);
+
+    expect(renderCount).toBe(1);
+
+    act(() => {
+      store.objectToUndefined = undefined;
+    });
+
+    expect(renderCount).toBe(2);
+
+    act(() => {
+      store.undefinedToObject = {};
+    });
+
+    expect(renderCount).toBe(3);
+  });
+
   describe("Same value assignment to observable properties", () => {
     it("should not rerender on set same value for primitive types", () => {
       let store!: PrimitiveTypesStore;
