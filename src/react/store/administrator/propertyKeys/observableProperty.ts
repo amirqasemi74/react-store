@@ -1,6 +1,8 @@
 import { isPrimitive } from "src/utils/isPrimitive";
 
 export class ObservableProperty {
+  isSetStatePending = false;
+
   isPrimitive: boolean;
 
   private value: {
@@ -8,7 +10,7 @@ export class ObservableProperty {
     state?: unknown;
   };
 
-  private _reactSetState?: React.Dispatch<React.SetStateAction<unknown>>;
+  private _reactSetState?: () => void;
 
   constructor(value: unknown) {
     this.isPrimitive = isPrimitive(value);
@@ -19,10 +21,11 @@ export class ObservableProperty {
     };
   }
 
-  set reactSetState(setState) {
-    this._reactSetState = (newValue) => {
-      this.isPrimitive = isPrimitive(newValue);
+  setReactSetState(setState: React.Dispatch<unknown>) {
+    this._reactSetState = () => {
+      const newValue = this.getValue("Store");
       setState?.(this.isPrimitive ? newValue : { $: newValue });
+      this.isSetStatePending = false;
     };
   }
 

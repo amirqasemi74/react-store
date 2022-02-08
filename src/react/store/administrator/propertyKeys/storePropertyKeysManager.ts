@@ -113,9 +113,9 @@ export class StorePropertyKeysManager {
 
     // Props property key must not affect renders status at all.
     if (!matchedPolicy || matchedPolicy.render) {
-      const info = this.propertyKeys.get(propertyKey);
-      info?.reactSetState?.(info.getValue("Store"));
-
+      if (info) {
+        info.isSetStatePending = true;
+      }
       const purePreValue = Reflect.get(Object(preValue), TARGET) || preValue;
       if (purePreValue !== value) {
         this.storeAdmin.renderConsumers();
@@ -130,12 +130,21 @@ export class StorePropertyKeysManager {
       onSet: () => {
         this.storeAdmin.gettersManager.recomputedGetters();
         const info = this.propertyKeys.get(propertyKey);
-        info?.reactSetState?.(info.getValue("Store"));
+        if (info) {
+          info.isSetStatePending = true;
+        }
         this.storeAdmin.renderConsumers();
       },
     });
   }
 
+  doPendingSetStates() {
+    this.propertyKeys.forEach((info) => {
+      if (info.isSetStatePending) {
+        info.reactSetState?.();
+      }
+    });
+  }
   /**
    * *********************** Store UseStates ******************************
    */
@@ -154,7 +163,7 @@ export class StorePropertyKeysManager {
             info.isPrimitive ? info.getValue("Store") : { $: info.getValue("Store") }
           );
           info.setValue(state, "State");
-          info.reactSetState = setState;
+          info.setReactSetState(setState);
         });
       },
     });
