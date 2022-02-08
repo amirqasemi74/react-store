@@ -64,8 +64,9 @@ export class StoreAdministrator {
 
   renderConsumers() {
     ReactDOM.unstable_batchedUpdates(() => {
+      this.propertyKeysManager.doPendingSetStates();
       this.consumers.forEach((render) => render());
-      Array.from(this.injectedInTos.values()).forEach((st) => st.renderConsumers());
+      this.injectedInTos.forEach((st) => st.renderConsumers());
     });
   }
 }

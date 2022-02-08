@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   Store,
   StoreProvider,
