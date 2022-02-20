@@ -1,5 +1,6 @@
 dist
 coverage
+sampleApp
 *.config.js
 *.spec.ts
 *.spec.tsx

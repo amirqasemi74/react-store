@@ -1,5 +1,3 @@
-import { storeComputedTests } from "./computed._spec";
-import { storeEffectTests } from "./effects._spec";
 import { storeHooksCompatibilityTests } from "./hooksCompatibility._spec";
 import { storeInjectionTests } from "./injection._spec";
 import { Store, connect, useStore } from "@react-store/core";
@@ -13,8 +11,6 @@ describe("Store", () => {
     jest.restoreAllMocks();
   });
 
-  describe("Computed Getters", storeComputedTests);
-  describe("Effects", storeEffectTests);
   describe("Injections", storeInjectionTests);
   describe("Pure React Hook Compatibility", storeHooksCompatibilityTests);
 

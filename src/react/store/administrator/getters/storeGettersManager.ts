@@ -24,11 +24,12 @@ export class StoreGettersManager {
   }
 
   recomputedGetters() {
-    const propertyKeysManager = this.storeAdmin.propertyKeysManager;
-    const setPaths = propertyKeysManager.calcSetPaths();
-    propertyKeysManager.clearAccessProperties();
-    Array.from(this.getters.values()).forEach((cp) =>
-      cp.tryRecomputeIfNeed(setPaths)
-    );
+    if (this.getters.size) {
+      const setPaths = this.storeAdmin.propertyKeysManager
+        .calcPaths()
+        .filter((p) => p.type === "SET")
+        .map((p) => p.path);
+      this.getters.forEach((cp) => cp.tryRecomputeIfNeed(setPaths));
+    }
   }
 }

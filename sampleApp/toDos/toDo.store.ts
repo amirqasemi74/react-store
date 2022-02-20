@@ -1,5 +1,5 @@
 import { BaseStore } from "./base.store";
-import { Effect, Props, Store } from "@react-store/core";
+import { AutoEffect, Effect, Props, Store } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 
 @Store()
@@ -9,11 +9,22 @@ export class ToDoStore extends BaseStore {
 
   todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
 
-  d = new Date();
-  a = 1;
-  b = 2;
+  a = 4;
+  b = 5;
+  c: any = [1, 2, 3, { a: 1 }];
+  d = { e: 5 };
 
-  @Effect([])
+  @AutoEffect()
+  onUserChanged() {
+    this.a = 3;
+    this.b = this.a;
+
+    this.c[this.b].a = 45;
+    this.c[3];
+    this.d.e;
+  }
+
+  // @Effect([])
   init() {
     for (let i = 0; i < 10; i++) {
       this.todos.push({
@@ -24,9 +35,9 @@ export class ToDoStore extends BaseStore {
     }
   }
 
-  get todosCount() {
-    return this.todos.length;
-  }
+  // get todosCount() {
+  //   return this.todos.length;
+  // }
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.todo.value = e.target.value;

@@ -1,8 +1,14 @@
 import { StoreAdministrator } from "./administrator/storeAdministrator";
+import { StorePropsMetadataUtils } from "src/decorators/props";
 
 export class StoreForComponentUsageProxy implements ProxyHandler<object> {
   get(target: object, propertyKey: PropertyKey, receiver: unknown) {
     const storeAdmin = StoreAdministrator.get(target);
+
+    // Props must get from store value not state value
+    if (StorePropsMetadataUtils.is(storeAdmin.type, propertyKey)) {
+      return Reflect.get(target, propertyKey, receiver);
+    }
 
     if (storeAdmin?.propertyKeysManager.propertyKeys.has(propertyKey)) {
       const value = storeAdmin?.propertyKeysManager.propertyKeys

@@ -11,6 +11,7 @@ It also covers shortcomings of react hooks (believe me!) and let developers to u
 - [Installation](#installation)
 - [Usage](#usage)
 - [Effects](#effects)
+- [Auto Effect](#auto-effect)
 - [Props](#props)
 - [Store Part](#store-part)
 - [Computed Property](#computed-property)
@@ -138,6 +139,32 @@ export class UserStore {
 ```
 
 > Methods which decorate with `@Effect()` can be async, but if you want to return `clear effect` function make it sync method
+
+## Auto Effect
+
+With `@AutoEffect()` like `@Effect()` you can manage your application side effects. With this decorator, dependencies will calculate automatically base on store properties you have used.
+
+For example:
+
+```ts
+@Store()
+export class UserStore {
+  a = 1;
+  
+  b = 2;
+
+  user = { name: "" };
+
+  @AutoEffect()
+  autoEffect() {
+    this.a = 1;
+    this.b = this.a;
+    const username = this.user.name
+  }
+}
+```
+
+The dependencies for `autoEffect` method is `user.name`.
 
 ## Props
 

@@ -1,13 +1,14 @@
 import lodashGet from "lodash/get";
 import type { ClassType } from "src/types";
 
+type DepFn<T> = (storeInstance: T) => Array<unknown>;
+
 export function Effect<T extends object>(
-  deps?: ((_: T) => Array<unknown>) | Array<string> | string,
-  dequal?: boolean
+  deps?: DepFn<T> | Array<string> | string,
+  deepEqual?: boolean
 ): MethodDecorator {
   return function (target, propertyKey, descriptor) {
-    let depsFn!: (_: T) => Array<unknown>;
-
+    let depsFn: DepFn<T> | undefined;
     if (typeof deps === "function") {
       depsFn = deps;
     } else if (Array.isArray(deps)) {
@@ -19,7 +20,20 @@ export function Effect<T extends object>(
     EffectsMetadataUtils.add(target.constructor as ClassType, {
       options: {
         deps: depsFn,
-        dequal,
+        deepEqual,
+      } as ManualEffectOptions,
+      propertyKey,
+    });
+    return descriptor;
+  };
+}
+
+export function AutoEffect(deepEqual?: boolean): MethodDecorator {
+  return function (target, propertyKey, descriptor) {
+    EffectsMetadataUtils.add(target.constructor as ClassType, {
+      options: {
+        deepEqual,
+        auto: true,
       },
       propertyKey,
     });
@@ -30,7 +44,7 @@ export function Effect<T extends object>(
 export class EffectsMetadataUtils {
   private static readonly KEY = Symbol();
 
-  static getOwn<T extends object>(storeType: ClassType): EffectMetaData<T>[] {
+  static getOwn(storeType: ClassType): EffectMetaData[] {
     let effects = Reflect.getOwnMetadata(this.KEY, storeType);
     if (!effects) {
       effects = [];
@@ -39,7 +53,7 @@ export class EffectsMetadataUtils {
     return effects;
   }
 
-  static get<T extends object>(storeType: ClassType): EffectMetaData<T>[] {
+  static get(storeType: ClassType): EffectMetaData[] {
     // TODO: Effects must be returns only for @Store & @StorePart
     let effects = this.getOwn(storeType);
     const parentClass = Reflect.getPrototypeOf(storeType) as ClassType;
@@ -49,17 +63,25 @@ export class EffectsMetadataUtils {
     return effects;
   }
 
-  static add<T extends object>(storeType: ClassType, metadata: EffectMetaData<T>) {
-    this.getOwn<T>(storeType).push(metadata);
+  static add(storeType: ClassType, metadata: EffectMetaData) {
+    this.getOwn(storeType).push(metadata);
   }
 }
 
-interface EffectOptions<T extends object> {
+interface ManualEffectOptions<T extends object = object> {
+  auto?: false;
   deps?: (_: T) => Array<unknown>;
-  dequal?: boolean;
+  deepEqual?: boolean;
 }
 
-export interface EffectMetaData<T extends object> {
+interface AutoEffectOptions {
+  auto: true;
+  deepEqual?: boolean;
+}
+
+type EffectOptions = ManualEffectOptions | AutoEffectOptions;
+
+export interface EffectMetaData {
   propertyKey: PropertyKey;
-  options: EffectOptions<T>;
+  options: EffectOptions;
 }

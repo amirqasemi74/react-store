@@ -7,6 +7,10 @@ export function propsHandler(
 ) {
   const propsPropertyKey = StorePropsMetadataUtils.get(storeAdministrator.type);
   if (propsPropertyKey) {
-    Reflect.set(storeAdministrator.instance, propsPropertyKey, props);
+    storeAdministrator.propertyKeysManager.onSetPropertyKey(
+      propsPropertyKey,
+      props,
+      true
+    );
   }
 }

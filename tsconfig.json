@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "strict": true,
     "strictPropertyInitialization": false,
+    "useDefineForClassFields": true,
     "noImplicitAny": false,
     "jsx": "react",
     "paths": {

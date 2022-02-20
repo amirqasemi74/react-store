@@ -1,11 +1,46 @@
 import { Effect, Observable, Store, connect, useStore } from "@react-store/core";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
+import { act } from "react-dom/test-utils";
 import { clearContainer } from "src/container/container";
 
-export const storeEffectTests = () => {
+describe("Effects", () => {
   beforeEach(() => {
     clearContainer();
+  });
+
+  it("should effect be called on each render", async () => {
+    let userStore!: UserStore;
+    const usernameChangeCallback = jest.fn();
+    @Store()
+    class UserStore {
+      username = "1";
+
+      @Effect()
+      onUsernameChange() {
+        usernameChangeCallback();
+      }
+    }
+
+    const User = connect(() => {
+      const vm = useStore(UserStore);
+      userStore = vm;
+      return <>{vm.username}</>;
+    }, UserStore);
+
+    render(<User />);
+
+    expect(usernameChangeCallback).toBeCalledTimes(1);
+
+    act(() => {
+      userStore.username = "2";
+    });
+    expect(usernameChangeCallback).toBeCalledTimes(2);
+
+    act(() => {
+      userStore.username = "3";
+    });
+    expect(usernameChangeCallback).toBeCalledTimes(3);
   });
 
   it("should effect be called when dependencies are being changed", async () => {
@@ -15,13 +50,15 @@ export const storeEffectTests = () => {
       user = { name: "amir.qasemi74" };
       password = "123456";
 
-      changeUsername(e: ChangeEvent<HTMLInputElement>) {
-        this.user.name = e.target.value;
-      }
-
       @Effect<UserStore>((_) => [_.user.name])
       onUsernameChange() {
+        this.user.name;
+        this.password;
         usernameChangeCallback();
+      }
+
+      changeUsername(e: ChangeEvent<HTMLInputElement>) {
+        this.user.name = e.target.value;
       }
     }
 
@@ -273,4 +310,4 @@ export const storeEffectTests = () => {
 
     expect(onMountedCB).toBeCalledTimes(1);
   });
-};
+});

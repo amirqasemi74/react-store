@@ -24,8 +24,6 @@ export function proxyValueAndSaveIt(
   if (
     value &&
     !value[STORE_ADMINISTRATION] &&
-    // Frozen Object does not need to be proxied (observable) like React Props
-    !Object.isFrozen(value) &&
     !isInArrayOrObjectPrototype(target, propertyKey) &&
     [Object, Array, Map].includes(value.constructor)
   ) {

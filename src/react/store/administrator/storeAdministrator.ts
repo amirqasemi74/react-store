@@ -7,7 +7,7 @@ import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
 import ReactDOM from "react-dom";
-import { ClassType } from "src/types";
+import { ClassType, Func } from "src/types";
 
 export class StoreAdministrator {
   type: ClassType;
@@ -16,7 +16,7 @@ export class StoreAdministrator {
 
   instanceForComponents: InstanceType<ClassType>;
 
-  consumers = new Set<() => void>();
+  consumers = new Set<Func>();
 
   injectedInTos = new Set<StoreAdministrator>();
 
@@ -72,7 +72,7 @@ export class StoreAdministrator {
 }
 
 export interface StoreAdministratorReactHooks {
-  hook: (storeAdmin: StoreAdministrator, props?: object) => void;
-  when: "BEFORE_INSTANCE" | "AFTER_INSTANCE";
   result?: (...args: any[]) => void;
+  when: "BEFORE_INSTANCE" | "AFTER_INSTANCE";
+  hook: (storeAdmin: StoreAdministrator, props?: object) => void;
 }
