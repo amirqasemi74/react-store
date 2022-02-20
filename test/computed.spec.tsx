@@ -1,9 +1,10 @@
 import { Store, connect, useStore } from "@react-store/core";
+import "@testing-library/jest-dom/extend-expect";
 import { act, render } from "@testing-library/react";
 import React from "react";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
-export const storeComputedTests = () => {
+describe("Computed Getters", () => {
   it("should compute getter if dependencies has been changed", () => {
     const passLenFn = jest.fn();
     const usernameFn = jest.fn();
@@ -53,7 +54,7 @@ export const storeComputedTests = () => {
     expect(getByText("amir")).toBeInTheDocument();
     expect(passLenFn).toBeCalledTimes(1);
     expect(usernameFn).toBeCalledTimes(1);
-    expect(storeAdmin.gettersManager.getters.get("username"));
+
     act(() => {
       storeRef.changePassword();
       storeRef.changeUser();
@@ -140,4 +141,4 @@ export const storeComputedTests = () => {
       "arrB"
     );
   });
-};
+});

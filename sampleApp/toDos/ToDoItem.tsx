@@ -8,7 +8,7 @@ interface Props {
 }
 
 const ToDoItem: React.FC<Props> = ({ itemIndex }) => {
-  const vm = useStore(ToDoStore, ({ todos }) => [todos[itemIndex]]);
+  const vm = useStore(ToDoStore);
 
   return (
     <ToDoItemWrapper>

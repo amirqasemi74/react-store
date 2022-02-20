@@ -5,6 +5,7 @@ import { TARGET } from "src/constant";
 import { StorePropsMetadataUtils } from "src/decorators/props";
 import { WireMetadataUtils } from "src/decorators/wire";
 import { adtProxyBuilder } from "src/proxy/adtProxy/adtProxyBuilder";
+import { GetSetPathsCalculator } from "src/utils/getSetPathsCalculator";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
@@ -19,16 +20,14 @@ export class StorePropertyKeysManager {
     this.policies.push({
       matcher: (propertyKey) =>
         StorePropsMetadataUtils.is(storeAdmin.type, propertyKey),
-      render: false,
-      set: "ORIGINAL",
+      set: "OBSERVABLE-READONLY",
     });
 
     //@Wire
     this.policies.push({
       matcher: (propertyKey) =>
         WireMetadataUtils.is(this.storeAdmin.type, propertyKey),
-      render: false,
-      set: "NONE",
+      set: "OBSERVABLE-READONLY",
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -39,36 +38,31 @@ export class StorePropertyKeysManager {
   }
 
   makeAllObservable() {
-    Object.keys(this.storeAdmin.instance)
-      .filter(
-        (propertyKey) =>
-          this.policies.find((p) => p.matcher(propertyKey))?.set !== "ORIGINAL"
-      )
-      .forEach((propertyKey) => {
-        const policy = this.policies.find(({ matcher }) => matcher(propertyKey));
-        let value = this.storeAdmin.instance[propertyKey];
+    Object.keys(this.storeAdmin.instance).forEach((propertyKey) => {
+      const policy = this.policies.find(({ matcher }) => matcher(propertyKey));
+      let value = this.storeAdmin.instance[propertyKey];
 
-        switch (policy?.set) {
-          case "ORIGINAL":
-          case "NONE":
-            break;
-          case "OBSERVABLE":
-          case undefined:
-            value = this.makeDeepObservable(propertyKey, value);
-            break;
-        }
-        this.propertyKeys.set(propertyKey, new ObservableProperty(value));
+      switch (policy?.set) {
+        case "OBSERVABLE-READONLY":
+          value = this.makeDeepObservable(propertyKey, value, true);
+          break;
+        case "OBSERVABLE":
+        case undefined:
+          value = this.makeDeepObservable(propertyKey, value, false);
+          break;
+      }
+      this.propertyKeys.set(propertyKey, new ObservableProperty(value));
 
-        // Define setter and getter
-        // to intercept this props getting and
-        // return proxied value
-        Object.defineProperty(this.storeAdmin.instance, propertyKey, {
-          enumerable: true,
-          configurable: true,
-          get: () => this.onGetPropertyKey(propertyKey),
-          set: (value: unknown) => this.onSetPropertyKey(propertyKey, value),
-        });
+      // Define setter and getter
+      // to intercept this props getting and
+      // return proxied value
+      Object.defineProperty(this.storeAdmin.instance, propertyKey, {
+        enumerable: true,
+        configurable: true,
+        get: () => this.onGetPropertyKey(propertyKey),
+        set: (value: unknown) => this.onSetPropertyKey(propertyKey, value),
       });
+    });
   }
 
   private onGetPropertyKey(propertyKey: PropertyKey) {
@@ -82,7 +76,13 @@ export class StorePropertyKeysManager {
     return value;
   }
 
-  private onSetPropertyKey(propertyKey: PropertyKey, value: unknown) {
+  /**
+   *
+   * @param propertyKey
+   * @param value
+   * @param force to set props in props handler
+   */
+  onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force = false) {
     this.addAccessedProperty({
       value,
       propertyKey,
@@ -95,16 +95,17 @@ export class StorePropertyKeysManager {
     const matchedPolicy = this.policies.find(({ matcher }) => matcher(propertyKey));
 
     switch (matchedPolicy?.set) {
-      case "ORIGINAL":
-        info?.setValue(value, "Store");
-        matchedPolicy?.onSet?.(propertyKey);
+      case "OBSERVABLE-READONLY": {
+        if (force) {
+          info?.setValue(this.makeDeepObservable(propertyKey, value, true), "Store");
+        } else {
+          matchedPolicy?.onSet?.(propertyKey);
+        }
         break;
-      case "NONE":
-        matchedPolicy?.onSet?.(propertyKey);
-        break;
+      }
       case "OBSERVABLE":
       case undefined:
-        info?.setValue(this.makeDeepObservable(propertyKey, value), "Store");
+        info?.setValue(this.makeDeepObservable(propertyKey, value, false), "Store");
         matchedPolicy?.onSet?.(propertyKey);
         break;
     }
@@ -112,7 +113,7 @@ export class StorePropertyKeysManager {
     this.storeAdmin.gettersManager.recomputedGetters();
 
     // Props property key must not affect renders status at all.
-    if (!matchedPolicy || matchedPolicy.render) {
+    if (!matchedPolicy || matchedPolicy.set === "OBSERVABLE") {
       if (info) {
         info.isSetStatePending = true;
       }
@@ -123,7 +124,11 @@ export class StorePropertyKeysManager {
     }
   }
 
-  private makeDeepObservable(propertyKey: PropertyKey, value: unknown) {
+  private makeDeepObservable(
+    propertyKey: PropertyKey,
+    value: unknown,
+    readonly: boolean
+  ) {
     return adtProxyBuilder({
       value,
       onAccess: this.addAccessedProperty.bind(this),
@@ -133,7 +138,9 @@ export class StorePropertyKeysManager {
         if (info) {
           info.isSetStatePending = true;
         }
-        this.storeAdmin.renderConsumers();
+        if (!readonly) {
+          this.storeAdmin.renderConsumers();
+        }
       },
     });
   }
@@ -155,7 +162,8 @@ export class StorePropertyKeysManager {
         const propertyKeysInfo = useFixedLazyRef(() =>
           Array.from(this.propertyKeys.entries()).filter(
             ([propertyKey]) =>
-              !WireMetadataUtils.is(this.storeAdmin.type, propertyKey)
+              !WireMetadataUtils.is(this.storeAdmin.type, propertyKey) &&
+              !StorePropsMetadataUtils.is(this.storeAdmin.type, propertyKey)
           )
         );
         propertyKeysInfo.forEach(([, info]) => {
@@ -170,93 +178,35 @@ export class StorePropertyKeysManager {
   }
 
   /**
-   * *********************** Access Paths ******************************
+   * *********************** Accessed Paths ******************************
    */
-  clearAccessProperties() {
+  clearAccessedProperties() {
     this.accessedProperties = [];
   }
 
   addAccessedProperty(ap: AccessedProperty) {
-    const value =
-      ap.value && typeof ap.value === "object" ? ap.value[TARGET] : ap.value;
-    this.accessedProperties.push({ ...ap, value });
-  }
-
-  calcGetPaths() {
-    const depPaths: AccessedPath[] = [];
-
-    let path: PropertyKey[] = [];
-    let preValue: unknown;
-    for (const ap of this.accessedProperties) {
-      if (ap.target === this.storeAdmin.instance) {
-        path.length && depPaths.push(path);
-        path = [ap.propertyKey];
-      } else if (preValue === ap.target) {
-        if (this.isInArrayProto(ap)) {
-          path && depPaths.push(path);
-          path = [];
-        }
-        if (
-          !Object.prototype.hasOwnProperty.call(
-            Object.getPrototypeOf(ap.target),
-            ap.propertyKey
-          ) &&
-          path.length
-        ) {
-          path.push(ap.propertyKey);
-        }
-      }
-      preValue = ap.value;
-    }
-    path.length && depPaths.push(path);
-    return Array.from(depPaths);
-  }
-
-  calcSetPaths() {
-    const paths: PropertyKey[][] = [];
-    this.accessedProperties.forEach((ap, i) => {
-      if (ap.type === "SET") {
-        paths.push(this.calcSetPath(ap, i));
-      }
+    this.accessedProperties.push({
+      ...ap,
+      value: ap.value && typeof ap.value === "object" ? ap.value[TARGET] : ap.value,
     });
-    return paths;
   }
 
-  private calcSetPath(ap: AccessedProperty, index: number) {
-    let path: PropertyKey[] = this.isInArrayProto(ap)
-      ? []
-      : [this.accessedProperties[index].propertyKey];
-
-    let currentTarget = this.accessedProperties[index].target;
-    for (let i = index - 1; i >= 0; i--) {
-      if (currentTarget === this.accessedProperties[i].value) {
-        path.unshift(this.accessedProperties[i].propertyKey);
-        currentTarget = this.accessedProperties[i].target;
-      }
-      if (currentTarget === this.storeAdmin.instance) {
-        break;
-      }
-    }
-
-    return path;
-  }
-
-  private isInArrayProto(ap: AccessedProperty) {
-    return (
-      Array.isArray(ap.target) &&
-      FullArrayAccessMethods.includes(ap.propertyKey.toString())
+  calcPaths() {
+    const calculator = new GetSetPathsCalculator(
+      this.storeAdmin.instance,
+      this.accessedProperties
     );
+    return calculator.calcPaths();
   }
 }
 
 interface SetPropertyPolicy {
   matcher: (propertyKey: PropertyKey) => boolean;
-  render: boolean;
   set: SetPropertyPolicySetType;
   onSet?: (propertyKey: PropertyKey) => void;
 }
 
-type SetPropertyPolicySetType = "ORIGINAL" | "OBSERVABLE" | "NONE";
+type SetPropertyPolicySetType = "OBSERVABLE-READONLY" | "OBSERVABLE";
 
 export interface AccessedProperty {
   target: object;
@@ -266,34 +216,3 @@ export interface AccessedProperty {
 }
 
 export type AccessedPath = PropertyKey[];
-
-const FullArrayAccessMethods = [
-  "length",
-  "copyWithin",
-  "find",
-  "findIndex",
-  "lastIndexOf",
-  "reverse",
-  "slice",
-  "sort",
-  "splice",
-  "includes",
-  "indexOf",
-  "join",
-  "keys",
-  "entries",
-  "values",
-  "forEach",
-  "filter",
-  "flat",
-  "flatMap",
-  "map",
-  "every",
-  "some",
-  "reduce",
-  "reduceRight",
-  "toLocaleString",
-  "toString",
-  "findLast",
-  "findLastIndex",
-];

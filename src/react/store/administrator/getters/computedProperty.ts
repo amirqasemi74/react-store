@@ -12,7 +12,7 @@ export class ComputedProperty {
     state: unknown;
   } = { state: null, store: null };
 
-  deps: PropertyKey[][] = [];
+  deps: AccessedPath[] = [];
 
   constructor(
     private storeAdmin: StoreAdministrator,
@@ -35,9 +35,12 @@ export class ComputedProperty {
 
   private calcStoreValue() {
     const propertyKeysManager = this.storeAdmin.propertyKeysManager;
-    propertyKeysManager.clearAccessProperties();
+    propertyKeysManager.clearAccessedProperties();
     this.lastValue.store = this.getterFn.call(this.storeAdmin.instance);
-    this.deps = propertyKeysManager.calcGetPaths();
+    this.deps = propertyKeysManager
+      .calcPaths()
+      .filter((p) => p.type === "GET")
+      .map((p) => p.path);
     this.hasStoreValCopiedToStateVal = false;
   }
 
@@ -55,6 +58,7 @@ export class ComputedProperty {
   }
 
   private copyStoreValueToStateValueIfPossible() {
+    // Because react 18 transition mode
     const doCopy = this.deps.every(
       (dep) =>
         lodashGet(this.storeAdmin.instance, dep) ===

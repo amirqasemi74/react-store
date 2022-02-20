@@ -5,7 +5,7 @@ export { useStore } from "./react/hooks/useStore";
 export { connect } from "./react/store/connect";
 export { StoreProvider } from "./react/store/StoreProvider";
 export { Props } from "./decorators/props";
-export { Effect } from "./decorators/effect";
+export { Effect, AutoEffect } from "./decorators/effect";
 export { Store } from "./decorators/store";
 export { Inject } from "./container/decorators/inject";
 export { StorePart } from "./decorators/storePart";

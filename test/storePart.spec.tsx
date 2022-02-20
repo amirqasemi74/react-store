@@ -131,7 +131,8 @@ describe("Store Parts", () => {
 
     expect(pre).toBeDefined();
     expect(post).toBeDefined();
-    expect(pre).toBe(post);
+
+    expect(pre === post).toBeTruthy();
     expect(errorMock).toHaveBeenLastCalledWith(
       "`UserStore.validator` is decorated with `@Wire(...)` or `@AutoWire()`, so can't be mutated."
     );

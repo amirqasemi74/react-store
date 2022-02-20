@@ -2,6 +2,7 @@ import arrayProxyBuilder from "./array.proxyBuilder";
 import { mapProxyBuilder } from "./map.proxyBuilder";
 import objectProxyBuilder from "./object.proxyBuilder";
 import { ObservableMetadataUtils } from "src/decorators/observable";
+import { StorePartMetadataUtils } from "src/decorators/storePart";
 import { AccessedProperty } from "src/react/store/administrator/propertyKeys/storePropertyKeysManager";
 
 export interface BaseAdtProxyBuilderArgs {
@@ -24,8 +25,10 @@ export const adtProxyBuilder = ({ value, ...restOfArgs }: AdtProxyBuilderArgs) =
 
   try {
     if (
-      ((valType === Object && !Object.isFrozen(value)) ||
-        (value instanceof Object && ObservableMetadataUtils.is(valType))) &&
+      (valType === Object ||
+        (value instanceof Object &&
+          (ObservableMetadataUtils.is(valType) ||
+            StorePartMetadataUtils.is(valType)))) &&
       doObjectProxy
     ) {
       return objectProxyBuilder({

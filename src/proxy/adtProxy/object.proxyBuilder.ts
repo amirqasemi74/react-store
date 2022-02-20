@@ -1,4 +1,4 @@
-import { proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
+import { PROXIED_VALUE, proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
 import { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
 import { TARGET } from "src/constant";
 
@@ -12,13 +12,18 @@ const objectProxyBuilder = ({
 }: ObjectProxyBuilderArgs): object => {
   const { onSet } = restOfArgs;
 
-  return new Proxy(object, {
+  return new Proxy(Object.isFrozen(object) ? {} : object, {
     get(target: object, propertyKey: PropertyKey, receiver: unknown) {
       if (propertyKey === TARGET) {
         return target;
       }
-      // console.log("Object::get", target, propertyKey);
-      const value = proxyValueAndSaveIt(target, propertyKey, receiver, restOfArgs);
+
+      const value = proxyValueAndSaveIt(
+        Object.isFrozen(object) ? object : target,
+        propertyKey,
+        receiver,
+        restOfArgs
+      );
       restOfArgs.onAccess?.({
         value,
         target,
@@ -42,7 +47,9 @@ const objectProxyBuilder = ({
         propertyKey,
       });
       const res = Reflect.set(target, propertyKey, value, receiver);
-      onSet?.();
+      if (propertyKey !== PROXIED_VALUE) {
+        onSet?.();
+      }
       return res;
     },
   });
