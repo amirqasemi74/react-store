@@ -3,6 +3,7 @@ import {
   adtProxyBuilder,
 } from "./adtProxy/adtProxyBuilder";
 import { STORE_ADMINISTRATION } from "src/constant";
+import { isPrimitive } from "src/utils/isPrimitive";
 
 /**
  * Proxy value if need and then proxied value for next usage
@@ -21,26 +22,16 @@ export function proxyValueAndSaveIt(
     return value;
   }
 
-  if (
-    value &&
-    !value[STORE_ADMINISTRATION] &&
-    !isInArrayOrObjectPrototype(target, propertyKey) &&
-    [Object, Array, Map].includes(value.constructor)
-  ) {
-    const proxiedValue = () =>
-      adtProxyBuilder({
-        value,
-        ...adtProxyBuilderArgs,
-      });
-
-    return value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue());
+  if (isPrimitive(value) || (value && value[STORE_ADMINISTRATION])) {
+    return value;
   }
 
-  return value;
+  const proxiedValue = () =>
+    adtProxyBuilder({
+      value,
+      ...adtProxyBuilderArgs,
+    });
+  return value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue());
 }
 
 export const PROXIED_VALUE = Symbol("PROXIED_VALUE");
-
-const isInArrayOrObjectPrototype = (target: object, propertyKey: PropertyKey) =>
-  (target.constructor === Object && Object.prototype[propertyKey]) ||
-  (target.constructor === Array && Array.prototype[propertyKey]);
