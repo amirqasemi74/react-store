@@ -28,6 +28,7 @@ export const mapProxyBuilder = ({
               adtProxyBuilder({
                 onSet,
                 value: mapValue,
+                ...restOfArgs,
               })
             );
             onSet?.();

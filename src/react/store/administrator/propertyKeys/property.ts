@@ -6,6 +6,8 @@ export class Property {
    */
   isPure = false;
 
+  proxiedValuesStorage: Map<unknown, unknown>;
+
   isSetStatePending = false;
 
   isPrimitive: boolean;
@@ -17,8 +19,13 @@ export class Property {
 
   private _reactSetState?: () => void;
 
-  constructor(value: unknown, isPure?: boolean) {
+  constructor(
+    value: unknown,
+    proxiedValuesStorage: Map<unknown, unknown>,
+    isPure?: boolean
+  ) {
     this.isPure = !!isPure;
+    this.proxiedValuesStorage = proxiedValuesStorage;
     this.isPrimitive = isPrimitive(value);
     const _val = this.isPrimitive ? value : { $: value };
     this.value = {

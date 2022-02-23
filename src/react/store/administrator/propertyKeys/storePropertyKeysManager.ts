@@ -47,13 +47,19 @@ export class StorePropertyKeysManager {
         matcher(propertyKey)
       );
 
+      const proxiedValuesStorage = new Map();
+
       const value = this.makeDeepObservable(
         propertyKey,
         this.storeAdmin.instance[propertyKey],
+        proxiedValuesStorage,
         isPureProperty
       );
 
-      this.propertyKeys.set(propertyKey, new Property(value, isPureProperty));
+      this.propertyKeys.set(
+        propertyKey,
+        new Property(value, proxiedValuesStorage, isPureProperty)
+      );
 
       // Define setter and getter
       // to intercept this props getting and
@@ -103,12 +109,28 @@ export class StorePropertyKeysManager {
 
     if (pureProperty) {
       if (options.forceSet) {
-        info.setValue(this.makeDeepObservable(propertyKey, value, true), "Store");
+        info.setValue(
+          this.makeDeepObservable(
+            propertyKey,
+            value,
+            info.proxiedValuesStorage,
+            true
+          ),
+          "Store"
+        );
       } else {
         pureProperty.onSet?.(propertyKey);
       }
     } else {
-      info.setValue(this.makeDeepObservable(propertyKey, value, false), "Store");
+      info.setValue(
+        this.makeDeepObservable(
+          propertyKey,
+          value,
+          info.proxiedValuesStorage,
+          false
+        ),
+        "Store"
+      );
     }
 
     this.storeAdmin.gettersManager.recomputedGetters();
@@ -126,10 +148,12 @@ export class StorePropertyKeysManager {
   private makeDeepObservable(
     propertyKey: PropertyKey,
     value: unknown,
+    proxiedValuesStorage: Map<unknown, unknown>,
     readonly: boolean
   ) {
     return adtProxyBuilder({
       value,
+      proxiedValuesStorage,
       onAccess: this.addAccessedProperty.bind(this),
       onSet: () => {
         this.storeAdmin.gettersManager.recomputedGetters();

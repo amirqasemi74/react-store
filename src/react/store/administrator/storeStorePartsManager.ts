@@ -34,7 +34,7 @@ export class StoreStorePartsManager {
             storePartAdmin.setInstance(instance);
             this.storeAdmin.propertyKeysManager.propertyKeys.set(
               wire.propertyKey,
-              new Property(instance, true)
+              new Property(instance, new Map(), true)
             );
             initiatedStorePart.add(wire.propertyKey);
           }

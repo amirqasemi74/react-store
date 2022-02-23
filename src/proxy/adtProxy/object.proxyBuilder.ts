@@ -1,5 +1,6 @@
 import { PROXIED_VALUE, proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
 import { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
+import React from "react";
 import { TARGET } from "src/constant";
 
 interface ObjectProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
@@ -10,6 +11,10 @@ export const objectProxyBuilder = ({
   object,
   ...restOfArgs
 }: ObjectProxyBuilderArgs): object => {
+  if (React.isValidElement(object)) {
+    return object;
+  }
+
   const { onSet } = restOfArgs;
   const isFrozen = Object.isFrozen(object);
 
