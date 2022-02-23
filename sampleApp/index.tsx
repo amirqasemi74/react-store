@@ -19,17 +19,17 @@ function AppWrapper() {
 
 // ReactDOM.render(<AppWrapper />, document.querySelector("#root"));
 // ReactDOM.render(<AutoEffectTest />, document.querySelector("#root"));
-// ReactDOM.render(
-//   <PropsTest obj={{ a: 3 }} a={<p>Amir</p>} />,
-//   document.querySelector("#root")
-// );
-
-// ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
 ReactDOM.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/user/:id" element={<HooksAreaTest />} />
-    </Routes>
-  </BrowserRouter>,
+  <PropsTest obj={{ a: 3 }} a={<p>Amir</p>} />,
   document.querySelector("#root")
 );
+
+// ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
+// ReactDOM.render(
+//   <BrowserRouter>
+//     <Routes>
+//       <Route path="/user/:id" element={<HooksAreaTest />} />
+//     </Routes>
+//   </BrowserRouter>,
+//   document.querySelector("#root")
+// );

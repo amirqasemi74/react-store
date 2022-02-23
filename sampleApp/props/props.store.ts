@@ -7,6 +7,8 @@ export class PropsStore {
 
   @AutoEffect()
   fn() {
-    console.log(this.props.obj.a);
+    console.log(this.props);
+
+    // console.log(this.props.obj.a);
   }
 }
