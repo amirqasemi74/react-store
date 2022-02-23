@@ -36,7 +36,11 @@ export function proxyValueAndSaveIt(
     return value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue());
   }
 
-  return proxiedValue();
+  if (!adtProxyBuilderArgs.proxiedValuesStorage.has(value)) {
+    adtProxyBuilderArgs.proxiedValuesStorage.set(value, proxiedValue());
+  }
+
+  return adtProxyBuilderArgs.proxiedValuesStorage.get(value);
 }
 
 export const PROXIED_VALUE = Symbol("PROXIED_VALUE");

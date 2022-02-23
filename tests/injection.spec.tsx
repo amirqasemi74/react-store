@@ -10,7 +10,7 @@ import { fireEvent, render } from "@testing-library/react";
 import React, { memo } from "react";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
-export const storeInjectionTests = () => {
+describe("Dependency Injection", () => {
   it("should inject @Injectable into store", () => {
     expect.assertions(5);
 
@@ -205,4 +205,4 @@ export const storeInjectionTests = () => {
       expect(mainStore.b).toBeInstanceOf(B);
     });
   });
-};
+});

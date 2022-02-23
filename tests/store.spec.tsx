@@ -1,19 +1,10 @@
-import { storeHooksCompatibilityTests } from "./hooksCompatibility._spec";
-import { storeInjectionTests } from "./injection._spec";
 import { Store, connect, useStore } from "@react-store/core";
+import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import React from "react";
 import { clearContainer } from "src/container/container";
 
 describe("Store", () => {
-  beforeEach(() => {
-    clearContainer();
-    jest.restoreAllMocks();
-  });
-
-  describe("Injections", storeInjectionTests);
-  describe("Pure React Hook Compatibility", storeHooksCompatibilityTests);
-
   it("should each component which use store, have same instance of it", () => {
     let usernameStore!: UserStore, passwordStore!: UserStore, appStore!: UserStore;
 

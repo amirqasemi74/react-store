@@ -6,9 +6,10 @@ import { StorePartMetadataUtils } from "src/decorators/storePart";
 import { AccessedProperty } from "src/react/store/administrator/propertyKeys/storePropertyKeysManager";
 
 export interface BaseAdtProxyBuilderArgs {
-  proxyTypes?: Array<"Array" | "Object" | "Map">;
   onSet?: () => void;
+  proxyTypes?: Array<"Array" | "Object" | "Map">;
   onAccess?: (accessPath: AccessedProperty) => void;
+  proxiedValuesStorage: Map<unknown, unknown>;
 }
 
 interface AdtProxyBuilderArgs extends BaseAdtProxyBuilderArgs {

@@ -4,6 +4,23 @@ import React from "react";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 describe("Immutable Objects & Arrays", () => {
+  it("should inner immutable object have same instance ref in each render", () => {
+    let store!: FrozenStore;
+    @Store()
+    class FrozenStore {
+      obj: any = Object.freeze({ a: 1, b: 2, c: Object.freeze({ d: 1 }) });
+    }
+
+    const App = connect(() => {
+      store = useStore(FrozenStore);
+      return <>Frozen Object</>;
+    }, FrozenStore);
+
+    render(<App />);
+
+    expect(store.obj.c).toBe(store.obj.c);
+  });
+
   describe("Frozen Objects & Arrays", () => {
     it("should return correct value of frozen objects", () => {
       let store!: FrozenStore;

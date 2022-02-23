@@ -1,8 +1,9 @@
 import { Store, connect, useStore } from "@react-store/core";
+import "@testing-library/jest-dom/extend-expect";
 import { render, screen, waitFor } from "@testing-library/react";
 import React, { useEffect } from "react";
 
-export const storeHooksCompatibilityTests = () => {
+describe("Pure React Hook Compatibility", () => {
   it("should render on calling action in deeper pure react useEffect", async () => {
     @Store()
     class SampleStore {
@@ -40,4 +41,4 @@ export const storeHooksCompatibilityTests = () => {
       expect(screen.getByText("changed title")).toHaveTextContent("changed title")
     );
   });
-};
+});
