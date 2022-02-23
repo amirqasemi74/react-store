@@ -1,7 +1,7 @@
 import { Effect, Props, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
-import React from "react";
+import React, { useEffect } from "react";
 
 describe("Store Props", () => {
   it("should parent component have props directly", () => {
@@ -73,5 +73,30 @@ describe("Store Props", () => {
     expect(getByText("amirhossein")).toBeInTheDocument();
     expect(effectCalled).toBeCalledTimes(2);
     expect(effectCalled).toBeCalledWith("amirhossein");
+  });
+
+  it("should render component which use props if props change", () => {
+    @Store()
+    class UserStore {
+      @Props()
+      props: any;
+    }
+
+    const Username = React.memo(() => {
+      const st = useStore(UserStore);
+      return <p>{st.props.username}</p>;
+    });
+
+    const App: React.FC<{ username: string }> = connect(() => {
+      return <Username />;
+    }, UserStore);
+
+    const { getByText, rerender } = render(<App username="amir" />);
+
+    expect(getByText("amir")).toBeInTheDocument();
+
+    rerender(<App username="amirhossein" />);
+
+    expect(getByText("amirhossein")).toBeInTheDocument();
   });
 });

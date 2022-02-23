@@ -9,15 +9,16 @@ const ToDos: React.FC = () => {
 
   return (
     <ToDoWrapper>
-      {/* <Title style={{ color: vm.theme.primary }}>To Do Application</Title>
+      {/* <Title style={{ color: vm.theme.primary }}>To Do Application</Title> */}
       <TodoInput
-        invalid={vm.validator.hasAnyError}
+        invalid={false}
         value={vm.todo.value}
         onChange={vm.onInputChange}
         onKeyDown={vm.onInputKeyDown}
         placeholder="Enter To Do"
-      /> */}
-      {/* <ToDoList /> */}
+      />
+      {vm.a}
+      <ToDoList />
       {/* <ToDoCount>ToDo Count: {vm.todosCount}</ToDoCount> */}
     </ToDoWrapper>
   );

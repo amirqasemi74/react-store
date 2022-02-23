@@ -1,8 +1,6 @@
 import { ReactApplicationContext } from "../appContext";
-import {
-  StoreAdministrator,
-  StoreAdministratorReactHooks,
-} from "./administrator/storeAdministrator";
+import { StoreAdministratorReactHooks } from "./administrator/hooksManager";
+import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
@@ -105,7 +103,7 @@ export class StoreFactory {
     storeAdmin: StoreAdministrator,
     props?: object
   ) {
-    Array.from(storeAdmin.reactHooks.values())
+    Array.from(storeAdmin.hooksManager.reactHooks.values())
       .filter(({ when: _when }) => _when === when)
       .forEach(({ hook, result }) => {
         const res = hook(storeAdmin, props);

@@ -4,59 +4,82 @@ import { dequal } from "dequal";
 import isPromise from "is-promise";
 import lodashGet from "lodash/get";
 import { useEffect, useRef } from "react";
+import { AutoEffectOptions, ManualEffectOptions } from "src/decorators/effect";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 import { Func } from "src/types";
 import { GetSetPaths } from "src/utils/getSetPathsCalculator";
 
 export const effectHandler = (storeAdmin: StoreAdministrator) => {
-  storeAdmin.effectsManager.effectsMetaData.forEach(
-    ({ propertyKey: effectKey, options }) => {
-      const { effectsManager, instanceForComponents, propertyKeysManager } =
-        storeAdmin;
-      const depsValue = (
-        options.auto
-          ? (o: object) =>
-              effectsManager.effects
-                .get(effectKey)
-                ?.deps?.map((path) => lodashGet(o, path))
-          : options.deps
-      )?.(instanceForComponents);
+  storeAdmin.effectsManager.effectsMetaData.forEach((metadata) => {
+    const handler = metadata.options.auto ? autoEffectHandler : manualEffectHandler;
+    handler(storeAdmin, metadata as ManualEffectOptions & AutoEffectOptions);
+  });
+};
 
-      const signal = useRef(0);
-      const preDepsValue = useRef<unknown[]>();
-      const isEqual = options.deepEqual ? dequal : Object.is;
+const autoEffectHandler = (
+  storeAdmin: StoreAdministrator,
+  {
+    propertyKey: effectKey,
+    options,
+  }: { options: AutoEffectOptions; propertyKey: PropertyKey }
+) => {
+  const { effectsManager, instanceForComponents, propertyKeysManager } = storeAdmin;
 
-      if (depsValue) {
-        if (depsValue.some((v, i) => !isEqual(v, preDepsValue.current?.[i]))) {
-          if (!options.auto) {
-            preDepsValue.current = options.deepEqual
-              ? cloneDeep(depsValue, true)
-              : depsValue;
-          }
-          signal.current += 1;
-        }
-      } else {
-        signal.current++;
-      }
-
-      useEffect(() => {
-        if (options.auto) {
-          propertyKeysManager.clearAccessedProperties();
-        }
-
-        runEffect(effectKey, storeAdmin);
-
-        if (options.auto) {
-          const depPaths = calcDepPaths(propertyKeysManager.calcPaths());
-          effectsManager.setEffectDeps(effectKey, depPaths);
-          preDepsValue.current = depPaths.map((p) =>
-            lodashGet(instanceForComponents, p)
-          );
-        }
-        return () => effectsManager.getClearEffect(effectKey)?.();
-      }, [signal.current]);
-    }
+  const signal = useRef(0);
+  const preDepsValue = useRef<unknown[]>();
+  const isEqual = options.deepEqual ? dequal : Object.is;
+  const depsValue = ((o: object) =>
+    effectsManager.effects.get(effectKey)!.deps.map((path) => lodashGet(o, path)))?.(
+    instanceForComponents
   );
+
+  if (depsValue.some((v, i) => !isEqual(v, preDepsValue.current?.[i]))) {
+    signal.current++;
+  }
+
+  useEffect(() => {
+    propertyKeysManager.clearAccessedProperties();
+
+    runEffect(effectKey, storeAdmin);
+
+    const depPaths = calcDepPaths(propertyKeysManager.calcPaths());
+    effectsManager.setEffectDeps(effectKey, depPaths);
+    preDepsValue.current = depPaths.map((p) => lodashGet(instanceForComponents, p));
+
+    return () => effectsManager.getClearEffect(effectKey)?.();
+  }, [signal.current]);
+};
+
+const manualEffectHandler = (
+  storeAdmin: StoreAdministrator,
+  {
+    propertyKey: effectKey,
+    options,
+  }: { options: ManualEffectOptions; propertyKey: PropertyKey }
+) => {
+  const { effectsManager, instanceForComponents } = storeAdmin;
+  const signal = useRef(0);
+  const preDepsValue = useRef<unknown[]>();
+  const isEqual = options.deepEqual ? dequal : Object.is;
+  const depsValue = options.deps?.(instanceForComponents);
+
+  if (depsValue) {
+    if (depsValue.some((v, i) => !isEqual(v, preDepsValue.current?.[i]))) {
+      if (!options.auto) {
+        preDepsValue.current = options.deepEqual
+          ? cloneDeep(depsValue, true)
+          : depsValue;
+      }
+      signal.current++;
+    }
+  } else {
+    signal.current++;
+  }
+
+  useEffect(() => {
+    runEffect(effectKey, storeAdmin);
+    return () => effectsManager.getClearEffect(effectKey)?.();
+  }, [signal.current]);
 };
 
 const calcDepPaths = (getSetPaths: GetSetPaths) => {

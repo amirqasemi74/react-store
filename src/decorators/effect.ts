@@ -68,13 +68,13 @@ export class EffectsMetadataUtils {
   }
 }
 
-interface ManualEffectOptions<T extends object = object> {
+export interface ManualEffectOptions<T extends object = object> {
   auto?: false;
   deps?: (_: T) => Array<unknown>;
   deepEqual?: boolean;
 }
 
-interface AutoEffectOptions {
+export interface AutoEffectOptions {
   auto: true;
   deepEqual?: boolean;
 }

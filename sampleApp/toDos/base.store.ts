@@ -7,12 +7,12 @@ import { ToDoService } from "sampleApp/toDos/services/todos.service";
 export class BaseStore {
   todo = new ToDo();
 
-  @AutoWire()
+  // @AutoWire()
   readonly validator: FormValidator;
 
   constructor(public theme: ThemeStore, public todoService: ToDoService) {}
 
-  @Effect([])
+  // @Effect([])
   onMount() {
     this.validator.form = this.todo;
   }

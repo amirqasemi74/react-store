@@ -1,4 +1,4 @@
-import { ObservableProperty } from "./propertyKeys/observableProperty";
+import { Property } from "./propertyKeys/property";
 import { StoreAdministrator } from "./storeAdministrator";
 import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
@@ -24,7 +24,7 @@ export class StoreStorePartsManager {
     const initiatedStorePart = new Set<PropertyKey>();
     this.storePartWires.forEach((wire) => {
       const StorePart = wire.type as ClassType;
-      this.storeAdmin.reactHooks.add({
+      this.storeAdmin.hooksManager.reactHooks.add({
         when: "BEFORE_INSTANCE",
         hook: () => this.resolveStorePartsDeps(StorePart),
         result: (depsValue: unknown[]) => {
@@ -34,7 +34,7 @@ export class StoreStorePartsManager {
             storePartAdmin.setInstance(instance);
             this.storeAdmin.propertyKeysManager.propertyKeys.set(
               wire.propertyKey,
-              new ObservableProperty(instance)
+              new Property(instance, true)
             );
             initiatedStorePart.add(wire.propertyKey);
           }

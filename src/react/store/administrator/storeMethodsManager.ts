@@ -1,7 +1,8 @@
 import type { StoreAdministrator } from "./storeAdministrator";
+import { Func } from "src/types";
 
 export class StoreMethodsManager {
-  methods = new Map<PropertyKey, (...args: any[]) => unknown | null>();
+  methods = new Map<PropertyKey, Func | null>();
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
@@ -16,12 +17,11 @@ export class StoreMethodsManager {
           enumerable: false,
           configurable: true,
           get: () => this.methods.get(methodKey),
-          // set: (value: unknown) => this.methods.set(methodKey, value),
         });
       });
   }
 
-  createMethod(fn: () => unknown) {
+  createMethod(fn: Func) {
     return fn.bind(this.storeAdmin.instance);
   }
 

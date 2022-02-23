@@ -18,5 +18,5 @@
     },
     "sourceMap": true
   },
-  "include": ["src", "test", "sampleApp"]
+  "include": ["src", "tests", "sampleApp"]
 }

@@ -7,14 +7,16 @@ import { Func } from "src/types";
 export class StoreEffectsManager {
   readonly effects = new Map<
     PropertyKey,
-    { deps?: AccessedPath[]; clear?: Func<void> }
+    { deps: AccessedPath[]; clear?: Func<void> }
   >();
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
   registerEffects() {
-    this.effectsMetaData.forEach((e) => this.effects.set(e.propertyKey, {}));
-    this.storeAdmin.reactHooks.add({
+    this.effectsMetaData.forEach((e) =>
+      this.effects.set(e.propertyKey, { deps: [] })
+    );
+    this.storeAdmin.hooksManager.reactHooks.add({
       hook: effectHandler,
       when: "AFTER_INSTANCE",
     });
