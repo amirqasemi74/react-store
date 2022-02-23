@@ -35,8 +35,8 @@
     "@types/react-dom": "^17.0.11",
     "@types/styled-components": "^5.1.23",
     "@types/testing-library__jest-dom": "^5.14.2",
-    "@typescript-eslint/eslint-plugin": "^5.12.0",
-    "@typescript-eslint/parser": "^5.12.0",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
     "@zerollup/ts-transform-paths": "^1.7.18",
     "babel-jest": "^27.5.1",
     "babel-plugin-transform-typescript-metadata": "^0.3.2",
@@ -50,7 +50,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-refresh-typescript": "^2.0.3",
-    "rollup": "^2.67.3",
+    "react-router-dom": "6",
+    "rollup": "^2.68.0",
     "rollup-plugin-typescript2": "^0.31.2",
     "styled-components": "^5.3.3",
     "ts-loader": "^9.2.6",
@@ -65,11 +66,11 @@
     "start:app": "webpack serve --config sampleApp/webpack.config.js",
     "test": "jest",
     "build": "rm -rf dist && rollup -c rollup.config.js",
-    "prepare": "yarn lint && yarn test && yarn build && husky install",
+    "prepare": "husky install",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "pub": "npm publish --access public",
     "format": "yarn prettier --write",
-    "lint": "yarn eslint 'src/**/*.{ts,tsx}'"
+    "lint": "yarn eslint 'src/**/*.{ts,tsx}' --max-warnings=0"
   },
   "lint-staged": {
     "*.{js,css,ts,tsx}": [

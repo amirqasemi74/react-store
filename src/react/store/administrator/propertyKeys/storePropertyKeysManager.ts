@@ -1,5 +1,5 @@
 import type { StoreAdministrator } from "../storeAdministrator";
-import { ObservableProperty } from "./observableProperty";
+import { Property } from "./property";
 import { useState } from "react";
 import { TARGET } from "src/constant";
 import { StorePropsMetadataUtils } from "src/decorators/props";
@@ -9,25 +9,29 @@ import { GetSetPathsCalculator } from "src/utils/getSetPathsCalculator";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
-  readonly propertyKeys = new Map<PropertyKey, ObservableProperty>();
+  readonly propertyKeys = new Map<PropertyKey, Property>();
 
   private accessedProperties: AccessedProperty[] = [];
 
-  private readonly policies: SetPropertyPolicy[] = [];
+  private readonly purePropertyKeyMatchers: PurePropertyKeyMatcher[] = [];
 
   constructor(private storeAdmin: StoreAdministrator) {
     // @Props
-    this.policies.push({
+    this.purePropertyKeyMatchers.push({
       matcher: (propertyKey) =>
         StorePropsMetadataUtils.is(storeAdmin.type, propertyKey),
-      set: "OBSERVABLE-READONLY",
+      onSet: (propertyKey) =>
+        console.error(
+          `\`${
+            this.storeAdmin.type.name
+          }.${propertyKey.toString()}\` is decorated with \`@Props()\`, so can't be mutated.`
+        ),
     });
 
     //@Wire
-    this.policies.push({
+    this.purePropertyKeyMatchers.push({
       matcher: (propertyKey) =>
         WireMetadataUtils.is(this.storeAdmin.type, propertyKey),
-      set: "OBSERVABLE-READONLY",
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -39,19 +43,17 @@ export class StorePropertyKeysManager {
 
   makeAllObservable() {
     Object.keys(this.storeAdmin.instance).forEach((propertyKey) => {
-      const policy = this.policies.find(({ matcher }) => matcher(propertyKey));
-      let value = this.storeAdmin.instance[propertyKey];
+      const isPureProperty = this.purePropertyKeyMatchers.some(({ matcher }) =>
+        matcher(propertyKey)
+      );
 
-      switch (policy?.set) {
-        case "OBSERVABLE-READONLY":
-          value = this.makeDeepObservable(propertyKey, value, true);
-          break;
-        case "OBSERVABLE":
-        case undefined:
-          value = this.makeDeepObservable(propertyKey, value, false);
-          break;
-      }
-      this.propertyKeys.set(propertyKey, new ObservableProperty(value));
+      const value = this.makeDeepObservable(
+        propertyKey,
+        this.storeAdmin.instance[propertyKey],
+        isPureProperty
+      );
+
+      this.propertyKeys.set(propertyKey, new Property(value, isPureProperty));
 
       // Define setter and getter
       // to intercept this props getting and
@@ -77,46 +79,43 @@ export class StorePropertyKeysManager {
   }
 
   /**
-   *
    * @param propertyKey
    * @param value
-   * @param force to set props in props handler
+   * @param force to set props in props handler or developer hooks
    */
-  onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force = false) {
+  onSetPropertyKey(
+    propertyKey: PropertyKey,
+    value: unknown,
+    options: { forceSet?: boolean; forceRender?: boolean } = {}
+  ) {
     this.addAccessedProperty({
       value,
       propertyKey,
       type: "SET",
       target: this.storeAdmin.instance,
     });
-    const info = this.propertyKeys.get(propertyKey);
+
+    const info = this.propertyKeys.get(propertyKey)!;
     const preValue = info?.getValue("Store");
+    const pureProperty = this.purePropertyKeyMatchers.find(({ matcher }) =>
+      matcher(propertyKey)
+    );
 
-    const matchedPolicy = this.policies.find(({ matcher }) => matcher(propertyKey));
-
-    switch (matchedPolicy?.set) {
-      case "OBSERVABLE-READONLY": {
-        if (force) {
-          info?.setValue(this.makeDeepObservable(propertyKey, value, true), "Store");
-        } else {
-          matchedPolicy?.onSet?.(propertyKey);
-        }
-        break;
+    if (pureProperty) {
+      if (options.forceSet) {
+        info.setValue(this.makeDeepObservable(propertyKey, value, true), "Store");
+      } else {
+        pureProperty.onSet?.(propertyKey);
       }
-      case "OBSERVABLE":
-      case undefined:
-        info?.setValue(this.makeDeepObservable(propertyKey, value, false), "Store");
-        matchedPolicy?.onSet?.(propertyKey);
-        break;
+    } else {
+      info.setValue(this.makeDeepObservable(propertyKey, value, false), "Store");
     }
 
     this.storeAdmin.gettersManager.recomputedGetters();
 
     // Props property key must not affect renders status at all.
-    if (!matchedPolicy || matchedPolicy.set === "OBSERVABLE") {
-      if (info) {
-        info.isSetStatePending = true;
-      }
+    if (!pureProperty || options.forceRender) {
+      info.isSetStatePending = true;
       const purePreValue = Reflect.get(Object(preValue), TARGET) || preValue;
       if (purePreValue !== value) {
         this.storeAdmin.renderConsumers();
@@ -138,6 +137,7 @@ export class StorePropertyKeysManager {
         if (info) {
           info.isSetStatePending = true;
         }
+
         if (!readonly) {
           this.storeAdmin.renderConsumers();
         }
@@ -156,17 +156,13 @@ export class StorePropertyKeysManager {
    * *********************** Store UseStates ******************************
    */
   registerUseStates() {
-    this.storeAdmin.reactHooks.add({
+    this.storeAdmin.hooksManager.reactHooks.add({
       when: "AFTER_INSTANCE",
       hook: () => {
         const propertyKeysInfo = useFixedLazyRef(() =>
-          Array.from(this.propertyKeys.entries()).filter(
-            ([propertyKey]) =>
-              !WireMetadataUtils.is(this.storeAdmin.type, propertyKey) &&
-              !StorePropsMetadataUtils.is(this.storeAdmin.type, propertyKey)
-          )
+          Array.from(this.propertyKeys.values()).filter((info) => !info.isPure)
         );
-        propertyKeysInfo.forEach(([, info]) => {
+        propertyKeysInfo.forEach((info) => {
           const [state, setState] = useState(() =>
             info.isPrimitive ? info.getValue("Store") : { $: info.getValue("Store") }
           );
@@ -200,13 +196,10 @@ export class StorePropertyKeysManager {
   }
 }
 
-interface SetPropertyPolicy {
+interface PurePropertyKeyMatcher {
   matcher: (propertyKey: PropertyKey) => boolean;
-  set: SetPropertyPolicySetType;
   onSet?: (propertyKey: PropertyKey) => void;
 }
-
-type SetPropertyPolicySetType = "OBSERVABLE-READONLY" | "OBSERVABLE";
 
 export interface AccessedProperty {
   target: object;

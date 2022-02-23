@@ -1,6 +1,11 @@
 import { isPrimitive } from "src/utils/isPrimitive";
 
-export class ObservableProperty {
+export class Property {
+  /**
+   * Property which doesn't have React.useState
+   */
+  isPure = false;
+
   isSetStatePending = false;
 
   isPrimitive: boolean;
@@ -12,7 +17,8 @@ export class ObservableProperty {
 
   private _reactSetState?: () => void;
 
-  constructor(value: unknown) {
+  constructor(value: unknown, isPure?: boolean) {
+    this.isPure = !!isPure;
     this.isPrimitive = isPrimitive(value);
     const _val = this.isPrimitive ? value : { $: value };
     this.value = {
@@ -44,6 +50,9 @@ export class ObservableProperty {
   }
 
   getValue(from: "State" | "Store") {
+    if (this.isPure) {
+      from = "Store";
+    }
     switch (from) {
       case "State":
         return this.isPrimitive

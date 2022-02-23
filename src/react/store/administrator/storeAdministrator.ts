@@ -2,6 +2,7 @@ import { STORE_ADMINISTRATION } from "../../../constant";
 import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
 import { StoreGettersManager } from "./getters/storeGettersManager";
 import { propsHandler } from "./handlers/propsHandler";
+import { HooksManager } from "./hooksManager";
 import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
@@ -30,12 +31,12 @@ export class StoreAdministrator {
 
   gettersManager = new StoreGettersManager(this);
 
-  reactHooks = new Set<StoreAdministratorReactHooks>();
+  hooksManager = new HooksManager(this);
 
   constructor(type: ClassType) {
     this.type = type;
     this.storePartsManager.createInstances();
-    this.reactHooks.add({
+    this.hooksManager.reactHooks.add({
       when: "AFTER_INSTANCE",
       hook: propsHandler,
     });
@@ -55,6 +56,7 @@ export class StoreAdministrator {
 
     // !!!! Orders matter !!!!
     this.storePartsManager.register();
+    this.hooksManager.register();
     this.propertyKeysManager.registerUseStates();
     this.propertyKeysManager.makeAllObservable();
     this.effectsManager.registerEffects();
@@ -69,10 +71,4 @@ export class StoreAdministrator {
       this.injectedInTos.forEach((st) => st.renderConsumers());
     });
   }
-}
-
-export interface StoreAdministratorReactHooks {
-  result?: (...args: any[]) => void;
-  when: "BEFORE_INSTANCE" | "AFTER_INSTANCE";
-  hook: (storeAdmin: StoreAdministrator, props?: object) => void;
 }

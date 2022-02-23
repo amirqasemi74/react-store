@@ -1,9 +1,11 @@
 import App from "./App";
 import { AutoEffectTest } from "./autoEffect/AutoEffect";
+import { HooksAreaTest } from "./hooksArea/HooksArea";
 import { PropsTest } from "./props/Props";
 import { StorePartTest } from "./storePart/StorePart";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function AppWrapper() {
   const [mount, setMount] = useState(true);
@@ -22,4 +24,12 @@ function AppWrapper() {
 //   document.querySelector("#root")
 // );
 
-ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
+// ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
+ReactDOM.render(
+  <BrowserRouter>
+    <Routes>
+      <Route path="/user/:id" element={<HooksAreaTest />} />
+    </Routes>
+  </BrowserRouter>,
+  document.querySelector("#root")
+);

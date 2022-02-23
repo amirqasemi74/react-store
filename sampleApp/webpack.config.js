@@ -16,6 +16,9 @@ module.exports = {
       src: srcDir,
     },
   },
+  output: {
+    publicPath: "/",
+  },
   module: {
     rules: [
       {
@@ -29,6 +32,10 @@ module.exports = {
       template: resolve(sampleAppDir, "index.html"),
     }),
   ],
+  devServer: {
+    port: 5000,
+    historyApiFallback: true,
+  },
   performance: {
     hints: false,
     maxEntrypointSize: 512000,

@@ -13,3 +13,4 @@ export { Observable } from "./decorators/observable";
 export { Wire } from "./decorators/wire";
 export { AutoWire } from "./decorators/autoWire";
 export { toPlainObj } from "./utils/toPlainObj";
+export { Hook } from "./decorators/hook";

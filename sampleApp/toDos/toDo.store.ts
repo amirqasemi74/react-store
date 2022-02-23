@@ -4,7 +4,7 @@ import { ChangeEvent, KeyboardEvent } from "react";
 
 @Store()
 export class ToDoStore extends BaseStore {
-  @Props()
+  // @Props()
   props: any = {};
 
   todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
@@ -14,7 +14,7 @@ export class ToDoStore extends BaseStore {
   c: any = [1, 2, 3, { a: 1 }];
   d = { e: 5 };
 
-  @AutoEffect()
+  // @AutoEffect()
   onUserChanged() {
     this.a = 3;
     this.b = this.a;
@@ -41,6 +41,7 @@ export class ToDoStore extends BaseStore {
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.todo.value = e.target.value;
+    this.a = this.todo.value.length;
   }
 
   onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
