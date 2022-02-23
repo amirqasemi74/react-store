@@ -1,5 +1,5 @@
 src
-test
+tests
 sampleApp
 webpack.config.js
 tsconfig*

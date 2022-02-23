@@ -31,7 +31,12 @@ export function proxyValueAndSaveIt(
       value,
       ...adtProxyBuilderArgs,
     });
-  return value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue());
+
+  if (Object.isExtensible(value)) {
+    return value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue());
+  }
+
+  return proxiedValue();
 }
 
 export const PROXIED_VALUE = Symbol("PROXIED_VALUE");

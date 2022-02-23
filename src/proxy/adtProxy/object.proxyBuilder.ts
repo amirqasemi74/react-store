@@ -6,20 +6,20 @@ interface ObjectProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   object: object;
 }
 
-const objectProxyBuilder = ({
+export const objectProxyBuilder = ({
   object,
   ...restOfArgs
 }: ObjectProxyBuilderArgs): object => {
   const { onSet } = restOfArgs;
+  const isFrozen = Object.isFrozen(object);
 
-  return new Proxy(Object.isFrozen(object) ? {} : object, {
+  return new Proxy(isFrozen ? { ...object } : object, {
     get(target: object, propertyKey: PropertyKey, receiver: unknown) {
       if (propertyKey === TARGET) {
         return target;
       }
-
       const value = proxyValueAndSaveIt(
-        Object.isFrozen(object) ? object : target,
+        isFrozen ? object : target,
         propertyKey,
         receiver,
         restOfArgs
@@ -39,7 +39,6 @@ const objectProxyBuilder = ({
       value: unknown,
       receiver: unknown
     ) {
-      // console.log("Object::set", target, propertyKey, value);
       restOfArgs.onAccess?.({
         target,
         value,
@@ -54,5 +53,3 @@ const objectProxyBuilder = ({
     },
   });
 };
-
-export default objectProxyBuilder;

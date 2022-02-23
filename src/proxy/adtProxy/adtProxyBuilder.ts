@@ -1,6 +1,6 @@
-import arrayProxyBuilder from "./array.proxyBuilder";
+import { arrayProxyBuilder } from "./array.proxyBuilder";
 import { mapProxyBuilder } from "./map.proxyBuilder";
-import objectProxyBuilder from "./object.proxyBuilder";
+import { objectProxyBuilder } from "./object.proxyBuilder";
 import { ObservableMetadataUtils } from "src/decorators/observable";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
 import { AccessedProperty } from "src/react/store/administrator/propertyKeys/storePropertyKeysManager";
