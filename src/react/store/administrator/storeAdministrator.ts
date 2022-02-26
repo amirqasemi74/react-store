@@ -1,9 +1,9 @@
 import { STORE_ADMINISTRATION } from "../../../constant";
 import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
 import { StoreGettersManager } from "./getters/storeGettersManager";
-import { propsHandler } from "./handlers/propsHandler";
 import { HooksManager } from "./hooksManager";
 import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
+import { PropsManager } from "./propsManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
@@ -13,13 +13,19 @@ import { ClassType, Func } from "src/types";
 export class StoreAdministrator {
   type: ClassType;
 
+  consumers = new Set<Func>();
+
   instance: InstanceType<ClassType>;
+
+  injectedInTos = new Set<StoreAdministrator>();
 
   instanceForComponents: InstanceType<ClassType>;
 
-  consumers = new Set<Func>();
+  propsManager = new PropsManager(this);
 
-  injectedInTos = new Set<StoreAdministrator>();
+  hooksManager = new HooksManager(this);
+
+  gettersManager = new StoreGettersManager(this);
 
   methodsManager = new StoreMethodsManager(this);
 
@@ -29,17 +35,9 @@ export class StoreAdministrator {
 
   propertyKeysManager = new StorePropertyKeysManager(this);
 
-  gettersManager = new StoreGettersManager(this);
-
-  hooksManager = new HooksManager(this);
-
   constructor(type: ClassType) {
     this.type = type;
     this.storePartsManager.createInstances();
-    this.hooksManager.reactHooks.add({
-      when: "AFTER_INSTANCE",
-      hook: propsHandler,
-    });
   }
 
   static get(store: object) {
@@ -55,6 +53,7 @@ export class StoreAdministrator {
     );
 
     // !!!! Orders matter !!!!
+    this.propsManager.register();
     this.storePartsManager.register();
     this.hooksManager.register();
     this.propertyKeysManager.registerUseStates();

@@ -82,12 +82,12 @@ describe("Auto Effect", () => {
     act(() => {
       store.user.name = "amir";
     });
-    expect(onAutoEffectCalled).toBeCalledTimes(1);
+    expect(onAutoEffectCalled).toBeCalledTimes(2);
 
     act(() => {
       store.user = { ...store.user };
     });
-    expect(onAutoEffectCalled).toBeCalledTimes(1);
+    expect(onAutoEffectCalled).toBeCalledTimes(2);
   });
 
   it("should not assume the get path as dependency if the path is set before it is get", () => {
