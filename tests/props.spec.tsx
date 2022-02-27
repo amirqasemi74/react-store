@@ -2,8 +2,10 @@ import { Effect, Props, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import React from "react";
+import { act } from "react-dom/test-utils";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
-describe("Store Props", () => {
+describe("Props Decorator", () => {
   it("should parent component have props directly", () => {
     let props!: any;
     @Store()
@@ -102,5 +104,34 @@ describe("Store Props", () => {
     rerender(<App username="amirhossein" />);
 
     expect(getByText("amirhossein")).toBeInTheDocument();
+  });
+
+  it("should be readonly and pure @Props property key", () => {
+    const errorMock = jest.spyOn(console, "error").mockImplementation();
+    let store!: UserStore;
+    @Store()
+    class UserStore {
+      @Props()
+      props: any;
+    }
+
+    const App: React.FC<{ username: string }> = connect(() => {
+      store = useStore(UserStore);
+      return <>store</>;
+    }, UserStore);
+
+    render(<App username="amir" />);
+
+    expect(
+      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get("props")
+        ?.isPure
+    ).toBeTruthy();
+
+    act(() => {
+      store.props = {};
+    });
+    expect(errorMock).toBeCalledWith(
+      "`UserStore.props` is decorated with `@Props()`, so can't be mutated."
+    );
   });
 });

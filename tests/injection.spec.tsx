@@ -8,6 +8,7 @@ import {
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React, { memo } from "react";
+import { act } from "react-dom/test-utils";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 describe("Dependency Injection", () => {
@@ -53,6 +54,38 @@ describe("Dependency Injection", () => {
     };
     const AppWithStore = connect(connect(App, UserStore), PostStore);
     render(<AppWithStore />);
+  });
+
+  it("should injectable injected property be pure and readonly", () => {
+    const errorMock = jest.spyOn(console, "error").mockImplementation();
+    let store!: PostStore;
+
+    @Injectable()
+    class PostService {}
+
+    @Store()
+    class PostStore {
+      constructor(public postService: PostService) {}
+    }
+
+    const App = connect(() => {
+      store = useStore(PostStore);
+      return <div></div>;
+    }, PostStore);
+
+    render(<App />);
+
+    act(() => {
+      store.postService = "qw";
+    });
+    expect(errorMock).toBeCalledWith(
+      "`PostStore.postService` is an injected @Injectable() , so can't be mutated."
+    );
+    expect(
+      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get(
+        "postService"
+      )?.isPure
+    ).toBeTruthy();
   });
 
   it("should upper store inject into lower store", () => {
@@ -102,6 +135,41 @@ describe("Dependency Injection", () => {
     expect(getByText(/amir.qasemi74/i)).toBeInTheDocument();
     expect(getByText(/123456/i)).toBeInTheDocument();
     expect(getByText(/black/i)).toBeInTheDocument();
+  });
+
+  it("should injected store be pure and readonly", () => {
+    const errorMock = jest.spyOn(console, "error").mockImplementation();
+
+    let store!: UserStore;
+    @Store()
+    class AppStore {}
+
+    @Store()
+    class UserStore {
+      constructor(public appStore: AppStore) {}
+    }
+
+    const User = () => {
+      store = useStore(UserStore);
+      return <></>;
+    };
+
+    const App = connect(() => {
+      return <StoreProvider type={UserStore} render={User} />;
+    }, AppStore);
+
+    render(<App />);
+
+    act(() => {
+      store.appStore = "sdf";
+    });
+    expect(errorMock).toBeCalledWith(
+      "`UserStore.appStore` is an injected store, so can't be mutated"
+    );
+    expect(
+      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get("appStore")
+        ?.isPure
+    ).toBeTruthy();
   });
 
   it("Upper store mutations should rerender it's consumers", () => {
