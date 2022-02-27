@@ -2,7 +2,10 @@ import type { StoreAdministrator } from "../storeAdministrator";
 import { Property } from "./property";
 import { useState } from "react";
 import { TARGET } from "src/constant";
+import { InjectableMetadataUtils } from "src/container/decorators/Injectable";
+import { HooksMetadataUtils } from "src/decorators/hook";
 import { StorePropsMetadataUtils } from "src/decorators/props";
+import { StoreMetadataUtils } from "src/decorators/store";
 import { WireMetadataUtils } from "src/decorators/wire";
 import { adtProxyBuilder } from "src/proxy/adtProxy/adtProxyBuilder";
 import { GetSetPathsCalculator } from "src/utils/getSetPathsCalculator";
@@ -13,13 +16,22 @@ export class StorePropertyKeysManager {
 
   private accessedProperties: AccessedProperty[] = [];
 
-  private readonly purePropertyKeyMatchers: PurePropertyKeyMatcher[] = [];
+  private readonly purePropertyKeyMatchers: Array<
+    (propertyKey: PropertyKey) => boolean
+  > = [];
+
+  private readonly readonlyPropertyKeys: Array<{
+    matcher: (propertyKey: PropertyKey) => boolean;
+    onSet: (propertyKey: PropertyKey) => void;
+  }> = [];
 
   constructor(private storeAdmin: StoreAdministrator) {
     // @Props
-    this.purePropertyKeyMatchers.push({
-      matcher: (propertyKey) =>
-        StorePropsMetadataUtils.is(storeAdmin.type, propertyKey),
+    const propMatcher = (propertyKey: PropertyKey) =>
+      StorePropsMetadataUtils.is(storeAdmin.type, propertyKey);
+    this.purePropertyKeyMatchers.push(propMatcher);
+    this.readonlyPropertyKeys.push({
+      matcher: propMatcher,
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -27,11 +39,12 @@ export class StorePropertyKeysManager {
           }.${propertyKey.toString()}\` is decorated with \`@Props()\`, so can't be mutated.`
         ),
     });
-
-    //@Wire
-    this.purePropertyKeyMatchers.push({
-      matcher: (propertyKey) =>
-        WireMetadataUtils.is(this.storeAdmin.type, propertyKey),
+    // @Wire
+    const wireMatcher = (propertyKey: PropertyKey) =>
+      WireMetadataUtils.is(this.storeAdmin.type, propertyKey);
+    this.purePropertyKeyMatchers.push(wireMatcher);
+    this.readonlyPropertyKeys.push({
+      matcher: wireMatcher,
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -39,11 +52,54 @@ export class StorePropertyKeysManager {
           }.${propertyKey.toString()}\` is decorated with \`@Wire(...)\` or \`@AutoWire()\`, so can't be mutated.`
         ),
     });
+
+    // @Hook
+    this.readonlyPropertyKeys.push({
+      matcher: (propertyKey) =>
+        HooksMetadataUtils.is(this.storeAdmin.type, propertyKey),
+      onSet: (propertyKey) =>
+        console.error(
+          `\`${
+            this.storeAdmin.type.name
+          }.${propertyKey.toString()}\` is decorated with \`@Hook(...)\`, so can't be mutated.`
+        ),
+    });
+
+    // Injected injectable
+    const injectableMatcher = (propertyKey: PropertyKey) => {
+      const type = this.storeAdmin.instance[propertyKey]?.constructor;
+      return type && InjectableMetadataUtils.is(type);
+    };
+    this.purePropertyKeyMatchers.push(injectableMatcher);
+    this.readonlyPropertyKeys.push({
+      matcher: injectableMatcher,
+      onSet: (propertyKey) =>
+        console.error(
+          `\`${
+            this.storeAdmin.type.name
+          }.${propertyKey.toString()}\` is an injected @Injectable() , so can't be mutated.`
+        ),
+    });
+    // Injected Stores
+    const storeMatcher = (propertyKey: PropertyKey) => {
+      const type = this.storeAdmin.instance[propertyKey]?.constructor;
+      return type && StoreMetadataUtils.is(type);
+    };
+    this.purePropertyKeyMatchers.push(storeMatcher);
+    this.readonlyPropertyKeys.push({
+      matcher: storeMatcher,
+      onSet: (propertyKey) =>
+        console.error(
+          `\`${
+            this.storeAdmin.type.name
+          }.${propertyKey.toString()}\` is an injected store, so can't be mutated`
+        ),
+    });
   }
 
   makeAllObservable() {
     Object.keys(this.storeAdmin.instance).forEach((propertyKey) => {
-      const isPureProperty = this.purePropertyKeyMatchers.some(({ matcher }) =>
+      const isPureProperty = this.purePropertyKeyMatchers.some((matcher) =>
         matcher(propertyKey)
       );
 
@@ -103,7 +159,10 @@ export class StorePropertyKeysManager {
 
     const info = this.propertyKeys.get(propertyKey)!;
     const preValue = info?.getValue("Store");
-    const pureProperty = this.purePropertyKeyMatchers.find(({ matcher }) =>
+    const pureProperty = this.purePropertyKeyMatchers.find((matcher) =>
+      matcher(propertyKey)
+    );
+    const readonlyProperty = this.readonlyPropertyKeys.find(({ matcher }) =>
       matcher(propertyKey)
     );
 
@@ -119,18 +178,22 @@ export class StorePropertyKeysManager {
           "Store"
         );
       } else {
-        pureProperty.onSet?.(propertyKey);
+        readonlyProperty?.onSet(propertyKey);
       }
     } else {
-      info.setValue(
-        this.makeDeepObservable(
-          propertyKey,
-          value,
-          info.proxiedValuesStorage,
-          false
-        ),
-        "Store"
-      );
+      if (readonlyProperty && !options.forceSet) {
+        readonlyProperty.onSet(propertyKey);
+      } else {
+        info.setValue(
+          this.makeDeepObservable(
+            propertyKey,
+            value,
+            info.proxiedValuesStorage,
+            false
+          ),
+          "Store"
+        );
+      }
     }
 
     this.storeAdmin.gettersManager.recomputedGetters();
@@ -218,11 +281,6 @@ export class StorePropertyKeysManager {
     );
     return calculator.calcPaths();
   }
-}
-
-interface PurePropertyKeyMatcher {
-  matcher: (propertyKey: PropertyKey) => boolean;
-  onSet?: (propertyKey: PropertyKey) => void;
 }
 
 export interface AccessedProperty {

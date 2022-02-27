@@ -14,7 +14,9 @@ export class HooksManager {
         hook: () => hook(this.storeAdmin.instanceForComponents),
         result: (res) => {
           useEffect(() => {
-            this.storeAdmin.propertyKeysManager.onSetPropertyKey(propertyKey, res);
+            this.storeAdmin.propertyKeysManager.onSetPropertyKey(propertyKey, res, {
+              forceSet: true,
+            });
           }, [res]);
         },
       });

@@ -1,7 +1,8 @@
 import { AutoEffect, Hook, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
-import { render, waitFor } from "@testing-library/react";
+import { act, render, waitFor } from "@testing-library/react";
 import React, { useEffect, useState } from "react";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 describe("Hook Decorator", () => {
   it("should can use pure react hook in store", async () => {
@@ -60,5 +61,39 @@ describe("Hook Decorator", () => {
     const { getByText } = render(<App />);
 
     await waitFor(() => expect(getByText("https://google.com")).toBeInTheDocument());
+  });
+
+  it("should hook property key be readonly", async () => {
+    const errorMock = jest.spyOn(console, "error").mockImplementation();
+    let store!: HooksStore;
+    const useUrl = () => {
+      const [url] = useState("url");
+      return url;
+    };
+
+    @Store()
+    class HooksStore {
+      @Hook(useUrl)
+      url: string;
+    }
+
+    const App = connect(() => {
+      store = useStore(HooksStore);
+      return <>{store.url}</>;
+    }, HooksStore);
+
+    render(<App />);
+
+    act(() => {
+      store.url = "sdf";
+    });
+    expect(errorMock).toBeCalledWith(
+      "`HooksStore.url` is decorated with `@Hook(...)`, so can't be mutated."
+    );
+    expect(
+      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get("url")
+        ?.isPure
+    ).toBeFalsy();
+    expect(store.url).toBe("url");
   });
 });

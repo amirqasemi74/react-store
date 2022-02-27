@@ -97,10 +97,10 @@ describe("Store Parts", () => {
     expect(hasErrorChanged).toBeCalledTimes(2);
   });
 
-  it("should can't set store part property key", () => {
+  it("should store @Wire property be pure and read only", () => {
     const errorMock = jest.spyOn(console, "error").mockImplementation();
     let pre, post;
-
+    let store!: UserStore;
     @StorePart()
     class Validator {}
 
@@ -117,6 +117,7 @@ describe("Store Parts", () => {
 
     const App = () => {
       const vm = useStore(UserStore);
+      store = vm;
       if (!pre) pre = vm.validator;
       return (
         <>
@@ -136,6 +137,10 @@ describe("Store Parts", () => {
     expect(errorMock).toHaveBeenLastCalledWith(
       "`UserStore.validator` is decorated with `@Wire(...)` or `@AutoWire()`, so can't be mutated."
     );
+    expect(
+      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get("validator")
+        ?.isPure
+    ).toBeTruthy();
   });
 
   it("should inject dependencies", () => {
