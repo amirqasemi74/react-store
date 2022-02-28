@@ -5,14 +5,11 @@ import { ClassType } from "src/types";
 
 @Injectable()
 export class ReactApplicationContext {
-  private storeContexts = new Map<
-    ClassType,
-    React.Context<StoreAdministrator | null>
-  >();
+  private storeContexts = new Map<ClassType, StoreAdministratorReactContext>();
 
   registerStoreContext(
     storeType: ClassType,
-    context: React.Context<StoreAdministrator | null>
+    context: StoreAdministratorReactContext
   ) {
     this.storeContexts.set(storeType, context);
   }
@@ -21,3 +18,8 @@ export class ReactApplicationContext {
     return this.storeContexts.get(storeType);
   }
 }
+
+export type StoreAdministratorReactContext = React.Context<{
+  id: number;
+  storeAdmin: StoreAdministrator;
+} | null>;

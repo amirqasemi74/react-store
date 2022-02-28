@@ -7,19 +7,19 @@ import { PropsManager } from "./propsManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
-import ReactDOM from "react-dom";
-import { ClassType, Func } from "src/types";
+import React from "react";
+import { ClassType } from "src/types";
 
 export class StoreAdministrator {
   type: ClassType;
-
-  consumers = new Set<Func>();
 
   instance: InstanceType<ClassType>;
 
   injectedInTos = new Set<StoreAdministrator>();
 
   instanceForComponents: InstanceType<ClassType>;
+
+  contextRenderId?: React.MutableRefObject<number>;
 
   propsManager = new PropsManager(this);
 
@@ -35,8 +35,9 @@ export class StoreAdministrator {
 
   propertyKeysManager = new StorePropertyKeysManager(this);
 
-  constructor(type: ClassType) {
+  constructor(type: ClassType, contextRenderId?: React.MutableRefObject<number>) {
     this.type = type;
+    this.contextRenderId = contextRenderId;
     this.storePartsManager.createInstances();
   }
 
@@ -64,10 +65,10 @@ export class StoreAdministrator {
   }
 
   renderConsumers() {
-    ReactDOM.unstable_batchedUpdates(() => {
-      this.propertyKeysManager.doPendingSetStates();
-      this.consumers.forEach((render) => render());
-      this.injectedInTos.forEach((st) => st.renderConsumers());
-    });
+    if (this.contextRenderId) {
+      this.contextRenderId.current++;
+    }
+    this.propertyKeysManager.doPendingSetStates();
+    this.injectedInTos.forEach((st) => st.renderConsumers());
   }
 }

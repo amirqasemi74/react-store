@@ -1,5 +1,4 @@
 import { StoreAdministrator } from "./storeAdministrator";
-import { useEffect } from "react";
 import { HooksMetadataUtils } from "src/decorators/hook";
 
 export class HooksManager {
@@ -13,11 +12,11 @@ export class HooksManager {
         when: "AFTER_INSTANCE",
         hook: () => hook(this.storeAdmin.instanceForComponents),
         result: (res) => {
-          useEffect(() => {
-            this.storeAdmin.propertyKeysManager.onSetPropertyKey(propertyKey, res, {
-              forceSet: true,
-            });
-          }, [res]);
+          this.storeAdmin.propertyKeysManager.onSetPropertyKey(
+            propertyKey,
+            res,
+            true
+          );
         },
       });
     });
