@@ -54,6 +54,9 @@ export class StorePropertyKeysManager {
     });
 
     // @Hook
+    const hookMatcher = (propertyKey) =>
+      HooksMetadataUtils.is(this.storeAdmin.type, propertyKey);
+    this.purePropertyKeyMatchers.push(hookMatcher);
     this.readonlyPropertyKeys.push({
       matcher: (propertyKey) =>
         HooksMetadataUtils.is(this.storeAdmin.type, propertyKey),
@@ -145,11 +148,7 @@ export class StorePropertyKeysManager {
    * @param value
    * @param force to set props in props handler or developer hooks
    */
-  onSetPropertyKey(
-    propertyKey: PropertyKey,
-    value: unknown,
-    options: { forceSet?: boolean; forceRender?: boolean } = {}
-  ) {
+  onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force?: boolean) {
     this.addAccessedProperty({
       value,
       propertyKey,
@@ -167,7 +166,7 @@ export class StorePropertyKeysManager {
     );
 
     if (pureProperty) {
-      if (options.forceSet) {
+      if (force) {
         info.setValue(
           this.makeDeepObservable(
             propertyKey,
@@ -181,7 +180,7 @@ export class StorePropertyKeysManager {
         readonlyProperty?.onSet(propertyKey);
       }
     } else {
-      if (readonlyProperty && !options.forceSet) {
+      if (readonlyProperty && !force) {
         readonlyProperty.onSet(propertyKey);
       } else {
         info.setValue(
@@ -199,7 +198,7 @@ export class StorePropertyKeysManager {
     this.storeAdmin.gettersManager.recomputedGetters();
 
     // Props property key must not affect renders status at all.
-    if (!pureProperty || options.forceRender) {
+    if (!pureProperty || force) {
       info.isSetStatePending = true;
       const purePreValue = Reflect.get(Object(preValue), TARGET) || preValue;
       if (purePreValue !== value) {

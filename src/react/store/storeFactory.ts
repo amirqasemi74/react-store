@@ -1,7 +1,11 @@
-import { ReactApplicationContext } from "../appContext";
+import {
+  ReactApplicationContext,
+  StoreAdministratorReactContext,
+} from "../appContext";
 import { StoreAdministratorReactHooks } from "./administrator/hooksManager";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { useContext } from "react";
+import React from "react";
 import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { ClassType } from "src/types";
@@ -9,13 +13,17 @@ import { useFixedLazyRef } from "src/utils/useLazyRef";
 import { useWillMount } from "src/utils/useWillMount";
 
 export class StoreFactory {
-  static create(StoreType: ClassType, props?: object) {
+  static create(
+    StoreType: ClassType,
+    contextRenderId: React.MutableRefObject<number>,
+    props?: object
+  ) {
     // Has React.UseContext
     // So must be in render
     const deps = this.resolveStoreDeps(StoreType);
 
     const storeAdmin = useFixedLazyRef(() => {
-      const storeAdmin = new StoreAdministrator(StoreType);
+      const storeAdmin = new StoreAdministrator(StoreType, contextRenderId);
       // for example if we inject store A into other store B
       // if then injected store A change all store b consumer must be
       // notified to rerender base of their deps
@@ -51,10 +59,7 @@ export class StoreFactory {
     );
 
     const storeDepsContexts = useFixedLazyRef(() => {
-      const storeDepsContexts = new Map<
-        ClassType,
-        React.Context<StoreAdministrator | null>
-      >();
+      const storeDepsContexts = new Map<ClassType, StoreAdministratorReactContext>();
       const appContext = getFromContainer(ReactApplicationContext);
 
       // Find dependencies which is store type
@@ -89,8 +94,8 @@ export class StoreFactory {
     return useFixedLazyRef(() =>
       storeDeps.map(
         (dep) =>
-          storicalDepsValues.find((sdv) => sdv.type === dep.type)?.instance ||
-          getFromContainer(dep.type as ClassType)
+          storicalDepsValues.find((sdv) => sdv.storeAdmin.type === dep.type)
+            ?.storeAdmin.instance || getFromContainer(dep.type as ClassType)
       )
     );
   }

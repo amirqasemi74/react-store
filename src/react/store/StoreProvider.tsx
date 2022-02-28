@@ -1,7 +1,9 @@
-import { ReactApplicationContext } from "../appContext";
-import { StoreAdministrator } from "./administrator/storeAdministrator";
+import {
+  ReactApplicationContext,
+  StoreAdministratorReactContext,
+} from "../appContext";
 import { StoreFactory } from "./storeFactory";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { getFromContainer } from "src/container/container";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { ClassType } from "src/types";
@@ -14,6 +16,7 @@ interface Props {
 }
 
 export const StoreProvider = ({ type, render, props }: Props) => {
+  const contextRenderId = useRef(0);
   const TheContext = useFixedLazyRef(() => {
     if (!StoreMetadataUtils.is(type)) {
       throw new Error(`\`${type.name}\` does not decorated with @Store()`);
@@ -22,7 +25,8 @@ export const StoreProvider = ({ type, render, props }: Props) => {
     const appContext = getFromContainer(ReactApplicationContext);
     let context = appContext.getStoreReactContext(type);
     if (!context) {
-      context = React.createContext<StoreAdministrator | null>(null);
+      context =
+        React.createContext<React.ContextType<StoreAdministratorReactContext>>(null);
       context.displayName = `${type.name}`;
       // store context provider in app container
       // to use context ref in useStore to get context value
@@ -32,12 +36,17 @@ export const StoreProvider = ({ type, render, props }: Props) => {
     return context;
   });
 
-  const storeAdmin = StoreFactory.create(type, props);
+  const storeAdmin = StoreFactory.create(type, contextRenderId, props);
 
   const Component = useMemo(() => React.memo(render), []);
 
+  const value = useMemo(
+    () => ({ storeAdmin, id: contextRenderId.current }),
+    [storeAdmin, contextRenderId.current]
+  );
+
   return (
-    <TheContext.Provider value={storeAdmin}>
+    <TheContext.Provider value={value}>
       <Component {...props} />
     </TheContext.Provider>
   );

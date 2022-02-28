@@ -1,36 +1,24 @@
 import { ReactApplicationContext } from "../appContext";
-import { useContext, useRef } from "react";
+import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
-import { useForceUpdate } from "src/utils/useForceUpdate";
-import { useWillMount } from "src/utils/useWillMount";
 
 export const useStore = <T extends ClassType>(storeType: T): InstanceType<T> => {
-  const isUnMounted = useRef(false);
-  const forceUpdate = useForceUpdate();
-  const storeContext = getFromContainer(
+  const StoreContext = getFromContainer(
     ReactApplicationContext
   ).getStoreReactContext(storeType);
 
-  if (!storeContext) {
+  if (!StoreContext) {
     throw new Error(
       `${storeType.name} haven't been connected to the component tree!`
     );
   }
-  const storeAdmin = useContext(storeContext)!;
 
-  useWillMount(() => {
-    const render = () => {
-      if (isUnMounted.current) return;
-      forceUpdate();
-    };
-    storeAdmin.consumers.add(render);
+  const context = useContext(StoreContext);
 
-    return () => {
-      isUnMounted.current = true;
-      storeAdmin.consumers.delete(render);
-    };
-  });
+  if (!context) {
+    throw new Error(`\`${storeType.name}\` can't be reached.`);
+  }
 
-  return storeAdmin.instanceForComponents;
+  return context.storeAdmin.instanceForComponents;
 };
