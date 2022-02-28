@@ -73,9 +73,9 @@
     "lint": "yarn eslint 'src/**/*.{ts,tsx}' --max-warnings=0"
   },
   "lint-staged": {
-    "*.{js,css,ts,tsx}": [
+    "src/**/*.{js,css,ts,tsx}": [
       "yarn format",
-      "yarn eslint"
+      "yarn lint"
     ]
   },
   "prettier": {

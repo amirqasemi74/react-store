@@ -1,6 +1,7 @@
 import {
   AutoWire,
   Effect,
+  Hook,
   Store,
   StorePart,
   connect,
@@ -8,7 +9,7 @@ import {
 } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { render, waitFor } from "@testing-library/react";
-import React, { Profiler } from "react";
+import React, { Profiler, useEffect, useState } from "react";
 
 describe("Render Performance", () => {
   it("should react have 2 commit phase", async () => {
@@ -149,5 +150,55 @@ describe("Render Performance", () => {
     await waitFor(async () => expect(await findByText("reza")).toBeInTheDocument());
     await waitFor(async () => expect(await findByText("ID")).toBeInTheDocument());
     expect(renderCommits.size).toBe(2);
+  });
+
+  it("should react have 2 commit phase with using @Hook decorator", async () => {
+    const renderCommits = new Set<number>();
+
+    const onRender: React.ProfilerOnRenderCallback = (...[, , , , , commitTime]) => {
+      renderCommits.add(commitTime);
+    };
+
+    function useUsername(userId: string) {
+      const [username, setUsername] = useState("");
+
+      useEffect(() => {
+        setUsername(userId);
+      }, [userId]);
+
+      return username;
+    }
+
+    @Store()
+    class UserStore {
+      @Hook(() => useUsername("amir"))
+      username: string;
+    }
+
+    const Main = () => {
+      const st = useStore(UserStore);
+      return (
+        <>
+          <span>{st.username}</span>
+        </>
+      );
+    };
+
+    const App = connect(
+      () => (
+        <Profiler id="App" onRender={onRender}>
+          <Main />
+        </Profiler>
+      ),
+      UserStore
+    );
+
+    const { getByText } = render(
+      <Profiler id="main" onRender={onRender}>
+        <App />
+      </Profiler>
+    );
+    expect(renderCommits.size).toBe(2);
+    expect(getByText("amir")).toBeInTheDocument();
   });
 });
