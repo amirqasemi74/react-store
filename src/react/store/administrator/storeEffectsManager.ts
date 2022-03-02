@@ -151,7 +151,11 @@ export class StoreEffectsManager {
   }
 
   get effectsMetaData() {
-    return EffectsMetadataUtils.get(this.storeAdmin.type);
+    // For overridden store methods we have two metadata
+    // so we must filter duplicate ones
+    return EffectsMetadataUtils.get(this.storeAdmin.type).filter(
+      (v, i, data) => i === data.findIndex((vv) => vv.propertyKey === v.propertyKey)
+    );
   }
 
   setClearEffect(effectKey: PropertyKey, clear: Func<void>) {

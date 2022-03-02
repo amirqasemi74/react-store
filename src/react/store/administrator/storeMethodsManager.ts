@@ -31,7 +31,7 @@ export class StoreMethodsManager {
     const _get = (o: unknown, methods = {}) => {
       const proto = Object.getPrototypeOf(o);
       if (proto && proto !== Object.prototype) {
-        methods = { ...methods, ...Object.getOwnPropertyDescriptors(proto) };
+        methods = { ...Object.getOwnPropertyDescriptors(proto), ...methods };
         return _get(proto, methods);
       } else {
         return methods;

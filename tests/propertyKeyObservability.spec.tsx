@@ -154,6 +154,7 @@ describe("Properties Observability", () => {
           <span>{JSON.stringify(vm.nested)}</span>
           <span>{vm.map.get("a")}</span>
           <span>{JSON.stringify(vm.map.get("b"))}</span>
+          <span>Map Size: {vm.map.size}</span>
         </div>
       );
     }, ComplexTypesStore);

@@ -287,27 +287,58 @@ describe("Effects", () => {
     expect(onUsernameDepAsStringChangeCB).toBeCalledTimes(2);
   });
 
-  it("should run parent store class effects", () => {
-    const onMountedCB = jest.fn();
+  describe("Parent Class", () => {
+    it("should run parent store class effects", () => {
+      const onMountedCB = jest.fn();
 
-    @Store()
-    class A {
-      @Effect<A>([])
-      onMount() {
-        onMountedCB();
+      @Store()
+      class A {
+        @Effect<A>([])
+        onMount() {
+          onMountedCB();
+        }
       }
-    }
 
-    @Store()
-    class B extends A {}
+      @Store()
+      class B extends A {}
 
-    const App = connect(() => {
-      useStore(B);
-      return <></>;
-    }, B);
+      const App = connect(() => {
+        return <></>;
+      }, B);
 
-    const {} = render(<App />);
+      render(<App />);
 
-    expect(onMountedCB).toBeCalledTimes(1);
+      expect(onMountedCB).toBeCalledTimes(1);
+    });
+
+    it("should only run overridden effect method", () => {
+      const baseStoreMountCB = jest.fn();
+      const mainStoreMountCB = jest.fn();
+
+      @Store()
+      class BaseStore {
+        @Effect([])
+        onMount() {
+          baseStoreMountCB();
+        }
+      }
+
+      @Store()
+      class MainStore extends BaseStore {
+        @Effect([])
+        onMount() {
+          mainStoreMountCB();
+        }
+      }
+
+      const App = connect(() => {
+        return <></>;
+      }, MainStore);
+
+      render(<App />);
+
+      expect(baseStoreMountCB).toBeCalledTimes(0);
+      expect(mainStoreMountCB).toBeCalledTimes(1);
+    });
   });
 });

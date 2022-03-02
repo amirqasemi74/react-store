@@ -50,9 +50,7 @@ export const mapProxyBuilder = ({
         }
       }
 
-      return Map.prototype[propertyKey] && value instanceof Function
-        ? value.bind(map)
-        : value;
+      return value instanceof Function ? value.bind(map) : value;
     },
   });
 };
