@@ -79,8 +79,6 @@ describe("Computed Getters", () => {
 
     @Store()
     class SampleStore {
-      private password = "123456";
-
       private objA: any = { b: [1, 2, { c: [{ d: [7] }] }], [PRIVATE_PROP]: 10 };
 
       private arrB: any = [
@@ -140,5 +138,38 @@ describe("Computed Getters", () => {
     expect(storeAdmin.gettersManager.getters.get("getArrB")?.deps[0].join(".")).toBe(
       "arrB"
     );
+  });
+
+  it("should remove duplicate deps from dependencies array", () => {
+    let store!: ComputedStore;
+    @Store()
+    class ComputedStore {
+      obj = { a: 1 };
+
+      arr = [1, 2, 3, 4, 1, 4, 5, 1];
+
+      get getOneCount() {
+        this.obj.a = 1;
+        return this.arr.reduce((acc, val) => {
+          if (val === this.obj.a) return acc++;
+          return acc;
+        }, 0);
+      }
+    }
+
+    const App = connect(() => {
+      store = useStore(ComputedStore);
+      return (
+        <>
+          <span>{store.getOneCount}</span>
+        </>
+      );
+    }, ComputedStore);
+
+    render(<App />);
+
+    expect(
+      StoreAdministrator.get(store).gettersManager.getters.get("getOneCount")?.deps
+    ).toStrictEqual([["arr"], ["obj", "a"]]);
   });
 });

@@ -27,9 +27,18 @@ export class GetSetPathsCalculator {
       }
     });
 
-    return Array.from(this.getSetPaths.values()).filter(
-      (p) => p && !p.hasDeeperAccess && Reflect.has(this.storeInstance, p.path[0])
-    ) as GetSetPaths;
+    return Array.from(this.getSetPaths.values())
+      .filter(
+        (p) => p && !p.hasDeeperAccess && Reflect.has(this.storeInstance, p.path[0])
+      )
+      .filter(
+        (ap, i, paths) =>
+          ap &&
+          paths.findIndex(
+            (_ap) =>
+              ap.type === _ap?.type && ap.path.every((p, j) => _ap.path[j] === p)
+          ) === i
+      ) as GetSetPaths;
   }
 
   /**
@@ -84,6 +93,7 @@ export class GetSetPathsCalculator {
       if (ap.target === this.accessedProperties[i].value) {
         const prePath = this.getSetPaths.get(this.accessedProperties[i]);
         if (prePath) {
+          prePath.hasDeeperAccess = true;
           this.getSetPaths.set(ap, {
             type: "SET",
             path: [...prePath.path, ap.propertyKey],
