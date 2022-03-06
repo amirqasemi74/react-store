@@ -91,7 +91,7 @@ describe("Hook Decorator", () => {
       "`HooksStore.url` is decorated with `@Hook(...)`, so can't be mutated."
     );
     expect(
-      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get("url")
+      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("url")
         ?.isPure
     ).toBeTruthy();
     expect(store.url).toBe("url");

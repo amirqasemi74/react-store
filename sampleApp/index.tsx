@@ -25,5 +25,5 @@ function AppWrapper() {
 //   document.querySelector("#root")
 // );
 
-// ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
-ReactDOM.render(<PureHooksTest />, document.querySelector("#root"));
+ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
+// ReactDOM.render(<PureHooksTest />, document.querySelector("#root"));

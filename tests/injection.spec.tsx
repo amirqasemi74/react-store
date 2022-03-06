@@ -82,7 +82,7 @@ describe("Dependency Injection", () => {
       "`PostStore.postService` is an injected @Injectable() , so can't be mutated."
     );
     expect(
-      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get(
+      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
         "postService"
       )?.isPure
     ).toBeTruthy();
@@ -167,7 +167,7 @@ describe("Dependency Injection", () => {
       "`UserStore.appStore` is an injected store, so can't be mutated"
     );
     expect(
-      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get("appStore")
+      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("appStore")
         ?.isPure
     ).toBeTruthy();
   });

@@ -20,6 +20,6 @@ export class ReactApplicationContext {
 }
 
 export type StoreAdministratorReactContext = React.Context<{
-  id: number;
+  id: string;
   storeAdmin: StoreAdministrator;
 } | null>;

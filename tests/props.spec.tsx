@@ -123,7 +123,7 @@ describe("Props Decorator", () => {
     render(<App username="amir" />);
 
     expect(
-      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get("props")
+      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("props")
         ?.isPure
     ).toBeTruthy();
 

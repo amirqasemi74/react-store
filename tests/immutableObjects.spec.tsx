@@ -45,7 +45,7 @@ describe("Immutable Objects & Arrays", () => {
       expect(store.obj.c).toStrictEqual({ d: 1 });
 
       expect(
-        StoreAdministrator.get(store).effectsManager.effects.get("frozenAccess")
+        StoreAdministrator.get(store)!.effectsManager.effects.get("frozenAccess")
           ?.deps
       ).toStrictEqual([["obj", "c", "d"]]);
     });

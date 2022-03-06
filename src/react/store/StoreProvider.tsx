@@ -7,6 +7,7 @@ import React, { useMemo, useRef } from "react";
 import { getFromContainer } from "src/container/container";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { ClassType } from "src/types";
+import { useForceUpdate } from "src/utils/useForceUpdate";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 interface Props {
@@ -15,8 +16,10 @@ interface Props {
   render: React.FC;
 }
 
-export const StoreProvider = ({ type, render, props }: Props) => {
-  const contextRenderId = useRef(0);
+export const StoreProvider = React.memo(({ type, render, props }: Props) => {
+  const renderId = useRef(0);
+  const isRenderRelax = useRef(true);
+  const [forceRenderId, forceRenderContext] = useForceUpdate();
   const TheContext = useFixedLazyRef(() => {
     if (!StoreMetadataUtils.is(type)) {
       throw new Error(`\`${type.name}\` does not decorated with @Store()`);
@@ -32,17 +35,30 @@ export const StoreProvider = ({ type, render, props }: Props) => {
       // to use context ref in useStore to get context value
       appContext.registerStoreContext(type, context);
     }
-
     return context;
   });
 
-  const storeAdmin = StoreFactory.create(type, contextRenderId, props);
+  const renderContext = (relax?: boolean) => {
+    isRenderRelax.current = !!relax;
+    if (relax) {
+      renderId.current++;
+    } else {
+      forceRenderContext();
+    }
+  };
+
+  const storeAdmin = StoreFactory.create(type, renderContext, props);
 
   const Component = useMemo(() => React.memo(render), []);
 
   const value = useMemo(
-    () => ({ storeAdmin, id: contextRenderId.current }),
-    [storeAdmin, contextRenderId.current]
+    () => ({
+      storeAdmin,
+      id: isRenderRelax.current
+        ? `relax-${renderId.current}`
+        : `force-${forceRenderId}`,
+    }),
+    [renderId.current, forceRenderId, isRenderRelax.current]
   );
 
   return (
@@ -50,4 +66,4 @@ export const StoreProvider = ({ type, render, props }: Props) => {
       <Component {...props} />
     </TheContext.Provider>
   );
-};
+});

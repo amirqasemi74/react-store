@@ -1,4 +1,4 @@
-import type { StoreAdministrator } from "../storeAdministrator";
+import { StoreAdministrator } from "../storeAdministrator";
 import { Property } from "./property";
 import { useState } from "react";
 import { TARGET } from "src/constant";
@@ -14,7 +14,7 @@ import { useFixedLazyRef } from "src/utils/useLazyRef";
 export class StorePropertyKeysManager {
   readonly propertyKeys = new Map<PropertyKey, Property>();
 
-  private accessedProperties: AccessedProperty[] = [];
+  accessedProperties: AccessedProperty[] = [];
 
   private readonly purePropertyKeyMatchers: Array<
     (propertyKey: PropertyKey) => boolean
@@ -195,14 +195,12 @@ export class StorePropertyKeysManager {
       }
     }
 
-    this.storeAdmin.gettersManager.recomputedGetters();
-
     // Props property key must not affect renders status at all.
     if (!pureProperty || force) {
       info.isSetStatePending = true;
       const purePreValue = Reflect.get(Object(preValue), TARGET) || preValue;
       if (purePreValue !== value) {
-        this.storeAdmin.renderConsumers();
+        this.storeAdmin.renderConsumers(true);
       }
     }
   }
@@ -218,7 +216,6 @@ export class StorePropertyKeysManager {
       proxiedValuesStorage,
       onAccess: this.addAccessedProperty.bind(this),
       onSet: () => {
-        this.storeAdmin.gettersManager.recomputedGetters();
         const info = this.propertyKeys.get(propertyKey);
         if (info) {
           info.isSetStatePending = true;
@@ -229,6 +226,12 @@ export class StorePropertyKeysManager {
         }
       },
     });
+  }
+
+  hasPendingSetStates() {
+    return Array.from(this.propertyKeys.values()).some(
+      (info) => info.isSetStatePending
+    );
   }
 
   doPendingSetStates() {
@@ -264,18 +267,26 @@ export class StorePropertyKeysManager {
    */
   clearAccessedProperties() {
     this.accessedProperties = [];
+    this.propertyKeys.forEach((v) => {
+      StoreAdministrator.get(
+        v.getValue("Store")
+      )?.propertyKeysManager.clearAccessedProperties();
+    });
   }
 
   addAccessedProperty(ap: AccessedProperty) {
     this.accessedProperties.push({
       ...ap,
-      value: ap.value && typeof ap.value === "object" ? ap.value[TARGET] : ap.value,
+      value:
+        ap.value && typeof ap.value === "object"
+          ? ap.value[TARGET] || ap.value
+          : ap.value,
     });
   }
 
   calcPaths() {
     const calculator = new GetSetPathsCalculator(
-      this.storeAdmin.instance,
+      this.storeAdmin,
       this.accessedProperties
     );
     return calculator.calcPaths();

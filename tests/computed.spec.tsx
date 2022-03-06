@@ -1,4 +1,4 @@
-import { Store, connect, useStore } from "@react-store/core";
+import { AutoWire, Store, StorePart, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { act, render } from "@testing-library/react";
 import React from "react";
@@ -48,7 +48,7 @@ describe("Computed Getters", () => {
 
     const { getByText } = render(<App />);
 
-    const storeAdmin = StoreAdministrator.get(storeRef);
+    const storeAdmin = StoreAdministrator.get(storeRef)!;
 
     expect(getByText("6")).toBeInTheDocument();
     expect(getByText("amir")).toBeInTheDocument();
@@ -118,7 +118,7 @@ describe("Computed Getters", () => {
 
     const { getByText } = render(<App />);
 
-    const storeAdmin = StoreAdministrator.get(storeRef);
+    const storeAdmin = StoreAdministrator.get(storeRef)!;
 
     expect(getByText("7")).toBeInTheDocument();
 
@@ -149,7 +149,6 @@ describe("Computed Getters", () => {
       arr = [1, 2, 3, 4, 1, 4, 5, 1];
 
       get getOneCount() {
-        this.obj.a = 1;
         return this.arr.reduce((acc, val) => {
           if (val === this.obj.a) return acc++;
           return acc;
@@ -169,7 +168,144 @@ describe("Computed Getters", () => {
     render(<App />);
 
     expect(
-      StoreAdministrator.get(store).gettersManager.getters.get("getOneCount")?.deps
+      StoreAdministrator.get(store)!.gettersManager.getters.get("getOneCount")?.deps
     ).toStrictEqual([["arr"], ["obj", "a"]]);
+  });
+
+  it("should calculate dependencies for injected store accessed properties", () => {
+    let lowerStore!: LowerStore;
+
+    @Store()
+    class UpperStore {
+      a = [1, 2, 3];
+    }
+
+    @Store()
+    class LowerStore {
+      constructor(public upperStore: UpperStore) {}
+
+      get aLen() {
+        return this.upperStore.a.length;
+      }
+    }
+
+    const App = connect(
+      connect(function App() {
+        lowerStore = useStore(LowerStore);
+        return <span>{lowerStore.aLen}</span>;
+      }, LowerStore),
+      UpperStore
+    );
+
+    const { getByText } = render(<App />);
+
+    const storeAdmin = StoreAdministrator.get(lowerStore);
+
+    expect(storeAdmin?.gettersManager.getters.get("aLen")?.deps).toStrictEqual([
+      ["upperStore", "a"],
+    ]);
+    expect(lowerStore.aLen).toBe(3);
+    expect(getByText("3")).toBeInTheDocument();
+
+    act(() => {
+      lowerStore.upperStore.a = [1, 2, 3, 4, 5, 6, 7];
+    });
+
+    expect(storeAdmin?.gettersManager.getters.get("aLen")?.deps).toStrictEqual([
+      ["upperStore", "a"],
+    ]);
+    expect(lowerStore.aLen).toBe(7);
+    expect(getByText("7")).toBeInTheDocument();
+  });
+
+  it("should calculate dependencies for wired storePart accessed properties", () => {
+    let store!: ComputedStore;
+
+    @StorePart()
+    class PartStore {
+      obj = { a: { b: [1, 2, 3, 4] } };
+    }
+
+    @Store()
+    class ComputedStore {
+      @AutoWire()
+      part: PartStore;
+
+      get test() {
+        return this.part.obj.a.b.some((e) => e > 2);
+      }
+    }
+
+    const App = connect(() => {
+      store = useStore(ComputedStore);
+      return <>{store.test}</>;
+    }, ComputedStore);
+
+    render(<App />);
+
+    const storeAdmin = StoreAdministrator.get(store);
+
+    expect(storeAdmin?.gettersManager.getters.get("test")?.deps).toStrictEqual([
+      ["part", "obj", "a", "b"],
+    ]);
+    expect(store.test).toBeTruthy();
+
+    act(() => {
+      store.part.obj.a.b = [1, 2];
+    });
+
+    expect(storeAdmin?.gettersManager.getters.get("test")?.deps).toStrictEqual([
+      ["part", "obj", "a", "b"],
+    ]);
+    expect(store.test).toBeFalsy();
+  });
+
+  it("should reCalculated computed in lower store from computed in upper store", () => {
+    let lowerStore!: LowerStore;
+
+    @Store()
+    class UpperStore {
+      a = [1, 2, 3];
+
+      get aLen() {
+        return this.a.length;
+      }
+    }
+
+    @Store()
+    class LowerStore {
+      constructor(public upperStore: UpperStore) {}
+
+      get aLenPlus2() {
+        return this.upperStore.aLen + 2;
+      }
+    }
+
+    const App = connect(
+      connect(function App() {
+        lowerStore = useStore(LowerStore);
+        return <span>{lowerStore.aLenPlus2}</span>;
+      }, LowerStore),
+      UpperStore
+    );
+
+    render(<App />);
+
+    const storeAdmin = StoreAdministrator.get(lowerStore);
+
+    expect(storeAdmin?.gettersManager.getters.get("aLenPlus2")?.deps).toStrictEqual([
+      ["upperStore", "aLen"],
+    ]);
+
+    expect(lowerStore.aLenPlus2).toBe(5);
+
+    act(() => {
+      lowerStore.upperStore.a = [1, 2, 3, 4];
+    });
+
+    expect(storeAdmin?.gettersManager.getters.get("aLenPlus2")?.deps).toStrictEqual([
+      ["upperStore", "aLen"],
+    ]);
+    expect(lowerStore.aLenPlus2).toBe(6);
   });
 });

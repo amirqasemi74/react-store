@@ -98,7 +98,7 @@ export class StoreStorePartsManager {
         .get(propertyKey)
         ?.getValue("Store") as object;
       this.storeAdmin.instance[propertyKey] = value;
-      const storePartAdmin = StoreAdministrator.get(value);
+      const storePartAdmin = StoreAdministrator.get(value)!;
       storePartAdmin.injectedInTos.add(this.storeAdmin);
       this.storeParts.set(propertyKey, storePartAdmin);
     });

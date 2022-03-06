@@ -138,8 +138,9 @@ describe("Store Parts", () => {
       "`UserStore.validator` is decorated with `@Wire(...)` or `@AutoWire()`, so can't be mutated."
     );
     expect(
-      StoreAdministrator.get(store).propertyKeysManager.propertyKeys.get("validator")
-        ?.isPure
+      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
+        "validator"
+      )?.isPure
     ).toBeTruthy();
   });
 
