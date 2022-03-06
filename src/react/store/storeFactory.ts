@@ -5,7 +5,6 @@ import {
 import { StoreAdministratorReactHooks } from "./administrator/hooksManager";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { useContext } from "react";
-import React from "react";
 import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { ClassType } from "src/types";
@@ -15,7 +14,7 @@ import { useWillMount } from "src/utils/useWillMount";
 export class StoreFactory {
   static create(
     StoreType: ClassType,
-    contextRenderId: React.MutableRefObject<number>,
+    renderContext: (relax?: boolean) => void,
     props?: object
   ) {
     // Has React.UseContext
@@ -23,7 +22,7 @@ export class StoreFactory {
     const deps = this.resolveStoreDeps(StoreType);
 
     const storeAdmin = useFixedLazyRef(() => {
-      const storeAdmin = new StoreAdministrator(StoreType, contextRenderId);
+      const storeAdmin = new StoreAdministrator(StoreType, renderContext);
       // for example if we inject store A into other store B
       // if then injected store A change all store b consumer must be
       // notified to rerender base of their deps

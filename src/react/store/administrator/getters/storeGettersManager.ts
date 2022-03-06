@@ -1,3 +1,4 @@
+import { AccessedPath } from "../propertyKeys/storePropertyKeysManager";
 import { StoreAdministrator } from "../storeAdministrator";
 import { ComputedProperty } from "./computedProperty";
 
@@ -14,22 +15,29 @@ export class StoreGettersManager {
     )
       .filter(([, { get }]) => get)
       .forEach(([propertyKey, desc]) => {
-        const computed = new ComputedProperty(this.storeAdmin, desc.get!);
+        const computed = new ComputedProperty(
+          propertyKey,
+          desc.get!,
+          this.storeAdmin
+        );
         this.getters.set(propertyKey, computed);
         Object.defineProperty(this.storeAdmin.instance, propertyKey, {
           ...desc,
-          get: () => computed.getValue("Store"),
+          get: () => {
+            const value = computed.getValue("Store");
+            this.storeAdmin.propertyKeysManager.addAccessedProperty({
+              value,
+              propertyKey,
+              type: "GET",
+              target: this.storeAdmin.instance,
+            });
+            return value;
+          },
         });
       });
   }
 
-  recomputedGetters() {
-    if (this.getters.size) {
-      const setPaths = this.storeAdmin.propertyKeysManager
-        .calcPaths()
-        .filter((p) => p.type === "SET")
-        .map((p) => p.path);
-      this.getters.forEach((cp) => cp.tryRecomputeIfNeed(setPaths));
-    }
+  recomputedGetters(setPaths: AccessedPath[]) {
+    this.getters.forEach((cp) => cp.tryRecomputeIfNeed(setPaths));
   }
 }

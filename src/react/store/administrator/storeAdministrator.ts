@@ -2,12 +2,14 @@ import { STORE_ADMINISTRATION } from "../../../constant";
 import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
 import { StoreGettersManager } from "./getters/storeGettersManager";
 import { HooksManager } from "./hooksManager";
-import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
+import {
+  AccessedPath,
+  StorePropertyKeysManager,
+} from "./propertyKeys/storePropertyKeysManager";
 import { PropsManager } from "./propsManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
-import React from "react";
 import { ClassType } from "src/types";
 
 export class StoreAdministrator {
@@ -17,9 +19,11 @@ export class StoreAdministrator {
 
   injectedInTos = new Set<StoreAdministrator>();
 
+  lastSetPaths: AccessedPath[];
+
   instanceForComponents: InstanceType<ClassType>;
 
-  contextRenderId?: React.MutableRefObject<number>;
+  renderContext?: (relax?: boolean) => void;
 
   propsManager = new PropsManager(this);
 
@@ -35,14 +39,15 @@ export class StoreAdministrator {
 
   propertyKeysManager = new StorePropertyKeysManager(this);
 
-  constructor(type: ClassType, contextRenderId?: React.MutableRefObject<number>) {
+  constructor(type: ClassType, renderContext?: (relax?: boolean) => void) {
     this.type = type;
-    this.contextRenderId = contextRenderId;
+    this.renderContext = renderContext;
     this.storePartsManager.createInstances();
   }
 
-  static get(store: object) {
-    return (store[STORE_ADMINISTRATION] as StoreAdministrator) || null;
+  static get(value: unknown) {
+    return ((value && typeof value === "object" && value[STORE_ADMINISTRATION]) ||
+      null) as null | StoreAdministrator;
   }
 
   setInstance(instance: InstanceType<ClassType>) {
@@ -64,11 +69,14 @@ export class StoreAdministrator {
     this.methodsManager.makeAllAutoBound();
   }
 
-  renderConsumers() {
-    if (this.contextRenderId) {
-      this.contextRenderId.current++;
-    }
+  renderConsumers(relax?: boolean) {
+    this.lastSetPaths = this.propertyKeysManager
+      .calcPaths()
+      .filter((p) => p.type === "SET")
+      .map((p) => p.path);
+    this.gettersManager.recomputedGetters(this.lastSetPaths);
+    this.renderContext?.(relax || this.propertyKeysManager.hasPendingSetStates());
     this.propertyKeysManager.doPendingSetStates();
-    this.injectedInTos.forEach((st) => st.renderConsumers());
+    this.injectedInTos.forEach((st) => st.renderConsumers(relax));
   }
 }

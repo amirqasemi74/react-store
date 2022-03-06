@@ -2,7 +2,7 @@ import {
   AccessedPath,
   AccessedProperty,
 } from "src/react/store/administrator/propertyKeys/storePropertyKeysManager";
-import { ClassType } from "src/types";
+import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
 
 type AccessedPathDetail = GetSetPath & {
   hasDeeperAccess?: boolean;
@@ -12,40 +12,59 @@ type AccessedPathDetail = GetSetPath & {
 export class GetSetPathsCalculator {
   private getSetPaths: Map<AccessedProperty, AccessedPathDetail | null>;
   constructor(
-    private storeInstance: InstanceType<ClassType>,
+    private storeAdmin: StoreAdministrator,
     private accessedProperties: AccessedProperty[]
   ) {
     this.getSetPaths = new Map(this.accessedProperties.map((ap) => [ap, null]));
   }
 
   calcPaths() {
+    const injectedStoresDeps: GetSetPaths = [];
+
     this.accessedProperties.forEach((ap, i) => {
-      if (ap.type === "GET") {
-        this.calcGetPath(ap, i);
+      const valueStoreAdmin = StoreAdministrator.get(ap.value);
+      if (valueStoreAdmin && valueStoreAdmin.type !== this.storeAdmin.type) {
+        const storeAdmin = StoreAdministrator.get(ap.value)!;
+        storeAdmin.propertyKeysManager.calcPaths().forEach(({ path, type }) => {
+          injectedStoresDeps.push({ type, path: [ap.propertyKey, ...path] });
+        });
       } else {
-        this.calcSetPath(ap, i);
+        if (ap.type === "GET") {
+          this.calcGetPath(ap, i);
+        } else {
+          this.calcSetPath(ap, i);
+        }
       }
     });
 
-    return Array.from(this.getSetPaths.values())
+    const deps = Array.from(this.getSetPaths.values())
       .filter(
-        (p) => p && !p.hasDeeperAccess && Reflect.has(this.storeInstance, p.path[0])
+        (p) =>
+          p && !p.hasDeeperAccess && Reflect.has(this.storeAdmin.instance, p.path[0])
       )
-      .filter(
-        (ap, i, paths) =>
-          ap &&
-          paths.findIndex(
+      .filter((ap, i, paths) => {
+        // Remove Duplicate paths
+        if (ap) {
+          const j = paths.findIndex(
             (_ap) =>
-              ap.type === _ap?.type && ap.path.every((p, j) => _ap.path[j] === p)
-          ) === i
-      ) as GetSetPaths;
+              ap.type === _ap?.type &&
+              ap.path.length === _ap.path.length &&
+              ap.path.every((p, j) => _ap.path[j] === p)
+          );
+          return j === -1 ? true : j === i;
+        }
+        return false;
+      })
+      .concat(injectedStoresDeps) as GetSetPaths;
+
+    return deps;
   }
 
   /**
    * Here we incrementally detect paths
    */
   private calcGetPath(ap: AccessedProperty, index: number) {
-    if (ap.target === this.storeInstance) {
+    if (ap.target === this.storeAdmin.instance) {
       this.getSetPaths.set(ap, { type: "GET", path: [ap.propertyKey] });
       return;
     }
@@ -85,7 +104,7 @@ export class GetSetPathsCalculator {
   }
 
   private calcSetPath(ap: AccessedProperty, index: number) {
-    if (ap.target === this.storeInstance) {
+    if (ap.target === this.storeAdmin.instance) {
       this.getSetPaths.set(ap, { type: "SET", path: [ap.propertyKey] });
       return;
     }
