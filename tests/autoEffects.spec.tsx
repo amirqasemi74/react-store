@@ -37,7 +37,7 @@ describe("Auto Effect", () => {
     render(<App />);
 
     expect(
-      StoreAdministrator.get(store).effectsManager.effects.get("fn")?.deps
+      StoreAdministrator.get(store)!.effectsManager.effects.get("fn")?.deps
     ).toStrictEqual([
       ["user", "name"],
       ["user", "pass"],
@@ -120,7 +120,7 @@ describe("Auto Effect", () => {
     render(<App />);
 
     expect(
-      StoreAdministrator.get(store).effectsManager.effects.get("fn")?.deps
+      StoreAdministrator.get(store)!.effectsManager.effects.get("fn")?.deps
     ).toStrictEqual([["c"]]);
 
     expect(effectCB).toBeCalledTimes(1);
@@ -186,7 +186,7 @@ describe("Auto Effect", () => {
 
     render(<App />);
 
-    const effects = StoreAdministrator.get(store).effectsManager.effects;
+    const effects = StoreAdministrator.get(store)!.effectsManager.effects;
 
     expect(effects.get("fn1")?.deps).toStrictEqual([
       ["c", "3"],
@@ -233,7 +233,7 @@ describe("Auto Effect", () => {
     expect(effectCalled).toBeCalledTimes(1);
 
     expect(
-      StoreAdministrator.get(store).effectsManager.effects.get("propEffect")?.deps
+      StoreAdministrator.get(store)!.effectsManager.effects.get("propEffect")?.deps
     ).toStrictEqual([
       ["props", "a"],
       ["props", "obj", "b"],
@@ -289,7 +289,7 @@ describe("Auto Effect", () => {
     expect(effectCalled).toBeCalledTimes(1);
 
     expect(
-      StoreAdministrator.get(store).effectsManager.effects.get("effectSp")?.deps
+      StoreAdministrator.get(store)!.effectsManager.effects.get("effectSp")?.deps
     ).toStrictEqual([["sp", "obj", "a"]]);
 
     act(() => {

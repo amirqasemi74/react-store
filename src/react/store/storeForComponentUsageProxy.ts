@@ -10,7 +10,7 @@ export class StoreForComponentUsageProxy implements ProxyHandler<object> {
         ?.getValue("State");
     }
 
-    if (storeAdmin.gettersManager.getters.has(propertyKey)) {
+    if (storeAdmin?.gettersManager.getters.has(propertyKey)) {
       return storeAdmin.gettersManager.getters.get(propertyKey)?.getValue("State");
     }
 
