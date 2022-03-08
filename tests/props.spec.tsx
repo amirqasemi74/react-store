@@ -106,7 +106,7 @@ describe("Props Decorator", () => {
     expect(getByText("amirhossein")).toBeInTheDocument();
   });
 
-  it("should be readonly and pure @Props property key", () => {
+  it("should be readonly @Props property key", () => {
     const errorMock = jest.spyOn(console, "error").mockImplementation();
     let store!: UserStore;
     @Store()
@@ -124,7 +124,7 @@ describe("Props Decorator", () => {
 
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("props")
-        ?.isPure
+        ?.isReadOnly
     ).toBeTruthy();
 
     act(() => {

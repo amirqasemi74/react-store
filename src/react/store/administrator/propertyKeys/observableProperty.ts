@@ -1,16 +1,13 @@
+import { StoreAdministrator } from "../storeAdministrator";
+import { adtProxyBuilder } from "src/proxy/adtProxy/adtProxyBuilder";
 import { isPrimitive } from "src/utils/isPrimitive";
 
-export class Property {
-  /**
-   * Property which doesn't have React.useState
-   */
-  isPure = false;
-
-  proxiedValuesStorage: Map<unknown, unknown>;
+export class ObservableProperty {
+  isPrimitive: boolean;
 
   isSetStatePending = false;
 
-  isPrimitive: boolean;
+  proxiedValuesStorage = new Map<unknown, unknown>();
 
   private value: {
     store?: unknown;
@@ -20,13 +17,12 @@ export class Property {
   private _reactSetState?: () => void;
 
   constructor(
+    private storeAdmin: StoreAdministrator,
     value: unknown,
-    proxiedValuesStorage: Map<unknown, unknown>,
-    isPure?: boolean
+    public isReadOnly?: boolean
   ) {
-    this.isPure = !!isPure;
-    this.proxiedValuesStorage = proxiedValuesStorage;
     this.isPrimitive = isPrimitive(value);
+    value = this.makeDeepObservable(value, isReadOnly);
     const _val = this.isPrimitive ? value : { $: value };
     this.value = {
       state: _val,
@@ -46,8 +42,11 @@ export class Property {
     return this._reactSetState;
   }
 
-  setValue(value: unknown, to: "State" | "Store") {
+  setValue(value: unknown, to: "State" | "Store", readonly?: boolean) {
     this.isPrimitive = isPrimitive(value);
+    if (to === "Store") {
+      value = this.makeDeepObservable(value, readonly);
+    }
     switch (to) {
       case "State":
         return (this.value.state = value);
@@ -57,7 +56,7 @@ export class Property {
   }
 
   getValue(from: "State" | "Store") {
-    if (this.isPure) {
+    if (this.isReadOnly) {
       from = "Store";
     }
     switch (from) {
@@ -70,5 +69,20 @@ export class Property {
           ? this.value.store
           : (this.value.store as { $: unknown } | undefined)?.$;
     }
+  }
+
+  private makeDeepObservable(value: unknown, readonly?: boolean) {
+    return adtProxyBuilder({
+      value,
+      proxiedValuesStorage: this.proxiedValuesStorage,
+      onAccess: (...args) =>
+        this.storeAdmin.propertyKeysManager.addAccessedProperty(...args),
+      onSet: () => {
+        this.isSetStatePending = true;
+        if (!readonly) {
+          this.storeAdmin.renderConsumers();
+        }
+      },
+    });
   }
 }

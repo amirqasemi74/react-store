@@ -19,7 +19,7 @@ export class StoreAdministrator {
 
   injectedInTos = new Set<StoreAdministrator>();
 
-  lastSetPaths: AccessedPath[];
+  lastSetPaths: AccessedPath[] = [];
 
   instanceForComponents: InstanceType<ClassType>;
 
@@ -70,11 +70,13 @@ export class StoreAdministrator {
   }
 
   renderConsumers(relax?: boolean) {
-    this.lastSetPaths = this.propertyKeysManager
-      .calcPaths()
-      .filter((p) => p.type === "SET")
-      .map((p) => p.path);
-    this.gettersManager.recomputedGetters(this.lastSetPaths);
+    this.gettersManager.recomputedGetters();
+    if (
+      this.effectsManager.effects.size === 0 &&
+      this.gettersManager.getters.size === 0
+    ) {
+      this.propertyKeysManager.clearAccessedProperties();
+    }
     this.renderContext?.(relax || this.propertyKeysManager.hasPendingSetStates());
     this.propertyKeysManager.doPendingSetStates();
     this.injectedInTos.forEach((st) => st.renderConsumers(relax));

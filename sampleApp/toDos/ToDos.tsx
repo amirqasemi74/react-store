@@ -6,10 +6,11 @@ import styled, { css } from "styled-components";
 
 const ToDos: React.FC = () => {
   const vm = useStore(ToDoStore);
+  console.log(vm);
 
   return (
     <ToDoWrapper>
-      {/* <Title style={{ color: vm.theme.primary }}>To Do Application</Title> */}
+      <Title style={{ color: vm.theme.primary }}>To Do Application</Title>
       <TodoInput
         invalid={false}
         value={vm.todo.value}
@@ -17,7 +18,6 @@ const ToDos: React.FC = () => {
         onKeyDown={vm.onInputKeyDown}
         placeholder="Enter To Do"
       />
-      {vm.a}
       <ToDoList />
       {/* <ToDoCount>ToDo Count: {vm.todosCount}</ToDoCount> */}
     </ToDoWrapper>

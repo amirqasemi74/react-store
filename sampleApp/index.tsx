@@ -1,5 +1,6 @@
 import App from "./App";
 import { AutoEffectTest } from "./autoEffect/AutoEffect";
+import { Computed } from "./computed/Computed";
 import { PureHooksTest } from "./hooks/PureHooks";
 import { StoreHooksTest } from "./hooks/StoreHooksTest";
 import { PropsTest } from "./props/Props";
@@ -25,5 +26,6 @@ function AppWrapper() {
 //   document.querySelector("#root")
 // );
 
-ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
-// ReactDOM.render(<PureHooksTest />, document.querySelector("#root"));
+// ReactDOM.render(<Computed />, document.querySelector("#root"));
+// ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
+ReactDOM.render(<StoreHooksTest />, document.querySelector("#root"));

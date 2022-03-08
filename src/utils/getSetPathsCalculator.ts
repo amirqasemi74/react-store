@@ -1,3 +1,4 @@
+import { STORE_ADMINISTRATION } from "src/constant";
 import {
   AccessedPath,
   AccessedProperty,
@@ -19,25 +20,15 @@ export class GetSetPathsCalculator {
   }
 
   calcPaths() {
-    const injectedStoresDeps: GetSetPaths = [];
-
     this.accessedProperties.forEach((ap, i) => {
-      const valueStoreAdmin = StoreAdministrator.get(ap.value);
-      if (valueStoreAdmin && valueStoreAdmin.type !== this.storeAdmin.type) {
-        const storeAdmin = StoreAdministrator.get(ap.value)!;
-        storeAdmin.propertyKeysManager.calcPaths().forEach(({ path, type }) => {
-          injectedStoresDeps.push({ type, path: [ap.propertyKey, ...path] });
-        });
+      if (ap.type === "GET") {
+        this.calcGetPath(ap, i);
       } else {
-        if (ap.type === "GET") {
-          this.calcGetPath(ap, i);
-        } else {
-          this.calcSetPath(ap, i);
-        }
+        this.calcSetPath(ap, i);
       }
     });
 
-    const deps = Array.from(this.getSetPaths.values())
+    return Array.from(this.getSetPaths.values())
       .filter(
         (p) =>
           p && !p.hasDeeperAccess && Reflect.has(this.storeAdmin.instance, p.path[0])
@@ -55,9 +46,18 @@ export class GetSetPathsCalculator {
         }
         return false;
       })
-      .concat(injectedStoresDeps) as GetSetPaths;
-
-    return deps;
+      .filter(
+        (ap) => ap && ![STORE_ADMINISTRATION].includes(ap.path.at(-1) as symbol)
+      )
+      .filter(
+        // injected store as access path must be removed
+        (ap) =>
+          !(
+            ap &&
+            ap.path.length === 1 &&
+            StoreAdministrator.get(this.storeAdmin.instance[ap.path[0]])
+          )
+      ) as GetSetPaths;
   }
 
   /**
@@ -96,7 +96,10 @@ export class GetSetPathsCalculator {
             path: [...prePath.path, ap.propertyKey],
           });
         } else {
-          this.getSetPaths.set(ap, { type: "GET", path: [ap.propertyKey] });
+          this.getSetPaths.set(ap, {
+            type: "GET",
+            path: [this.accessedProperties[i].propertyKey, ap.propertyKey],
+          });
         }
         break;
       }

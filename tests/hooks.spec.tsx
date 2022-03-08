@@ -92,7 +92,7 @@ describe("Hook Decorator", () => {
     );
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("url")
-        ?.isPure
+        ?.isReadOnly
     ).toBeTruthy();
     expect(store.url).toBe("url");
   });

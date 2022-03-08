@@ -2,7 +2,7 @@ import {
   BaseAdtProxyBuilderArgs,
   adtProxyBuilder,
 } from "./adtProxy/adtProxyBuilder";
-import { STORE_ADMINISTRATION } from "src/constant";
+import { TARGET } from "src/constant";
 import { isPrimitive } from "src/utils/isPrimitive";
 
 /**
@@ -16,13 +16,14 @@ export function proxyValueAndSaveIt(
   receiver: unknown,
   adtProxyBuilderArgs: BaseAdtProxyBuilderArgs
 ) {
+  const storage = adtProxyBuilderArgs.proxiedValuesStorage;
   const value = Reflect.get(target, propertyKey, receiver);
 
-  if (propertyKey === PROXIED_VALUE) {
-    return value;
+  if (storage.has(value?.[TARGET])) {
+    return storage.get(value?.[TARGET]);
   }
 
-  if (isPrimitive(value) || (value && value[STORE_ADMINISTRATION])) {
+  if (isPrimitive(value) || typeof value === "function") {
     return value;
   }
 
@@ -32,15 +33,9 @@ export function proxyValueAndSaveIt(
       ...adtProxyBuilderArgs,
     });
 
-  if (Object.isExtensible(value)) {
-    return value[PROXIED_VALUE] || (value[PROXIED_VALUE] = proxiedValue());
+  if (!storage.has(value)) {
+    storage.set(value, proxiedValue());
   }
 
-  if (!adtProxyBuilderArgs.proxiedValuesStorage.has(value)) {
-    adtProxyBuilderArgs.proxiedValuesStorage.set(value, proxiedValue());
-  }
-
-  return adtProxyBuilderArgs.proxiedValuesStorage.get(value);
+  return storage.get(value);
 }
-
-export const PROXIED_VALUE = Symbol("PROXIED_VALUE");

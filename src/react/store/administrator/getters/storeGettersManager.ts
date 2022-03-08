@@ -1,4 +1,3 @@
-import { AccessedPath } from "../propertyKeys/storePropertyKeysManager";
 import { StoreAdministrator } from "../storeAdministrator";
 import { ComputedProperty } from "./computedProperty";
 
@@ -37,7 +36,13 @@ export class StoreGettersManager {
       });
   }
 
-  recomputedGetters(setPaths: AccessedPath[]) {
-    this.getters.forEach((cp) => cp.tryRecomputeIfNeed(setPaths));
+  recomputedGetters() {
+    this.storeAdmin.lastSetPaths = this.storeAdmin.propertyKeysManager
+      .calcPaths()
+      .filter((p) => p.type === "SET")
+      .map((p) => p.path);
+    this.getters.forEach((cp) =>
+      cp.tryRecomputeIfNeed(this.storeAdmin.lastSetPaths)
+    );
   }
 }
