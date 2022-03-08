@@ -1,4 +1,5 @@
 import {
+  AutoEffect,
   AutoWire,
   Effect,
   Store,
@@ -269,7 +270,7 @@ describe("Computed Getters", () => {
     expect(store.test).toBeFalsy();
   });
 
-  it("should recalculated computed in lower store from computed in upper store", async () => {
+  it("should recompute computed in lower store from computed in upper store", async () => {
     let lowerStore!: LowerStore;
 
     @Store()
@@ -320,5 +321,81 @@ describe("Computed Getters", () => {
       ["upperStore", "a"],
     ]);
     expect(lowerStore.aLenPlus2).toBe(6);
+  });
+
+  it("should detect autoEffect dependencies when effect trigger recompute getter in upper store", async () => {
+    let store!: ComputedStore;
+
+    @Store()
+    class UpperComputedStore {
+      obj = { a: 1 };
+
+      changeObj() {
+        this.obj.a = 2;
+      }
+
+      get objStr() {
+        return JSON.stringify(this.obj);
+      }
+    }
+
+    @Store()
+    class ComputedStore {
+      constructor(public upper: UpperComputedStore) {}
+
+      @AutoEffect()
+      changeUpperObj() {
+        this.upper.changeObj();
+      }
+    }
+
+    const App = connect(
+      connect(() => {
+        store = useStore(ComputedStore);
+        return <span>{store.upper.objStr}</span>;
+      }, ComputedStore),
+      UpperComputedStore
+    );
+
+    const { getByText } = render(<App />);
+
+    const storeAdmin = StoreAdministrator.get(store);
+
+    expect(
+      storeAdmin?.effectsManager.effects.get("changeUpperObj")?.deps
+    ).toStrictEqual([]);
+    expect(getByText('{"a":2}')).toBeInTheDocument();
+  });
+
+  it("should recomputed getter for typeof object dependencies value", async () => {
+    let store!: ComputedStore;
+
+    @Store()
+    class ComputedStore {
+      obj = { a: 1 };
+
+      get objFromGetter() {
+        return this.obj;
+      }
+    }
+
+    const App = connect(() => {
+      store = useStore(ComputedStore);
+      return <span>{JSON.stringify(store.objFromGetter)}</span>;
+    }, ComputedStore);
+
+    const { getByText } = render(<App />);
+
+    const storeAdmin = StoreAdministrator.get(store);
+
+    expect(
+      storeAdmin?.gettersManager.getters.get("objFromGetter")?.deps
+    ).toStrictEqual([["obj"]]);
+    expect(getByText('{"a":1}')).toBeInTheDocument();
+
+    act(() => {
+      store.obj = { a: 2 };
+    });
+    expect(getByText('{"a":2}')).toBeInTheDocument();
   });
 });

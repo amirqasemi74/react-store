@@ -1,5 +1,5 @@
 import { StoreAdministrator } from "../storeAdministrator";
-import { Property } from "./property";
+import { ObservableProperty } from "./observableProperty";
 import { useState } from "react";
 import { TARGET } from "src/constant";
 import { InjectableMetadataUtils } from "src/container/decorators/Injectable";
@@ -7,18 +7,13 @@ import { HooksMetadataUtils } from "src/decorators/hook";
 import { StorePropsMetadataUtils } from "src/decorators/props";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { WireMetadataUtils } from "src/decorators/wire";
-import { adtProxyBuilder } from "src/proxy/adtProxy/adtProxyBuilder";
 import { GetSetPathsCalculator } from "src/utils/getSetPathsCalculator";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
-  readonly propertyKeys = new Map<PropertyKey, Property>();
+  readonly propertyKeys = new Map<PropertyKey, ObservableProperty>();
 
   accessedProperties: AccessedProperty[] = [];
-
-  private readonly purePropertyKeyMatchers: Array<
-    (propertyKey: PropertyKey) => boolean
-  > = [];
 
   private readonly readonlyPropertyKeys: Array<{
     matcher: (propertyKey: PropertyKey) => boolean;
@@ -27,11 +22,9 @@ export class StorePropertyKeysManager {
 
   constructor(private storeAdmin: StoreAdministrator) {
     // @Props
-    const propMatcher = (propertyKey: PropertyKey) =>
-      StorePropsMetadataUtils.is(storeAdmin.type, propertyKey);
-    this.purePropertyKeyMatchers.push(propMatcher);
     this.readonlyPropertyKeys.push({
-      matcher: propMatcher,
+      matcher: (propertyKey) =>
+        StorePropsMetadataUtils.is(storeAdmin.type, propertyKey),
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -40,11 +33,9 @@ export class StorePropertyKeysManager {
         ),
     });
     // @Wire
-    const wireMatcher = (propertyKey: PropertyKey) =>
-      WireMetadataUtils.is(this.storeAdmin.type, propertyKey);
-    this.purePropertyKeyMatchers.push(wireMatcher);
     this.readonlyPropertyKeys.push({
-      matcher: wireMatcher,
+      matcher: (propertyKey) =>
+        WireMetadataUtils.is(this.storeAdmin.type, propertyKey),
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -54,9 +45,6 @@ export class StorePropertyKeysManager {
     });
 
     // @Hook
-    const hookMatcher = (propertyKey) =>
-      HooksMetadataUtils.is(this.storeAdmin.type, propertyKey);
-    this.purePropertyKeyMatchers.push(hookMatcher);
     this.readonlyPropertyKeys.push({
       matcher: (propertyKey) =>
         HooksMetadataUtils.is(this.storeAdmin.type, propertyKey),
@@ -69,13 +57,11 @@ export class StorePropertyKeysManager {
     });
 
     // Injected injectable
-    const injectableMatcher = (propertyKey: PropertyKey) => {
-      const type = this.storeAdmin.instance[propertyKey]?.constructor;
-      return type && InjectableMetadataUtils.is(type);
-    };
-    this.purePropertyKeyMatchers.push(injectableMatcher);
     this.readonlyPropertyKeys.push({
-      matcher: injectableMatcher,
+      matcher: (propertyKey) => {
+        const type = this.storeAdmin.instance[propertyKey]?.constructor;
+        return type && InjectableMetadataUtils.is(type);
+      },
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -88,7 +74,6 @@ export class StorePropertyKeysManager {
       const type = this.storeAdmin.instance[propertyKey]?.constructor;
       return type && StoreMetadataUtils.is(type);
     };
-    this.purePropertyKeyMatchers.push(storeMatcher);
     this.readonlyPropertyKeys.push({
       matcher: storeMatcher,
       onSet: (propertyKey) =>
@@ -102,22 +87,16 @@ export class StorePropertyKeysManager {
 
   makeAllObservable() {
     Object.keys(this.storeAdmin.instance).forEach((propertyKey) => {
-      const isPureProperty = this.purePropertyKeyMatchers.some((matcher) =>
+      const isReadOnly = this.readonlyPropertyKeys.some(({ matcher }) =>
         matcher(propertyKey)
       );
-
-      const proxiedValuesStorage = new Map();
-
-      const value = this.makeDeepObservable(
-        propertyKey,
-        this.storeAdmin.instance[propertyKey],
-        proxiedValuesStorage,
-        isPureProperty
-      );
-
       this.propertyKeys.set(
         propertyKey,
-        new Property(value, proxiedValuesStorage, isPureProperty)
+        new ObservableProperty(
+          this.storeAdmin,
+          this.storeAdmin.instance[propertyKey],
+          isReadOnly
+        )
       );
 
       // Define setter and getter
@@ -158,74 +137,24 @@ export class StorePropertyKeysManager {
 
     const info = this.propertyKeys.get(propertyKey)!;
     const preValue = info?.getValue("Store");
-    const pureProperty = this.purePropertyKeyMatchers.find((matcher) =>
-      matcher(propertyKey)
-    );
     const readonlyProperty = this.readonlyPropertyKeys.find(({ matcher }) =>
       matcher(propertyKey)
     );
 
-    if (pureProperty) {
-      if (force) {
-        info.setValue(
-          this.makeDeepObservable(
-            propertyKey,
-            value,
-            info.proxiedValuesStorage,
-            true
-          ),
-          "Store"
-        );
-      } else {
-        readonlyProperty?.onSet(propertyKey);
-      }
+    if (readonlyProperty && !force) {
+      readonlyProperty?.onSet(propertyKey);
     } else {
-      if (readonlyProperty && !force) {
-        readonlyProperty.onSet(propertyKey);
-      } else {
-        info.setValue(
-          this.makeDeepObservable(
-            propertyKey,
-            value,
-            info.proxiedValuesStorage,
-            false
-          ),
-          "Store"
-        );
-      }
+      info.setValue(value, "Store", !!readonlyProperty);
     }
 
     // Props property key must not affect renders status at all.
-    if (!pureProperty || force) {
+    if (!readonlyProperty || force) {
       info.isSetStatePending = true;
       const purePreValue = Reflect.get(Object(preValue), TARGET) || preValue;
       if (purePreValue !== value) {
         this.storeAdmin.renderConsumers(force);
       }
     }
-  }
-
-  private makeDeepObservable(
-    propertyKey: PropertyKey,
-    value: unknown,
-    proxiedValuesStorage: Map<unknown, unknown>,
-    readonly: boolean
-  ) {
-    return adtProxyBuilder({
-      value,
-      proxiedValuesStorage,
-      onAccess: this.addAccessedProperty.bind(this),
-      onSet: () => {
-        const info = this.propertyKeys.get(propertyKey);
-        if (info) {
-          info.isSetStatePending = true;
-        }
-
-        if (!readonly) {
-          this.storeAdmin.renderConsumers();
-        }
-      },
-    });
   }
 
   hasPendingSetStates() {
@@ -249,7 +178,7 @@ export class StorePropertyKeysManager {
       when: "AFTER_INSTANCE",
       hook: () => {
         const propertyKeysInfo = useFixedLazyRef(() =>
-          Array.from(this.propertyKeys.values()).filter((info) => !info.isPure)
+          Array.from(this.propertyKeys.values()).filter((info) => !info.isReadOnly)
         );
         propertyKeysInfo.forEach((info) => {
           const [state, setState] = useState(() =>
@@ -267,11 +196,6 @@ export class StorePropertyKeysManager {
    */
   clearAccessedProperties() {
     this.accessedProperties = [];
-    this.propertyKeys.forEach((v) => {
-      StoreAdministrator.get(
-        v.getValue("Store")
-      )?.propertyKeysManager.clearAccessedProperties();
-    });
   }
 
   addAccessedProperty(ap: AccessedProperty) {

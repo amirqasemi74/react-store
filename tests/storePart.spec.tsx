@@ -97,7 +97,7 @@ describe("Store Parts", () => {
     expect(hasErrorChanged).toBeCalledTimes(2);
   });
 
-  it("should store @Wire property be pure and read only", () => {
+  it("should store @Wire property be read only", () => {
     const errorMock = jest.spyOn(console, "error").mockImplementation();
     let pre, post;
     let store!: UserStore;
@@ -140,7 +140,7 @@ describe("Store Parts", () => {
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
         "validator"
-      )?.isPure
+      )?.isReadOnly
     ).toBeTruthy();
   });
 

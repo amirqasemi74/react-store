@@ -1,4 +1,4 @@
-import { Property } from "./propertyKeys/property";
+import { ObservableProperty } from "./propertyKeys/observableProperty";
 import { StoreAdministrator } from "./storeAdministrator";
 import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
@@ -37,7 +37,7 @@ export class StoreStorePartsManager {
             storePartAdmin.setInstance(instance);
             this.storeAdmin.propertyKeysManager.propertyKeys.set(
               wire.propertyKey,
-              new Property(instance, new Map(), true)
+              new ObservableProperty(this.storeAdmin, instance, true)
             );
             initiatedStorePart.add(wire.propertyKey);
           }

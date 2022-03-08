@@ -56,7 +56,7 @@ describe("Dependency Injection", () => {
     render(<AppWithStore />);
   });
 
-  it("should injectable injected property be pure and readonly", () => {
+  it("should injectable injected property be readonly", () => {
     const errorMock = jest.spyOn(console, "error").mockImplementation();
     let store!: PostStore;
 
@@ -84,7 +84,7 @@ describe("Dependency Injection", () => {
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
         "postService"
-      )?.isPure
+      )?.isReadOnly
     ).toBeTruthy();
   });
 
@@ -137,7 +137,7 @@ describe("Dependency Injection", () => {
     expect(getByText(/black/i)).toBeInTheDocument();
   });
 
-  it("should injected store be pure and readonly", () => {
+  it("should injected store and readonly", () => {
     const errorMock = jest.spyOn(console, "error").mockImplementation();
 
     let store!: UserStore;
@@ -168,7 +168,7 @@ describe("Dependency Injection", () => {
     );
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("appStore")
-        ?.isPure
+        ?.isReadOnly
     ).toBeTruthy();
   });
 

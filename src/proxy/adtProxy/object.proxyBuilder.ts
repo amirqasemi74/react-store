@@ -1,4 +1,4 @@
-import { PROXIED_VALUE, proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
+import { proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
 import { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
 import React from "react";
 import { TARGET } from "src/constant";
@@ -23,6 +23,7 @@ export const objectProxyBuilder = ({
       if (propertyKey === TARGET) {
         return target;
       }
+
       const value = proxyValueAndSaveIt(
         isFrozen ? object : target,
         propertyKey,
@@ -51,9 +52,7 @@ export const objectProxyBuilder = ({
         propertyKey,
       });
       const res = Reflect.set(target, propertyKey, value, receiver);
-      if (propertyKey !== PROXIED_VALUE) {
-        onSet?.();
-      }
+      onSet?.();
       return res;
     },
   });

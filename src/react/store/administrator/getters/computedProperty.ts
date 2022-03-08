@@ -3,6 +3,8 @@ import { StoreAdministrator } from "../storeAdministrator";
 import lodashGet from "lodash/get";
 
 export class ComputedProperty {
+  private inited = false;
+
   private hasStoreValCopiedToStateVal = true;
 
   private readonly lastValue: {
@@ -16,12 +18,15 @@ export class ComputedProperty {
     private getterName: string,
     private getterFn: () => unknown,
     private storeAdmin: StoreAdministrator
-  ) {
-    this.calcStoreValue();
-    this.lastValue.state = this.lastValue.store;
-  }
+  ) {}
 
   getValue(from: "State" | "Store") {
+    if (!this.inited) {
+      this.calcStoreValue();
+      this.inited = true;
+      this.lastValue.state = this.lastValue.store;
+      this.hasStoreValCopiedToStateVal = true;
+    }
     if (!this.hasStoreValCopiedToStateVal && from === "State") {
       this.copyStoreValueToStateValueIfPossible();
     }
@@ -33,7 +38,6 @@ export class ComputedProperty {
     propertyKeysManager.clearAccessedProperties();
 
     this.lastValue.store = this.getterFn.call(this.storeAdmin.instance);
-
     this.deps = propertyKeysManager
       .calcPaths()
       .filter((p) => p.type === "GET")
@@ -44,10 +48,7 @@ export class ComputedProperty {
 
   tryRecomputeIfNeed(setPaths: AccessedPath[]) {
     let recompute = setPaths.some((setPath) =>
-      this.deps.some((dep) =>
-        // dep.every((item, index) => item === setPath[index]) ||
-        setPath.every((item, index) => item === dep[index])
-      )
+      this.deps.some((dep) => setPath.every((item, index) => item === dep[index]))
     );
     /**
      * Check if any of this getter dependencies path
@@ -57,7 +58,6 @@ export class ComputedProperty {
       const firstPathElementValue = this.storeAdmin.propertyKeysManager.propertyKeys
         .get(path[0])
         ?.getValue("Store");
-
       return StoreAdministrator.get(firstPathElementValue)?.lastSetPaths.some(
         (setPath) => setPath.every((item, index) => item === path[index + 1])
       );

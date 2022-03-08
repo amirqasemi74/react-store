@@ -9,24 +9,9 @@ export class ToDoStore extends BaseStore {
 
   todos: ToDoItem[] = [{ id: "123", value: "Job -1", isEditing: false }];
 
-  a = 4;
-  b = 5;
-  c: any = [1, 2, 3, { a: 1 }];
-  d = { e: 5 };
-
-  // @AutoEffect()
-  onUserChanged() {
-    this.a = 3;
-    this.b = this.a;
-
-    this.c[this.b].a = 45;
-    this.c[3];
-    this.d.e;
-  }
-
-  // @Effect([])
+  @Effect([])
   init() {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 100; i++) {
       this.todos.push({
         id: Math.random().toString(),
         value: "Job " + i.toString(),
@@ -41,7 +26,6 @@ export class ToDoStore extends BaseStore {
 
   onInputChange(e: ChangeEvent<HTMLInputElement>) {
     this.todo.value = e.target.value;
-    this.a = this.todo.value.length;
   }
 
   onInputKeyDown(e: KeyboardEvent<HTMLInputElement>) {
