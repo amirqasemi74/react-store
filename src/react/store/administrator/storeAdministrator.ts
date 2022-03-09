@@ -1,5 +1,5 @@
 import { STORE_ADMINISTRATION } from "../../../constant";
-import { StoreForComponentUsageProxy } from "../storeForComponentUsageProxy";
+import { StoreForConsumerComponentProxy } from "../../../proxy/storeForConsumerComponentProxy";
 import { StoreGettersManager } from "./getters/storeGettersManager";
 import { HooksManager } from "./hooksManager";
 import {
@@ -55,7 +55,7 @@ export class StoreAdministrator {
     this.instance[STORE_ADMINISTRATION] = this;
     this.instanceForComponents = new Proxy(
       this.instance,
-      new StoreForComponentUsageProxy()
+      new StoreForConsumerComponentProxy()
     );
 
     // !!!! Orders matter !!!!
@@ -67,15 +67,16 @@ export class StoreAdministrator {
     this.effectsManager.registerEffects();
     this.gettersManager.makeAllAsComputed();
     this.methodsManager.makeAllAutoBound();
+    this.propertyKeysManager.turnOnCollectAccessPathLogsIfNeeded();
   }
 
   renderConsumers(relax?: boolean) {
-    this.gettersManager.recomputedGetters();
-    if (
-      this.effectsManager.effects.size === 0 &&
-      this.gettersManager.getters.size === 0
-    ) {
-      this.propertyKeysManager.clearAccessedProperties();
+    if (this.propertyKeysManager.collectAccessPathLogs) {
+      this.lastSetPaths = this.propertyKeysManager
+        .calcPaths()
+        .filter((p) => p.type === "SET")
+        .map((p) => p.path);
+      this.gettersManager.recomputedGetters();
     }
     this.renderContext?.(relax || this.propertyKeysManager.hasPendingSetStates());
     this.propertyKeysManager.doPendingSetStates();

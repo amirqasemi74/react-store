@@ -1,5 +1,7 @@
 import { BaseAdtProxyBuilderArgs, adtProxyBuilder } from "./adtProxyBuilder";
+import { TARGET } from "src/constant";
 import { Func } from "src/types";
+import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
 interface MapProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   map: Map<unknown, unknown>;
@@ -12,6 +14,9 @@ export const mapProxyBuilder = ({
   const { onSet } = restOfArgs;
   return new Proxy(map, {
     get(target: Map<unknown, unknown>, propertyKey: PropertyKey) {
+      if (propertyKey === TARGET) {
+        return target;
+      }
       const value = target[propertyKey];
       switch (propertyKey) {
         case "get": {
@@ -27,7 +32,7 @@ export const mapProxyBuilder = ({
               mapKey,
               adtProxyBuilder({
                 onSet,
-                value: mapValue,
+                value: getUnproxiedValue(mapValue, true),
                 ...restOfArgs,
               })
             );

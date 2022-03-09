@@ -37,10 +37,6 @@ export class StoreGettersManager {
   }
 
   recomputedGetters() {
-    this.storeAdmin.lastSetPaths = this.storeAdmin.propertyKeysManager
-      .calcPaths()
-      .filter((p) => p.type === "SET")
-      .map((p) => p.path);
     this.getters.forEach((cp) =>
       cp.tryRecomputeIfNeed(this.storeAdmin.lastSetPaths)
     );

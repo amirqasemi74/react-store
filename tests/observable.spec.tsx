@@ -23,11 +23,14 @@ describe("Observable Decorator", () => {
     @Store()
     class ObservableTestStore {
       obs = new Obs1();
+
+      constructor() {
+        store = this;
+      }
     }
 
     const App = connect(() => {
       const st = useStore(ObservableTestStore);
-      store = st;
       return (
         <>
           <p>{st.obs.x}</p>

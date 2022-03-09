@@ -2,7 +2,7 @@ import {
   BaseAdtProxyBuilderArgs,
   adtProxyBuilder,
 } from "./adtProxy/adtProxyBuilder";
-import { TARGET } from "src/constant";
+import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { isPrimitive } from "src/utils/isPrimitive";
 
 /**
@@ -19,12 +19,12 @@ export function proxyValueAndSaveIt(
   const storage = adtProxyBuilderArgs.proxiedValuesStorage;
   const value = Reflect.get(target, propertyKey, receiver);
 
-  if (storage.has(value?.[TARGET])) {
-    return storage.get(value?.[TARGET]);
-  }
-
   if (isPrimitive(value) || typeof value === "function") {
     return value;
+  }
+
+  if (storage.has(getUnproxiedValue(value))) {
+    return storage.get(getUnproxiedValue(value));
   }
 
   const proxiedValue = () =>

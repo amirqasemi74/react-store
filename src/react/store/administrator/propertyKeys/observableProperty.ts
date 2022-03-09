@@ -1,5 +1,6 @@
 import { StoreAdministrator } from "../storeAdministrator";
 import { adtProxyBuilder } from "src/proxy/adtProxy/adtProxyBuilder";
+import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { isPrimitive } from "src/utils/isPrimitive";
 
 export class ObservableProperty {
@@ -63,7 +64,10 @@ export class ObservableProperty {
       case "State":
         return this.isPrimitive
           ? this.value.state
-          : (this.value.state as { $: unknown } | undefined)?.$;
+          : // due to performance we return pure values of store properties
+            // not proxied ones, pure value does not collect access logs
+            // and this is good
+            getUnproxiedValue((this.value.state as { $: unknown } | undefined)?.$);
       case "Store":
         return this.isPrimitive
           ? this.value.store
@@ -72,17 +76,21 @@ export class ObservableProperty {
   }
 
   private makeDeepObservable(value: unknown, readonly?: boolean) {
-    return adtProxyBuilder({
+    this.storeAdmin.propertyKeysManager.turnOffCollectAccessPathLogs();
+    const observable = adtProxyBuilder({
       value,
       proxiedValuesStorage: this.proxiedValuesStorage,
       onAccess: (...args) =>
         this.storeAdmin.propertyKeysManager.addAccessedProperty(...args),
       onSet: () => {
-        this.isSetStatePending = true;
+        this.isSetStatePending = false;
         if (!readonly) {
+          this.isSetStatePending = true;
           this.storeAdmin.renderConsumers();
         }
       },
     });
+    this.storeAdmin.propertyKeysManager.turnOnCollectAccessPathLogsIfNeeded();
+    return observable;
   }
 }

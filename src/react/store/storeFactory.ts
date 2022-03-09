@@ -28,11 +28,10 @@ export class StoreFactory {
       // notified to rerender base of their deps
       // so here we save store B ref in store A
       // to notify B if A changed
-      deps
-        .map(StoreAdministrator.get)
-        .forEach((sourceStoreAdmin) =>
-          sourceStoreAdmin?.injectedInTos.add(storeAdmin)
-        );
+      deps.map(StoreAdministrator.get).forEach((sourceStoreAdmin) => {
+        sourceStoreAdmin?.injectedInTos.add(storeAdmin);
+        sourceStoreAdmin?.propertyKeysManager.turnOnCollectAccessPathLogsIfNeeded();
+      });
 
       return storeAdmin;
     });
@@ -107,14 +106,14 @@ export class StoreFactory {
     storeAdmin: StoreAdministrator,
     props?: object
   ) {
+    Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach((spa) =>
+      this.runHooks(when, spa, props)
+    );
     Array.from(storeAdmin.hooksManager.reactHooks.values())
       .filter(({ when: _when }) => _when === when)
       .forEach(({ hook, result }) => {
         const res = hook(storeAdmin, props);
         result?.(res);
       });
-    Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach((spa) =>
-      this.runHooks(when, spa, props)
-    );
   }
 }

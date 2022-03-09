@@ -115,6 +115,9 @@ describe("Properties Observability", () => {
 
       map = new Map<string, any>();
 
+      constructor() {
+        store = this;
+      }
       @Effect([])
       onMount() {
         this.map.set("a", "map");
@@ -146,7 +149,6 @@ describe("Properties Observability", () => {
 
     const App: React.FC = connect(() => {
       const vm = useStore(ComplexTypesStore);
-      store = vm;
       return (
         <div>
           <span>{JSON.stringify(vm.object)}</span>
@@ -246,12 +248,15 @@ describe("Properties Observability", () => {
       array = [1, { a: 1 }];
       object = { a: [2, 3, 4], b: 1 };
       map = new Map<string, any>();
+
+      constructor() {
+        store = this;
+      }
       onChange() {}
     }
 
     const App: React.FC = connect(() => {
       const vm = useStore(SavedProxiedValueStore);
-      store = vm;
       return <div>App</div>;
     }, SavedProxiedValueStore);
 
@@ -313,11 +318,14 @@ describe("Properties Observability", () => {
       undefinedToObject?: any;
 
       objectToUndefined?: any = {};
+
+      constructor() {
+        store = this;
+      }
     }
 
     const App: React.FC = connect(() => {
       const vm = useStore(PropertyTypesStore);
-      store = vm;
       renderCount++;
       return (
         <div>
@@ -351,11 +359,14 @@ describe("Properties Observability", () => {
       @Store()
       class PrimitiveTypesStore {
         number = 1;
+
+        constructor() {
+          store = this;
+        }
       }
 
       const App: React.FC = connect(() => {
         const vm = useStore(PrimitiveTypesStore);
-        store = vm;
         renderCount++;
         return (
           <div>
@@ -382,11 +393,14 @@ describe("Properties Observability", () => {
       class NonPrimitiveTypesStore {
         object = constObj;
         array = constArr;
+
+        constructor() {
+          store = this;
+        }
       }
 
       const App: React.FC = connect(() => {
         const vm = useStore(NonPrimitiveTypesStore);
-        store = vm;
         renderCount++;
         return (
           <div>

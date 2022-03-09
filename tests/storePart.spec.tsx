@@ -11,6 +11,7 @@ import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
 describe("Store Parts", () => {
   it("should store part state change rerender it's consumers", () => {
@@ -133,7 +134,7 @@ describe("Store Parts", () => {
     expect(pre).toBeDefined();
     expect(post).toBeDefined();
 
-    expect(pre === post).toBeTruthy();
+    expect(pre.constructor === post.constructor).toBeTruthy();
     expect(errorMock).toHaveBeenLastCalledWith(
       "`UserStore.validator` is decorated with `@Wire(...)` or `@AutoWire()`, so can't be mutated."
     );

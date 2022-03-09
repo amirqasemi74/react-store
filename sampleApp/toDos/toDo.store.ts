@@ -11,7 +11,7 @@ export class ToDoStore extends BaseStore {
 
   @Effect([])
   init() {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 3; i++) {
       this.todos.push({
         id: Math.random().toString(),
         value: "Job " + i.toString(),

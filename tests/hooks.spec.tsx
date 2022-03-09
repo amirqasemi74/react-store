@@ -75,11 +75,15 @@ describe("Hook Decorator", () => {
     class HooksStore {
       @Hook(useUrl)
       url: string;
+
+      constructor() {
+        store = this;
+      }
     }
 
     const App = connect(() => {
-      store = useStore(HooksStore);
-      return <>{store.url}</>;
+      const st = useStore(HooksStore);
+      return <>{st.url}</>;
     }, HooksStore);
 
     render(<App />);
