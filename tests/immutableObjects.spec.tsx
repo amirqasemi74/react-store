@@ -31,6 +31,7 @@ describe("Immutable Objects & Arrays", () => {
         @AutoEffect()
         frozenAccess() {
           this.obj.c.d;
+          debugger;
         }
       }
 

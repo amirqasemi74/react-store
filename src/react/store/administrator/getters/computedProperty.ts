@@ -1,6 +1,7 @@
 import { AccessedPath } from "../propertyKeys/storePropertyKeysManager";
 import { StoreAdministrator } from "../storeAdministrator";
 import lodashGet from "lodash/get";
+import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
 export class ComputedProperty {
   private inited = false;
@@ -30,7 +31,12 @@ export class ComputedProperty {
     if (!this.hasStoreValCopiedToStateVal && from === "State") {
       this.copyStoreValueToStateValueIfPossible();
     }
-    return this.lastValue[from.toLowerCase()];
+
+    if (from === "Store") {
+      return this.lastValue[from.toLowerCase()];
+    } else {
+      return getUnproxiedValue(this.lastValue[from.toLowerCase()]);
+    }
   }
 
   private calcStoreValue() {
@@ -55,9 +61,12 @@ export class ComputedProperty {
      * is from injected store (store or store parts)
      */
     recompute ||= this.deps.some((path) => {
-      const firstPathElementValue = this.storeAdmin.propertyKeysManager.propertyKeys
-        .get(path[0])
-        ?.getValue("Store");
+      const firstPathElementValue = getUnproxiedValue(
+        this.storeAdmin.propertyKeysManager.propertyKeys
+          .get(path[0])
+          ?.getValue("Store")
+      );
+
       return StoreAdministrator.get(firstPathElementValue)?.lastSetPaths.some(
         (setPath) => setPath.every((item, index) => item === path[index + 1])
       );
@@ -70,11 +79,17 @@ export class ComputedProperty {
 
   private copyStoreValueToStateValueIfPossible() {
     // Because react 18 transition mode
-    const doCopy = this.deps.every(
-      (dep) =>
-        lodashGet(this.storeAdmin.instance, dep) ===
+    const doCopy = this.deps.every((dep) => {
+      /**
+       * Here if we have injected store as dep such as [['upper','a']]
+       * Get dep value from instance has more than one layer of proxy
+       * so `getUnproxiedValue` must check deep for return unproxied value
+       */
+      return (
+        getUnproxiedValue(lodashGet(this.storeAdmin.instance, dep), true) ===
         lodashGet(this.storeAdmin.instanceForComponents, dep)
-    );
+      );
+    });
     if (doCopy) {
       this.lastValue.state = this.lastValue.store;
       this.hasStoreValCopiedToStateVal = true;

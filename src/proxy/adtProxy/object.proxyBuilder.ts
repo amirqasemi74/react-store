@@ -2,6 +2,7 @@ import { proxyValueAndSaveIt } from "../proxyValueAndSaveIt";
 import { BaseAdtProxyBuilderArgs } from "./adtProxyBuilder";
 import React from "react";
 import { TARGET } from "src/constant";
+import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
 interface ObjectProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   object: object;
@@ -51,7 +52,12 @@ export const objectProxyBuilder = ({
         type: "SET",
         propertyKey,
       });
-      const res = Reflect.set(target, propertyKey, value, receiver);
+      const res = Reflect.set(
+        target,
+        propertyKey,
+        getUnproxiedValue(value, true),
+        receiver
+      );
       onSet?.();
       return res;
     },

@@ -1,4 +1,3 @@
-import { ObservableProperty } from "./propertyKeys/observableProperty";
 import { StoreAdministrator } from "./storeAdministrator";
 import { useContext } from "react";
 import { getFromContainer } from "src/container/container";
@@ -24,22 +23,17 @@ export class StoreStorePartsManager {
   }
 
   createInstances() {
-    const initiatedStorePart = new Set<PropertyKey>();
     this.storePartWires.forEach((wire) => {
       const StorePart = wire.type as ClassType;
       this.storeAdmin.hooksManager.reactHooks.add({
         when: "BEFORE_INSTANCE",
         hook: () => this.resolveStorePartsDeps(StorePart),
         result: (depsValue: unknown[]) => {
-          if (!initiatedStorePart.has(wire.propertyKey)) {
+          if (!this.storeParts.has(wire.propertyKey)) {
             const instance = new StorePart(...depsValue);
             const storePartAdmin = new StoreAdministrator(StorePart);
             storePartAdmin.setInstance(instance);
-            this.storeAdmin.propertyKeysManager.propertyKeys.set(
-              wire.propertyKey,
-              new ObservableProperty(this.storeAdmin, instance, true)
-            );
-            initiatedStorePart.add(wire.propertyKey);
+            this.storeParts.set(wire.propertyKey, storePartAdmin);
           }
         },
       });
@@ -93,14 +87,11 @@ export class StoreStorePartsManager {
   }
 
   register() {
-    this.storePartWires.forEach(({ propertyKey }) => {
-      const value = this.storeAdmin.propertyKeysManager.propertyKeys
-        .get(propertyKey)
-        ?.getValue("Store") as object;
-      this.storeAdmin.instance[propertyKey] = value;
-      const storePartAdmin = StoreAdministrator.get(value)!;
-      storePartAdmin.injectedInTos.add(this.storeAdmin);
-      this.storeParts.set(propertyKey, storePartAdmin);
+    this.storeParts.forEach((adm, propertyKey) => {
+      this.storeAdmin.instance[propertyKey] = adm.instance;
+      adm.injectedInTos.add(this.storeAdmin);
+      // TODO: turn on can be auto on add injected
+      adm.propertyKeysManager.turnOnCollectAccessPathLogsIfNeeded();
     });
   }
 }

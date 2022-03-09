@@ -19,7 +19,7 @@ function AppWrapper() {
   );
 }
 
-// ReactDOM.render(<AppWrapper />, document.querySelector("#root"));
+ReactDOM.render(<AppWrapper />, document.querySelector("#root"));
 // ReactDOM.render(<AutoEffectTest />, document.querySelector("#root"));
 // ReactDOM.render(
 //   <PropsTest obj={{ a: 3 }} a={<p>Amir</p>} />,
@@ -28,4 +28,4 @@ function AppWrapper() {
 
 // ReactDOM.render(<Computed />, document.querySelector("#root"));
 // ReactDOM.render(<StorePartTest />, document.querySelector("#root"));
-ReactDOM.render(<StoreHooksTest />, document.querySelector("#root"));
+// ReactDOM.render(<StoreHooksTest />, document.querySelector("#root"));

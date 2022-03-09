@@ -6,7 +6,7 @@ import styled, { css } from "styled-components";
 
 const ToDos: React.FC = () => {
   const vm = useStore(ToDoStore);
-  console.log(vm);
+  console.log(((window as any).x = vm));
 
   return (
     <ToDoWrapper>

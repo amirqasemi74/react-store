@@ -107,16 +107,20 @@ describe("Props Decorator", () => {
   });
 
   it("should be readonly @Props property key", () => {
-    const errorMock = jest.spyOn(console, "error").mockImplementation();
     let store!: UserStore;
+    const errorMock = jest.spyOn(console, "error").mockImplementation();
     @Store()
     class UserStore {
       @Props()
       props: any;
+
+      constructor() {
+        store = this;
+      }
     }
 
     const App: React.FC<{ username: string }> = connect(() => {
-      store = useStore(UserStore);
+      useStore(UserStore);
       return <>store</>;
     }, UserStore);
 

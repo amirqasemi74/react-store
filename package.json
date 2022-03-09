@@ -65,6 +65,7 @@
   "scripts": {
     "start:app": "webpack serve --config sampleApp/webpack.config.js",
     "test": "jest",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --detectOpenHandles",
     "build": "rm -rf dist && rollup -c rollup.config.js",
     "prepare": "husky install && yarn build",
     "prepublishOnly": "yarn lint && yarn test && yarn build",

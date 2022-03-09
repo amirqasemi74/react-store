@@ -241,14 +241,17 @@ describe("Computed Getters", () => {
       @AutoWire()
       part: PartStore;
 
+      constructor() {
+        store = this;
+      }
       get test() {
         return this.part.obj.a.b.some((e) => e > 2);
       }
     }
 
     const App = connect(() => {
-      store = useStore(ComputedStore);
-      return <>{store.test}</>;
+      const st = useStore(ComputedStore);
+      return <>{st.test}</>;
     }, ComputedStore);
 
     render(<App />);
@@ -364,6 +367,7 @@ describe("Computed Getters", () => {
     expect(
       storeAdmin?.effectsManager.effects.get("changeUpperObj")?.deps
     ).toStrictEqual([]);
+
     expect(getByText('{"a":2}')).toBeInTheDocument();
   });
 
@@ -374,14 +378,17 @@ describe("Computed Getters", () => {
     class ComputedStore {
       obj = { a: 1 };
 
+      constructor() {
+        store = this;
+      }
       get objFromGetter() {
         return this.obj;
       }
     }
 
     const App = connect(() => {
-      store = useStore(ComputedStore);
-      return <span>{JSON.stringify(store.objFromGetter)}</span>;
+      const st = useStore(ComputedStore);
+      return <span>{JSON.stringify(st.objFromGetter)}</span>;
     }, ComputedStore);
 
     const { getByText } = render(<App />);
@@ -397,5 +404,57 @@ describe("Computed Getters", () => {
       store.obj = { a: 2 };
     });
     expect(getByText('{"a":2}')).toBeInTheDocument();
+  });
+
+  it("should recomputed getter if upper store property set to lower store property", () => {
+    let lowerStore!: LowerStore;
+    let upperStore!: UpperStore;
+    @Store()
+    class UpperStore {
+      arr: any = [1, { arr: [1] }];
+
+      constructor() {
+        upperStore = this;
+      }
+    }
+
+    @Store()
+    class LowerStore {
+      fromUpperStoreArr: any = [];
+
+      constructor(public upperStore: UpperStore) {
+        lowerStore = this;
+      }
+
+      get arrLen() {
+        return this.fromUpperStoreArr[1]?.arr.length || 0;
+      }
+
+      @Effect([])
+      onUpperArrChanged() {
+        this.fromUpperStoreArr = this.upperStore.arr;
+      }
+    }
+
+    const App = connect(
+      connect(() => {
+        const st = useStore(LowerStore);
+        return <p>{st.arrLen}</p>;
+      }, LowerStore),
+      UpperStore
+    );
+
+    const { getByText } = render(<App />);
+
+    expect(getByText("1")).toBeInTheDocument();
+
+    act(() => {
+      upperStore.arr[1].arr.push(2);
+    });
+    expect(getByText("1")).toBeInTheDocument();
+    act(() => {
+      lowerStore.fromUpperStoreArr[1].arr = upperStore.arr[1].arr;
+    });
+    expect(getByText("2")).toBeInTheDocument();
   });
 });

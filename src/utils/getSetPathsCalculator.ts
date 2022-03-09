@@ -1,3 +1,4 @@
+import { getUnproxiedValue } from "./getUnProxiedValue";
 import { STORE_ADMINISTRATION } from "src/constant";
 import {
   AccessedPath,
@@ -55,7 +56,13 @@ export class GetSetPathsCalculator {
           !(
             ap &&
             ap.path.length === 1 &&
-            StoreAdministrator.get(this.storeAdmin.instance[ap.path[0]])
+            StoreAdministrator.get(
+              getUnproxiedValue(
+                this.storeAdmin.propertyKeysManager.propertyKeys
+                  .get(ap.path[0])
+                  ?.getValue("Store")
+              )
+            )
           )
       ) as GetSetPaths;
   }

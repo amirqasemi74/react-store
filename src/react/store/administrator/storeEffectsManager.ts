@@ -135,11 +135,8 @@ export class StoreEffectsManager {
 
   private runEffect(effectKey: PropertyKey, storeAdmin: StoreAdministrator) {
     // Run Effect
-    const clearEffect: Func<void> | undefined = Reflect.apply(
-      storeAdmin.instanceForComponents[effectKey],
-      storeAdmin.instanceForComponents,
-      []
-    );
+    const clearEffect: Func<void> | undefined =
+      storeAdmin.instanceForComponents[effectKey]?.();
 
     if (
       clearEffect &&

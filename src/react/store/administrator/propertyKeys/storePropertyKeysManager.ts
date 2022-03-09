@@ -1,19 +1,21 @@
 import { StoreAdministrator } from "../storeAdministrator";
 import { ObservableProperty } from "./observableProperty";
 import { useState } from "react";
-import { TARGET } from "src/constant";
 import { InjectableMetadataUtils } from "src/container/decorators/Injectable";
 import { HooksMetadataUtils } from "src/decorators/hook";
 import { StorePropsMetadataUtils } from "src/decorators/props";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { WireMetadataUtils } from "src/decorators/wire";
 import { GetSetPathsCalculator } from "src/utils/getSetPathsCalculator";
+import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
   readonly propertyKeys = new Map<PropertyKey, ObservableProperty>();
 
   accessedProperties: AccessedProperty[] = [];
+
+  collectAccessPathLogs = true;
 
   private readonly readonlyPropertyKeys: Array<{
     matcher: (propertyKey: PropertyKey) => boolean;
@@ -59,7 +61,11 @@ export class StorePropertyKeysManager {
     // Injected injectable
     this.readonlyPropertyKeys.push({
       matcher: (propertyKey) => {
-        const type = this.storeAdmin.instance[propertyKey]?.constructor;
+        this.turnOffCollectAccessPathLogs();
+        const type = getUnproxiedValue(
+          this.storeAdmin.instance[propertyKey]
+        )?.constructor;
+        this.turnOnCollectAccessPathLogsIfNeeded();
         return type && InjectableMetadataUtils.is(type);
       },
       onSet: (propertyKey) =>
@@ -71,7 +77,11 @@ export class StorePropertyKeysManager {
     });
     // Injected Stores
     const storeMatcher = (propertyKey: PropertyKey) => {
-      const type = this.storeAdmin.instance[propertyKey]?.constructor;
+      this.turnOffCollectAccessPathLogs();
+      const type = getUnproxiedValue(
+        this.storeAdmin.instance[propertyKey]
+      )?.constructor;
+      this.turnOnCollectAccessPathLogsIfNeeded();
       return type && StoreMetadataUtils.is(type);
     };
     this.readonlyPropertyKeys.push({
@@ -90,6 +100,7 @@ export class StorePropertyKeysManager {
       const isReadOnly = this.readonlyPropertyKeys.some(({ matcher }) =>
         matcher(propertyKey)
       );
+
       this.propertyKeys.set(
         propertyKey,
         new ObservableProperty(
@@ -128,6 +139,7 @@ export class StorePropertyKeysManager {
    * @param force to set props in props handler or developer hooks
    */
   onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force?: boolean) {
+    value = getUnproxiedValue(value, true);
     this.addAccessedProperty({
       value,
       propertyKey,
@@ -149,8 +161,8 @@ export class StorePropertyKeysManager {
 
     // Props property key must not affect renders status at all.
     if (!readonlyProperty || force) {
-      info.isSetStatePending = true;
-      const purePreValue = Reflect.get(Object(preValue), TARGET) || preValue;
+      info.isSetStatePending = !readonlyProperty;
+      const purePreValue = getUnproxiedValue(Object(preValue)) || preValue;
       if (purePreValue !== value) {
         this.storeAdmin.renderConsumers(force);
       }
@@ -199,21 +211,41 @@ export class StorePropertyKeysManager {
   }
 
   addAccessedProperty(ap: AccessedProperty) {
+    if (!this.collectAccessPathLogs) return;
     this.accessedProperties.push({
       ...ap,
       value:
         ap.value && typeof ap.value === "object"
-          ? ap.value[TARGET] || ap.value
+          ? getUnproxiedValue(ap.value)
           : ap.value,
     });
   }
 
-  calcPaths() {
-    const calculator = new GetSetPathsCalculator(
-      this.storeAdmin,
-      this.accessedProperties
+  turnOffCollectAccessPathLogs() {
+    this.collectAccessPathLogs = false;
+  }
+
+  /**
+   * If there is not AutoEffect, Computed Property and store not injected
+   * to any other store, access paths logs should not collect due to better performance
+   */
+  turnOnCollectAccessPathLogsIfNeeded() {
+    const adm = this.storeAdmin;
+    this.collectAccessPathLogs = !(
+      adm.gettersManager.getters.size === 0 &&
+      adm.effectsManager.effectsMetaData.every((md) => !md.options.auto) &&
+      adm.injectedInTos.size === 0
     );
-    return calculator.calcPaths();
+  }
+
+  calcPaths() {
+    const calculator = new GetSetPathsCalculator(this.storeAdmin, [
+      ...this.accessedProperties,
+    ]);
+    this.turnOffCollectAccessPathLogs();
+    const paths = calculator.calcPaths();
+    this.turnOnCollectAccessPathLogsIfNeeded();
+    return paths;
   }
 }
 

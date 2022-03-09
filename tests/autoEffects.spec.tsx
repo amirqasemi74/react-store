@@ -7,7 +7,7 @@ import {
   connect,
   useStore,
 } from "@react-store/core";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
 import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
@@ -20,6 +20,10 @@ describe("Auto Effect", () => {
     class AutoEffectStore {
       user = { name: "sdf", pass: "123" };
 
+      constructor() {
+        store = this;
+      }
+
       @AutoEffect()
       fn() {
         this.user.name;
@@ -30,7 +34,6 @@ describe("Auto Effect", () => {
 
     const App = connect(() => {
       const vm = useStore(AutoEffectStore);
-      store = vm;
       return <></>;
     }, AutoEffectStore);
 
@@ -63,6 +66,10 @@ describe("Auto Effect", () => {
     class AutoEffectStore {
       user = { name: "sdf", pass: "123" };
 
+      constructor() {
+        store = this;
+      }
+
       @AutoEffect(true)
       fn() {
         this.user;
@@ -71,8 +78,6 @@ describe("Auto Effect", () => {
     }
 
     const App = connect(() => {
-      const vm = useStore(AutoEffectStore);
-      store = vm;
       return <></>;
     }, AutoEffectStore);
 
@@ -102,6 +107,9 @@ describe("Auto Effect", () => {
 
       c = 5;
 
+      constructor() {
+        store = this;
+      }
       @AutoEffect()
       fn() {
         this.a = 5;
@@ -112,8 +120,7 @@ describe("Auto Effect", () => {
     }
 
     const App = connect(() => {
-      const vm = useStore(AutoEffectStore);
-      store = vm;
+      useStore(AutoEffectStore);
       return <></>;
     }, AutoEffectStore);
 
@@ -257,7 +264,7 @@ describe("Auto Effect", () => {
     expect(effectCalled).toBeCalledTimes(4);
   });
 
-  it("should detect store part path as dependency", () => {
+  it("should detect store part path as dependency", async () => {
     let store!: PropsAutoEffectStore;
     const effectCalled = jest.fn();
 
@@ -271,6 +278,10 @@ describe("Auto Effect", () => {
       @AutoWire()
       sp: StorePartTest;
 
+      constructor() {
+        store = this;
+      }
+
       @AutoEffect()
       effectSp() {
         this.sp.obj.a;
@@ -280,7 +291,6 @@ describe("Auto Effect", () => {
 
     const App: any = connect(() => {
       const vm = useStore(PropsAutoEffectStore);
-      store = vm;
       return <>{JSON.stringify(vm.sp.obj)}</>;
     }, PropsAutoEffectStore);
 
@@ -300,6 +310,6 @@ describe("Auto Effect", () => {
     act(() => {
       store.sp.obj = { a: 4 };
     });
-    expect(effectCalled).toBeCalledTimes(3);
+    await waitFor(() => expect(effectCalled).toBeCalledTimes(3), { timeout: 5000 });
   });
 });

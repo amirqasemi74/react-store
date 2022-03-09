@@ -65,11 +65,13 @@ describe("Dependency Injection", () => {
 
     @Store()
     class PostStore {
-      constructor(public postService: PostService) {}
+      constructor(public postService: PostService) {
+        store = this;
+      }
     }
 
     const App = connect(() => {
-      store = useStore(PostStore);
+      useStore(PostStore);
       return <div></div>;
     }, PostStore);
 
@@ -81,6 +83,7 @@ describe("Dependency Injection", () => {
     expect(errorMock).toBeCalledWith(
       "`PostStore.postService` is an injected @Injectable() , so can't be mutated."
     );
+
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
         "postService"
@@ -146,11 +149,13 @@ describe("Dependency Injection", () => {
 
     @Store()
     class UserStore {
-      constructor(public appStore: AppStore) {}
+      constructor(public appStore: AppStore) {
+        store = this;
+      }
     }
 
     const User = () => {
-      store = useStore(UserStore);
+      useStore(UserStore);
       return <></>;
     };
 

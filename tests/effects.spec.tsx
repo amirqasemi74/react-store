@@ -10,12 +10,15 @@ describe("Effects", () => {
   });
 
   it("should effect be called on each render", async () => {
-    let userStore!: UserStore;
+    let store!: UserStore;
     const usernameChangeCallback = jest.fn();
     @Store()
     class UserStore {
       username = "1";
 
+      constructor() {
+        store = this;
+      }
       @Effect()
       onUsernameChange() {
         usernameChangeCallback();
@@ -24,7 +27,6 @@ describe("Effects", () => {
 
     const User = connect(() => {
       const vm = useStore(UserStore);
-      userStore = vm;
       return <>{vm.username}</>;
     }, UserStore);
 
@@ -33,12 +35,12 @@ describe("Effects", () => {
     expect(usernameChangeCallback).toBeCalledTimes(1);
 
     act(() => {
-      userStore.username = "2";
+      store.username = "2";
     });
     expect(usernameChangeCallback).toBeCalledTimes(2);
 
     act(() => {
-      userStore.username = "3";
+      store.username = "3";
     });
     expect(usernameChangeCallback).toBeCalledTimes(3);
   });
