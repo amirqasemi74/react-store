@@ -6,6 +6,7 @@ import { HooksMetadataUtils } from "src/decorators/hook";
 import { StorePropsMetadataUtils } from "src/decorators/props";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { WireMetadataUtils } from "src/decorators/wire";
+import { deepUnproxy } from "src/proxy/deepUnproxy";
 import { GetSetPathsCalculator } from "src/utils/getSetPathsCalculator";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
@@ -139,7 +140,7 @@ export class StorePropertyKeysManager {
    * @param force to set props in props handler or developer hooks
    */
   onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force?: boolean) {
-    value = getUnproxiedValue(value, true);
+    value = deepUnproxy(value);
     this.addAccessedProperty({
       value,
       propertyKey,
