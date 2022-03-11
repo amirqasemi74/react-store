@@ -1,7 +1,7 @@
+import { deepUnproxy } from "../deepUnproxy";
 import { BaseAdtProxyBuilderArgs, adtProxyBuilder } from "./adtProxyBuilder";
 import { TARGET } from "src/constant";
 import { Func } from "src/types";
-import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
 interface MapProxyBuilderArgs extends BaseAdtProxyBuilderArgs {
   map: Map<unknown, unknown>;
@@ -32,7 +32,7 @@ export const mapProxyBuilder = ({
               mapKey,
               adtProxyBuilder({
                 onSet,
-                value: getUnproxiedValue(mapValue, true),
+                value: deepUnproxy(mapValue),
                 ...restOfArgs,
               })
             );

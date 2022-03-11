@@ -420,14 +420,14 @@ describe("Computed Getters", () => {
 
     @Store()
     class LowerStore {
-      fromUpperStoreArr: any = [];
+      fromUpperStoreArr?: any;
 
       constructor(public upperStore: UpperStore) {
         lowerStore = this;
       }
 
       get arrLen() {
-        return this.fromUpperStoreArr[1]?.arr.length || 0;
+        return this.fromUpperStoreArr?.[1]?.arr.length || 0;
       }
 
       @Effect([])
@@ -449,11 +449,13 @@ describe("Computed Getters", () => {
     expect(getByText("1")).toBeInTheDocument();
 
     act(() => {
-      upperStore.arr[1].arr.push(2);
+      upperStore.arr[1].arr = [1, 2];
     });
     expect(getByText("1")).toBeInTheDocument();
+
     act(() => {
-      lowerStore.fromUpperStoreArr[1].arr = upperStore.arr[1].arr;
+      // here we create inner proxy in {...upperStore.arr[1] }
+      lowerStore.fromUpperStoreArr[1] = { ...upperStore.arr[1] };
     });
     expect(getByText("2")).toBeInTheDocument();
   });
