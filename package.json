@@ -13,8 +13,8 @@
     "reflect-metadata": "^0.1.13"
   },
   "peerDependencies": {
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0"
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.16.7",
