@@ -1,4 +1,4 @@
-import { StoreAdministrator } from "../react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "../store/administrator/storeAdministrator";
 import { PROXY_HANDLER_TYPE } from "src/constant";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 

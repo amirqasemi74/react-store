@@ -1,13 +1,13 @@
 import { StoreAdministrator } from "./storeAdministrator";
 import { useContext } from "react";
+import {
+  ReactApplicationContext,
+  StoreAdministratorReactContext,
+} from "src/appContext";
 import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
 import { WireMetadataUtils } from "src/decorators/wire";
-import {
-  ReactApplicationContext,
-  StoreAdministratorReactContext,
-} from "src/react/appContext";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 

@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Props Decorator", () => {
   it("should parent component have props directly", () => {

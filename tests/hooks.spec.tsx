@@ -2,7 +2,7 @@ import { AutoEffect, Hook, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { act, render, waitFor } from "@testing-library/react";
 import React, { useEffect, useState } from "react";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Hook Decorator", () => {
   it("should can use pure react hook in store", async () => {

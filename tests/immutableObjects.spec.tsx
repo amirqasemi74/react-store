@@ -1,7 +1,7 @@
 import { AutoEffect, Store, connect, useStore } from "@react-store/core";
 import { render } from "@testing-library/react";
 import React from "react";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Immutable Objects & Arrays", () => {
   it("should inner immutable object have same instance ref in each render", () => {

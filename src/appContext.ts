@@ -1,4 +1,4 @@
-import { Injectable } from "..";
+import { Injectable } from ".";
 import { StoreAdministrator } from "./store/administrator/storeAdministrator";
 import React from "react";
 import { ClassType } from "src/types";

@@ -1,5 +1,5 @@
-import { STORE_ADMINISTRATION } from "../../../constant";
-import { StoreForConsumerComponentProxy } from "../../../proxy/storeForConsumerComponentProxy";
+import { STORE_ADMINISTRATION } from "../../constant";
+import { StoreForConsumerComponentProxy } from "../../proxy/storeForConsumerComponentProxy";
 import { StoreGettersManager } from "./getters/storeGettersManager";
 import { HooksManager } from "./hooksManager";
 import {

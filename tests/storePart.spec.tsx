@@ -10,7 +10,7 @@ import {
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
 describe("Store Parts", () => {

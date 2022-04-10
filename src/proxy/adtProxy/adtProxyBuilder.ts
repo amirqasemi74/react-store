@@ -4,7 +4,7 @@ import { objectProxyBuilder } from "./object.proxyBuilder";
 import { ObservableMetadataUtils } from "src/decorators/observable";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
-import { AccessedProperty } from "src/react/store/administrator/propertyKeys/storePropertyKeysManager";
+import { AccessedProperty } from "src/store/administrator/propertyKeys/storePropertyKeysManager";
 
 export interface BaseAdtProxyBuilderArgs {
   onSet?: () => void;

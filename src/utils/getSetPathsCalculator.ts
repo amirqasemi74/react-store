@@ -3,8 +3,8 @@ import { STORE_ADMINISTRATION } from "src/constant";
 import {
   AccessedPath,
   AccessedProperty,
-} from "src/react/store/administrator/propertyKeys/storePropertyKeysManager";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+} from "src/store/administrator/propertyKeys/storePropertyKeysManager";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 type AccessedPathDetail = GetSetPath & {
   hasDeeperAccess?: boolean;

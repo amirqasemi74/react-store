@@ -10,7 +10,7 @@ import {
 import { render, waitFor } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Auto Effect", () => {
   it("should run auto effect method", () => {

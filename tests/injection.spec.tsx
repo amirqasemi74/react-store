@@ -9,7 +9,7 @@ import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React, { memo } from "react";
 import { act } from "react-dom/test-utils";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Dependency Injection", () => {
   it("should inject @Injectable into store", () => {

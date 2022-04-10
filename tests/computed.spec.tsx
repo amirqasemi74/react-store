@@ -10,7 +10,7 @@ import {
 import "@testing-library/jest-dom/extend-expect";
 import { act, render, waitFor } from "@testing-library/react";
 import React from "react";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Computed Getters", () => {
   it("should compute getter if dependencies has been changed", () => {

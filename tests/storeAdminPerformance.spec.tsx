@@ -9,7 +9,7 @@ import {
 import "@testing-library/jest-dom/extend-expect";
 import { act, render } from "@testing-library/react";
 import React from "react";
-import { StoreAdministrator } from "src/react/store/administrator/storeAdministrator";
+import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Store Administrator Performance", () => {
   it("should not collect accessed path logs if there is no autoEffect, computed and store not injected to any other store", () => {

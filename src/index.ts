@@ -1,9 +1,9 @@
 export { getFromContainer } from "./container/container";
 export { Injectable, Scope } from "./container/decorators/Injectable";
 export { Injector } from "./container/Injector";
-export { useStore } from "./react/hooks/useStore";
-export { connect } from "./react/store/connect";
-export { StoreProvider } from "./react/store/StoreProvider";
+export { useStore } from "./hooks/useStore";
+export { connect } from "./store/connect";
+export { StoreProvider } from "./store/StoreProvider";
 export { Props } from "./decorators/props";
 export { Effect, AutoEffect } from "./decorators/effect";
 export { Store } from "./decorators/store";
