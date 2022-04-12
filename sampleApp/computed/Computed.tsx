@@ -5,11 +5,9 @@ import React from "react";
 export const Computed = connect(
   connect(() => {
     const st = useStore(ComputedStore);
-    console.log(st);
-
     return (
       <>
-        {/* <p>Array Length: {st.arrLen}</p> */}
+        <p>Array Length: {st.arrLen}</p>
         <button onClick={st.changeArray}>Change Array</button>
         {/* <p>Object String: {st.upper.objStr}</p> */}
         <button onClick={st.upper.changeObj}>Change Object</button>

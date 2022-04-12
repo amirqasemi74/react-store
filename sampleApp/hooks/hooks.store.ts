@@ -1,5 +1,5 @@
 import { useUsername } from "./useUsername";
-import { AutoEffect, Effect, Hook, Store } from "@react-store/core";
+import { Effect, Hook, Store } from "@react-store/core";
 
 @Store()
 export class HooksStore {
@@ -12,7 +12,7 @@ export class HooksStore {
   @Hook((st: HooksStore) => useUsername(st.userId))
   username: string;
 
-  @AutoEffect()
+  // @AutoEffect()
   onMount() {
     this.xId = this.username;
   }

@@ -1,4 +1,4 @@
-import { AutoEffect, Hook, Store, connect, useStore } from "@react-store/core";
+import { Effect, Hook, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { act, render, waitFor } from "@testing-library/react";
 import React, { useEffect, useState } from "react";
@@ -47,7 +47,7 @@ describe("Hook Decorator", () => {
 
       address: string;
 
-      @AutoEffect()
+      @Effect("url")
       onUrlChanged() {
         this.address = `https://${this.url}`;
       }

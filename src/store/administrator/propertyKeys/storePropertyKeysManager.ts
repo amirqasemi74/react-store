@@ -7,16 +7,11 @@ import { StorePropsMetadataUtils } from "src/decorators/props";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { WireMetadataUtils } from "src/decorators/wire";
 import { deepUnproxy } from "src/proxy/deepUnproxy";
-import { GetSetPathsCalculator } from "src/utils/getSetPathsCalculator";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
   readonly propertyKeys = new Map<PropertyKey, ObservableProperty>();
-
-  accessedProperties: AccessedProperty[] = [];
-
-  collectAccessPathLogs = true;
 
   private readonly readonlyPropertyKeys: Array<{
     matcher: (propertyKey: PropertyKey) => boolean;
@@ -62,11 +57,9 @@ export class StorePropertyKeysManager {
     // Injected injectable
     this.readonlyPropertyKeys.push({
       matcher: (propertyKey) => {
-        this.turnOffCollectAccessPathLogs();
         const type = getUnproxiedValue(
           this.storeAdmin.instance[propertyKey]
         )?.constructor;
-        this.turnOnCollectAccessPathLogsIfNeeded();
         return type && InjectableMetadataUtils.is(type);
       },
       onSet: (propertyKey) =>
@@ -78,11 +71,9 @@ export class StorePropertyKeysManager {
     });
     // Injected Stores
     const storeMatcher = (propertyKey: PropertyKey) => {
-      this.turnOffCollectAccessPathLogs();
       const type = getUnproxiedValue(
         this.storeAdmin.instance[propertyKey]
       )?.constructor;
-      this.turnOnCollectAccessPathLogsIfNeeded();
       return type && StoreMetadataUtils.is(type);
     };
     this.readonlyPropertyKeys.push({
@@ -125,12 +116,6 @@ export class StorePropertyKeysManager {
 
   private onGetPropertyKey(propertyKey: PropertyKey) {
     const value = this.propertyKeys.get(propertyKey)?.getValue("Store");
-    this.addAccessedProperty({
-      value,
-      type: "GET",
-      propertyKey,
-      target: this.storeAdmin.instance,
-    });
     return value;
   }
 
@@ -141,13 +126,6 @@ export class StorePropertyKeysManager {
    */
   onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force?: boolean) {
     value = deepUnproxy(value);
-    this.addAccessedProperty({
-      value,
-      propertyKey,
-      type: "SET",
-      target: this.storeAdmin.instance,
-    });
-
     const info = this.propertyKeys.get(propertyKey)!;
     const preValue = info?.getValue("Store");
     const readonlyProperty = this.readonlyPropertyKeys.find(({ matcher }) =>
@@ -203,58 +181,4 @@ export class StorePropertyKeysManager {
       },
     });
   }
-
-  /**
-   * *********************** Accessed Paths ******************************
-   */
-  clearAccessedProperties() {
-    this.accessedProperties = [];
-  }
-
-  addAccessedProperty(ap: AccessedProperty) {
-    if (!this.collectAccessPathLogs) return;
-    this.accessedProperties.push({
-      ...ap,
-      value:
-        ap.value && typeof ap.value === "object"
-          ? getUnproxiedValue(ap.value)
-          : ap.value,
-    });
-  }
-
-  turnOffCollectAccessPathLogs() {
-    this.collectAccessPathLogs = false;
-  }
-
-  /**
-   * If there is not AutoEffect, Computed Property and store not injected
-   * to any other store, access paths logs should not collect due to better performance
-   */
-  turnOnCollectAccessPathLogsIfNeeded() {
-    const adm = this.storeAdmin;
-    this.collectAccessPathLogs = !(
-      adm.gettersManager.getters.size === 0 &&
-      adm.effectsManager.effectsMetaData.every((md) => !md.options.auto) &&
-      adm.injectedInTos.size === 0
-    );
-  }
-
-  calcPaths() {
-    const calculator = new GetSetPathsCalculator(this.storeAdmin, [
-      ...this.accessedProperties,
-    ]);
-    this.turnOffCollectAccessPathLogs();
-    const paths = calculator.calcPaths();
-    this.turnOnCollectAccessPathLogsIfNeeded();
-    return paths;
-  }
 }
-
-export interface AccessedProperty {
-  target: object;
-  value: unknown;
-  propertyKey: PropertyKey;
-  type: "SET" | "GET";
-}
-
-export type AccessedPath = PropertyKey[];

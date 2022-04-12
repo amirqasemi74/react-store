@@ -1,10 +1,8 @@
 import ThemeStore from "./theme.store";
 import ToDos from "./toDos/ToDos";
 import { ToDoStore } from "./toDos/toDo.store";
-import { PureToDos } from "./todos-pure/PureToDos";
-import { PureToDosProvider } from "./todos-pure/PureToDosProvider";
 import { StoreProvider, connect, useStore } from "@react-store/core";
-import React, { useState } from "react";
+import React from "react";
 
 const App = () => {
   const vm = useStore(ThemeStore);
@@ -12,9 +10,6 @@ const App = () => {
     <>
       <button onClick={vm.changePrimary}>change theme</button>
       <StoreProvider type={ToDoStore} render={ToDos} props={{ a: 1 }} />
-      {/* <PureToDosProvider>
-        <PureToDos />
-      </PureToDosProvider> */}
     </>
   );
 };

@@ -4,7 +4,7 @@ import React from "react";
 
 const HooksContext = createContext<any>(null);
 
-const HooksProvider: React.FC = ({ children }) => {
+const HooksProvider: React.FC<any> = ({ children }) => {
   const username = useUsername("amir");
   return (
     <HooksContext.Provider value={{ username }}>{children}</HooksContext.Provider>

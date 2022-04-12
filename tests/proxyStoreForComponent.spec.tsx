@@ -3,7 +3,6 @@ import { act, render } from "@testing-library/react";
 import React from "react";
 import { PROXY_HANDLER_TYPE, TARGET } from "src/constant";
 import { StoreForConsumerComponentProxy } from "src/proxy/storeForConsumerComponentProxy";
-import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Proxy Store For Consumers Component", () => {
   it("should log an error if direct store property mutated in component body", () => {
@@ -100,11 +99,11 @@ describe("Proxy Store For Consumers Component", () => {
     expect(store.part[PROXY_HANDLER_TYPE]).toBe(StoreForConsumerComponentProxy);
     expect(store.part.val[TARGET]).toBeUndefined();
     expect(store.part.val[1][TARGET]).toBeUndefined();
-    expect(
-      StoreAdministrator.get(store)?.propertyKeysManager.accessedProperties
-    ).toHaveLength(0);
-    expect(
-      StoreAdministrator.get(store.part)?.propertyKeysManager.accessedProperties
-    ).toHaveLength(0);
+    // expect(
+    //   StoreAdministrator.get(store)?.propertyKeysManager.accessedProperties
+    // ).toHaveLength(0);
+    // expect(
+    //   StoreAdministrator.get(store.part)?.propertyKeysManager.accessedProperties
+    // ).toHaveLength(0);
   });
 });

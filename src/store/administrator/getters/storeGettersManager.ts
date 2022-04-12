@@ -1,44 +1,55 @@
 import { StoreAdministrator } from "../storeAdministrator";
-import { ComputedProperty } from "./computedProperty";
+import { MemoizedProperty } from "./memoizedProperty";
+import { MemosMetadataUtils } from "src/decorators/memo";
 
 export class StoreGettersManager {
-  readonly getters = new Map<PropertyKey, ComputedProperty>();
+  readonly getters = new Map<PropertyKey, MemoizedProperty>();
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
   makeAllAsComputed() {
-    Object.entries(
-      Object.getOwnPropertyDescriptors(
-        Object.getPrototypeOf(this.storeAdmin.instance)
-      )
-    )
-      .filter(([, { get }]) => get)
-      .forEach(([propertyKey, desc]) => {
-        const computed = new ComputedProperty(
-          propertyKey,
-          desc.get!,
-          this.storeAdmin
-        );
-        this.getters.set(propertyKey, computed);
-        Object.defineProperty(this.storeAdmin.instance, propertyKey, {
-          ...desc,
-          get: () => {
-            const value = computed.getValue("Store");
-            this.storeAdmin.propertyKeysManager.addAccessedProperty({
-              value,
-              propertyKey,
-              type: "GET",
-              target: this.storeAdmin.instance,
-            });
-            return value;
-          },
+    // @Memo Decorator
+    this.memosMetaData.forEach((metadata) => {
+      const getter = Object.getOwnPropertyDescriptor(
+        Object.getPrototypeOf(this.storeAdmin.instance),
+        metadata.propertyKey
+      )?.get;
+
+      if (getter) {
+        const memoized = new MemoizedProperty({
+          getter,
+          name: metadata.propertyKey,
+          storeAdmin: this.storeAdmin,
+          depFn: metadata.options.deps,
+          deepEqual: metadata.options.deepEqual,
         });
+        this.getters.set(metadata.propertyKey, memoized);
+      }
+    });
+
+    this.getters.forEach((memoized, propertyKey) => {
+      const desc = Object.getOwnPropertyDescriptor(
+        Object.getPrototypeOf(this.storeAdmin.instance),
+        propertyKey
+      );
+
+      Object.defineProperty(this.storeAdmin.instance, propertyKey, {
+        ...desc,
+        get: () => memoized.getValue("Store"),
       });
+    });
+
+    this.storeAdmin.hooksManager.reactHooks.add({
+      when: "AFTER_INSTANCE",
+      hook: () => this.getters.forEach((cp) => cp.tryRecomputeIfNeed()),
+    });
   }
 
-  recomputedGetters() {
-    this.getters.forEach((cp) =>
-      cp.tryRecomputeIfNeed(this.storeAdmin.lastSetPaths)
+  get memosMetaData() {
+    // For overridden store methods we have two metadata
+    // so we must filter duplicate ones
+    return MemosMetadataUtils.get(this.storeAdmin.type).filter(
+      (v, i, data) => i === data.findIndex((vv) => vv.propertyKey === v.propertyKey)
     );
   }
 }
