@@ -1,4 +1,4 @@
-import { AutoEffect, Store } from "@react-store/core";
+import { Store } from "@react-store/core";
 
 @Store()
 export class AutoEffectStore {

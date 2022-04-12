@@ -30,7 +30,6 @@ export class StoreFactory {
       // to notify B if A changed
       deps.map(StoreAdministrator.get).forEach((sourceStoreAdmin) => {
         sourceStoreAdmin?.injectedInTos.add(storeAdmin);
-        sourceStoreAdmin?.propertyKeysManager.turnOnCollectAccessPathLogsIfNeeded();
       });
 
       return storeAdmin;

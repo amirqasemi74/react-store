@@ -4,12 +4,10 @@ import { objectProxyBuilder } from "./object.proxyBuilder";
 import { ObservableMetadataUtils } from "src/decorators/observable";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
-import { AccessedProperty } from "src/store/administrator/propertyKeys/storePropertyKeysManager";
 
 export interface BaseAdtProxyBuilderArgs {
   onSet?: () => void;
   proxyTypes?: Array<"Array" | "Object" | "Map">;
-  onAccess?: (accessPath: AccessedProperty) => void;
   proxiedValuesStorage: Map<unknown, unknown>;
 }
 

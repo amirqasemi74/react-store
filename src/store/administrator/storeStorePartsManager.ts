@@ -91,7 +91,6 @@ export class StoreStorePartsManager {
       this.storeAdmin.instance[propertyKey] = adm.instance;
       adm.injectedInTos.add(this.storeAdmin);
       // TODO: turn on can be auto on add injected
-      adm.propertyKeysManager.turnOnCollectAccessPathLogsIfNeeded();
     });
   }
 }

@@ -1,5 +1,5 @@
 import { BaseStore } from "./base.store";
-import { AutoEffect, Effect, Props, Store } from "@react-store/core";
+import { Effect, Store } from "@react-store/core";
 import { ChangeEvent, KeyboardEvent } from "react";
 
 @Store()

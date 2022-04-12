@@ -1,4 +1,4 @@
-import { AutoEffect, AutoWire, Store, StorePart } from "@react-store/core";
+import { AutoWire, Memo, Store, StorePart } from "@react-store/core";
 
 @StorePart()
 class ComputedStorePart {
@@ -27,18 +27,20 @@ export class ComputedStore {
 
   constructor(public upper: UpperComputedStore) {}
 
-  @AutoEffect()
+  // @AutoEffect()
   changeUpperObj() {
     // this.upper.changeObj();
   }
 
+  @Memo("part.obj.a.b")
   get partObjArrLen() {
-    return this.part.obj.a.b[2];
+    return this.part.obj.a.b.length;
   }
 
-  // get arrLen() {
-  //   return this.arr.length;
-  // }
+  @Memo("arr")
+  get arrLen() {
+    return this.arr.length;
+  }
 
   changeArray() {
     this.arr = [1, 2, 3, 4, 5];

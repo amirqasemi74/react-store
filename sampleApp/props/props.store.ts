@@ -1,4 +1,4 @@
-import { AutoEffect, Props, Store } from "@react-store/core";
+import { Props, Store } from "@react-store/core";
 
 @Store()
 export class PropsStore {
@@ -7,7 +7,7 @@ export class PropsStore {
 
   a = 1;
 
-  @AutoEffect()
+  // @AutoEffect()
   fn() {
     // console.log(this.props);
     // console.log(this.props.obj.a);

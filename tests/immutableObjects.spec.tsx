@@ -1,4 +1,4 @@
-import { AutoEffect, Store, connect, useStore } from "@react-store/core";
+import { Effect, Store, connect, useStore } from "@react-store/core";
 import { render } from "@testing-library/react";
 import React from "react";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
@@ -28,7 +28,7 @@ describe("Immutable Objects & Arrays", () => {
       class FrozenStore {
         obj: any = Object.freeze({ a: 1, b: 2, c: Object.freeze({ d: 1 }) });
 
-        @AutoEffect()
+        @Effect("obj.c.d")
         frozenAccess() {
           this.obj.c.d;
           debugger;
@@ -45,10 +45,10 @@ describe("Immutable Objects & Arrays", () => {
       expect(store.obj).toStrictEqual({ a: 1, b: 2, c: { d: 1 } });
       expect(store.obj.c).toStrictEqual({ d: 1 });
 
-      expect(
-        StoreAdministrator.get(store)!.effectsManager.effects.get("frozenAccess")
-          ?.deps
-      ).toStrictEqual([["obj", "c", "d"]]);
+      // expect(
+      //   StoreAdministrator.get(store)!.effectsManager.effects.get("frozenAccess")
+      //     ?.deps
+      // ).toStrictEqual([["obj", "c", "d"]]);
     });
 
     it("should return correct value of frozen arrays", () => {

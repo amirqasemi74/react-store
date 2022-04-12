@@ -76,12 +76,9 @@ export class ObservableProperty {
   }
 
   private makeDeepObservable(value: unknown, readonly?: boolean) {
-    this.storeAdmin.propertyKeysManager.turnOffCollectAccessPathLogs();
     const observable = adtProxyBuilder({
       value,
       proxiedValuesStorage: this.proxiedValuesStorage,
-      onAccess: (...args) =>
-        this.storeAdmin.propertyKeysManager.addAccessedProperty(...args),
       onSet: () => {
         this.isSetStatePending = false;
         if (!readonly) {
@@ -90,7 +87,6 @@ export class ObservableProperty {
         }
       },
     });
-    this.storeAdmin.propertyKeysManager.turnOnCollectAccessPathLogsIfNeeded();
     return observable;
   }
 }

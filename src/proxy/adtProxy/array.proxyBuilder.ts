@@ -25,12 +25,7 @@ export const arrayProxyBuilder = ({
         receiver,
         restOfArgs
       );
-      restOfArgs.onAccess?.({
-        value,
-        target,
-        type: "GET",
-        propertyKey,
-      });
+
       return value;
     },
 
@@ -40,12 +35,6 @@ export const arrayProxyBuilder = ({
       value: unknown,
       receiver: unknown
     ) {
-      restOfArgs.onAccess?.({
-        target,
-        value,
-        type: "SET",
-        propertyKey,
-      });
       const res = Reflect.set(target, propertyKey, deepUnproxy(value), receiver);
       onSet?.();
       return res;

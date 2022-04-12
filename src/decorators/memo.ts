@@ -1,9 +1,9 @@
 import lodashGet from "lodash/get";
-import type { ClassType } from "src/types";
+import { ClassType } from "src/types";
 
 type DepFn<T> = (storeInstance: T) => Array<unknown>;
 
-export function Effect<T extends object>(
+export function Memo<T extends object>(
   deps?: DepFn<T> | Array<string> | string,
   deepEqual?: boolean
 ): MethodDecorator {
@@ -17,21 +17,21 @@ export function Effect<T extends object>(
       depsFn = (o) => [lodashGet(o, deps)];
     }
 
-    EffectsMetadataUtils.add(target.constructor as ClassType, {
+    MemosMetadataUtils.add(target.constructor as ClassType, {
       options: {
         deps: depsFn,
         deepEqual,
-      } as ManualEffectOptions,
+      } as MemoOptions,
       propertyKey,
     });
     return descriptor;
   };
 }
 
-export class EffectsMetadataUtils {
+export class MemosMetadataUtils {
   private static readonly KEY = Symbol();
 
-  static getOwn(storeType: ClassType): EffectMetaData[] {
+  static getOwn(storeType: ClassType): MemoMetadata[] {
     let effects = Reflect.getOwnMetadata(this.KEY, storeType);
     if (!effects) {
       effects = [];
@@ -40,8 +40,7 @@ export class EffectsMetadataUtils {
     return effects;
   }
 
-  static get(storeType: ClassType): EffectMetaData[] {
-    // TODO: Effects must be returns only for @Store & @StorePart
+  static get(storeType: ClassType): MemoMetadata[] {
     let effects = this.getOwn(storeType);
     const parentClass = Reflect.getPrototypeOf(storeType) as ClassType;
     if (parentClass) {
@@ -50,20 +49,17 @@ export class EffectsMetadataUtils {
     return effects;
   }
 
-  static add(storeType: ClassType, metadata: EffectMetaData) {
+  static add(storeType: ClassType, metadata: MemoMetadata) {
     this.getOwn(storeType).push(metadata);
   }
 }
 
-export interface ManualEffectOptions<T extends object = object> {
-  auto?: false;
+interface MemoOptions<T extends object = object> {
   deps?: (_: T) => Array<unknown>;
   deepEqual?: boolean;
 }
 
-type EffectOptions = ManualEffectOptions;
-
-export interface EffectMetaData {
+export interface MemoMetadata {
   propertyKey: PropertyKey;
-  options: EffectOptions;
+  options: MemoOptions;
 }

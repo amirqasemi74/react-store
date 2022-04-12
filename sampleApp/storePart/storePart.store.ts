@@ -1,4 +1,4 @@
-import { AutoEffect, AutoWire, Store, StorePart } from "@react-store/core";
+import { AutoWire, Store, StorePart } from "@react-store/core";
 
 @StorePart()
 class ValidatorX {
