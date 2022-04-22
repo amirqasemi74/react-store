@@ -18,7 +18,6 @@ export class StoreGettersManager {
       if (getter) {
         const memoized = new MemoizedProperty({
           getter,
-          name: metadata.propertyKey,
           storeAdmin: this.storeAdmin,
           depFn: metadata.options.deps,
           deepEqual: metadata.options.deepEqual,

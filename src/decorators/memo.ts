@@ -4,7 +4,7 @@ import { ClassType } from "src/types";
 type DepFn<T> = (storeInstance: T) => Array<unknown>;
 
 export function Memo<T extends object>(
-  deps?: DepFn<T> | Array<string> | string,
+  deps: DepFn<T> | Array<string> | string,
   deepEqual?: boolean
 ): MethodDecorator {
   return function (target, propertyKey, descriptor) {

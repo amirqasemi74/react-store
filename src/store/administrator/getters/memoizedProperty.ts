@@ -4,8 +4,6 @@ import { dequal } from "dequal";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
 export class MemoizedProperty {
-  private getterName: PropertyKey;
-
   private getterFn: () => unknown;
 
   private inited = false;
@@ -21,13 +19,11 @@ export class MemoizedProperty {
   private value: unknown;
 
   constructor(options: {
-    name: PropertyKey;
     deepEqual?: boolean;
     depFn?: DepFn;
     getter: () => unknown;
     storeAdmin: StoreAdministrator;
   }) {
-    this.getterName = options.name;
     this.deepEqual = this.deepEqual;
     options.depFn && (this.manualDepsFn = options.depFn);
     this.getterFn = options.getter;
@@ -38,14 +34,12 @@ export class MemoizedProperty {
     if (!this.inited) {
       this.calcStoreValue();
     }
-
     return from === "Store" ? this.value : getUnproxiedValue(this.value);
   }
 
   private calcStoreValue() {
     this.inited = true;
-    this.value = this.getterFn.call(this.storeAdmin.instance);
-    this.preDepValues = this.manualDepsFn(this.storeAdmin.instance);
+    this.value = this.getterFn.call(this.storeAdmin.instanceForComponents);
   }
 
   tryRecomputeIfNeed() {
