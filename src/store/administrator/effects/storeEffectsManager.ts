@@ -1,13 +1,18 @@
-import type { StoreAdministrator } from "./storeAdministrator";
+import type { StoreAdministrator } from "../storeAdministrator";
+import { EffectProxy } from "./effectsProxy";
 import cloneDeep from "clone-deep";
 import { dequal } from "dequal";
 import isPromise from "is-promise";
 import { useEffect, useRef } from "react";
 import { EffectsMetadataUtils, ManualEffectOptions } from "src/decorators/effect";
-import { Func } from "src/types";
+import { ClassType, Func } from "src/types";
 
 export class StoreEffectsManager {
   readonly effects = new Map<PropertyKey, { clear?: Func<void> }>();
+
+  private effectProxy: EffectProxy;
+
+  context: InstanceType<ClassType>;
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
@@ -23,6 +28,9 @@ export class StoreEffectsManager {
         },
       });
     });
+
+    this.effectProxy = new EffectProxy(this.storeAdmin);
+    this.context = new Proxy(this.storeAdmin.instance, this.effectProxy);
   }
 
   private manualEffectHandler(
@@ -50,6 +58,7 @@ export class StoreEffectsManager {
     }
 
     useEffect(() => {
+      this.effectProxy.directMutatedStoreProperties.clear();
       this.runEffect(effectKey, storeAdmin);
       return () => effectsManager.getClearEffect(effectKey)?.();
     }, [signal.current]);
@@ -58,8 +67,8 @@ export class StoreEffectsManager {
   private runEffect(effectKey: PropertyKey, storeAdmin: StoreAdministrator) {
     // Run Effect
     const clearEffect: Func<void> | undefined = (
-      storeAdmin.instanceForComponents[effectKey] as Func
-    )?.apply(storeAdmin.instanceForComponents) as undefined;
+      storeAdmin.instance[effectKey] as Func
+    )?.apply(this.context) as undefined;
 
     if (
       clearEffect &&

@@ -2,27 +2,19 @@ import type { StoreAdministrator } from "./storeAdministrator";
 import { Func } from "src/types";
 
 export class StoreMethodsManager {
-  methods = new Map<PropertyKey, Func | null>();
+  methods = new Map<PropertyKey, { storeBound: Func | null }>();
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
-  makeAllAutoBound() {
+  bindMethods() {
     Object.entries(this.getMethodsPropertyDescriptors(this.storeAdmin.instance))
       .filter(([key]) => key !== "constructor")
       .filter(([, desc]) => desc.value) // only methods not getter or setter
       .forEach(([methodKey, descriptor]) => {
-        this.methods.set(methodKey, this.createMethod(descriptor.value));
-
-        Object.defineProperty(this.storeAdmin.instance, methodKey, {
-          enumerable: false,
-          configurable: true,
-          get: () => this.methods.get(methodKey),
+        this.methods.set(methodKey, {
+          storeBound: descriptor.value?.bind(this.storeAdmin.instance),
         });
       });
-  }
-
-  createMethod(fn: Func) {
-    return fn.bind(this.storeAdmin.instance);
   }
 
   private getMethodsPropertyDescriptors(

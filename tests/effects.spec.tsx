@@ -289,6 +289,97 @@ describe("Effects", () => {
     expect(onUsernameDepAsStringChangeCB).toBeCalledTimes(2);
   });
 
+  describe("Render Context", () => {
+    it("should rerender if store property set in effect", () => {
+      @Store()
+      class UserStore {
+        user = { name: "user" };
+
+        password = "pass";
+
+        @Effect([])
+        changeUsername() {
+          this.user.name = "user2";
+        }
+
+        @Effect([])
+        changePassword() {
+          this.password = "pass2";
+        }
+      }
+
+      const User = connect(() => {
+        const vm = useStore(UserStore);
+        return (
+          <>
+            <p>{vm.user.name}</p>
+            <p>{vm.password}</p>
+          </>
+        );
+      }, UserStore);
+
+      const { getByText } = render(<User />);
+
+      expect(getByText("user2")).toBeInTheDocument();
+      expect(getByText("pass2")).toBeInTheDocument();
+    });
+
+    it("should set store property return new value on read after assignment", () => {
+      expect.assertions(1);
+      @Store()
+      class UserStore {
+        password = "pass";
+
+        @Effect([])
+        changePassword() {
+          this.password = "pass2";
+          expect(this.password).toBe("pass2");
+        }
+      }
+
+      const User = connect(() => {
+        const vm = useStore(UserStore);
+        return (
+          <>
+            <p>{vm.password}</p>
+          </>
+        );
+      }, UserStore);
+
+      render(<User />);
+    });
+
+    it("should store method bind to effect context if is called from effect", () => {
+      expect.assertions(1);
+
+      @Store()
+      class UserStore {
+        password = "pass";
+
+        getPassword() {
+          expect(this.password).toBe("pass2");
+        }
+
+        @Effect([])
+        changePassword() {
+          this.password = "pass2";
+          this.getPassword();
+        }
+      }
+
+      const User = connect(() => {
+        const vm = useStore(UserStore);
+        return (
+          <>
+            <p>{vm.password}</p>
+          </>
+        );
+      }, UserStore);
+
+      render(<User />);
+    });
+  });
+
   describe("Parent Class", () => {
     it("should run parent store class effects", () => {
       const onMountedCB = jest.fn();

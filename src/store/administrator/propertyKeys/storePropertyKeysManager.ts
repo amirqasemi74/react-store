@@ -128,19 +128,18 @@ export class StorePropertyKeysManager {
     value = deepUnproxy(value);
     const info = this.propertyKeys.get(propertyKey)!;
     const preValue = info?.getValue("Store");
-    const readonlyProperty = this.readonlyPropertyKeys.find(({ matcher }) =>
-      matcher(propertyKey)
-    );
 
-    if (readonlyProperty && !force) {
-      readonlyProperty?.onSet(propertyKey);
+    if (info.isReadOnly && !force) {
+      this.readonlyPropertyKeys
+        .find(({ matcher }) => matcher(propertyKey))
+        ?.onSet(propertyKey);
     } else {
-      info.setValue(value, "Store", !!readonlyProperty);
+      info.setValue(value, "Store");
     }
 
     // Props property key must not affect renders status at all.
-    if (!readonlyProperty || force) {
-      info.isSetStatePending = !readonlyProperty;
+    if (!info.isReadOnly || force) {
+      info.isSetStatePending = !info.isReadOnly;
       const purePreValue = getUnproxiedValue(Object(preValue)) || preValue;
       if (purePreValue !== value) {
         this.storeAdmin.renderConsumers(force);

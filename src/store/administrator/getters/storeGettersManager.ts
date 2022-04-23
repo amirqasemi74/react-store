@@ -7,35 +7,28 @@ export class StoreGettersManager {
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
-  makeAllAsComputed() {
-    // @Memo Decorator
+  registerMemos() {
     this.memosMetaData.forEach((metadata) => {
-      const getter = Object.getOwnPropertyDescriptor(
+      const descriptor = Object.getOwnPropertyDescriptor(
         Object.getPrototypeOf(this.storeAdmin.instance),
         metadata.propertyKey
-      )?.get;
+      );
 
-      if (getter) {
+      if (descriptor?.get) {
         const memoized = new MemoizedProperty({
-          getter,
+          getter: descriptor.get,
           storeAdmin: this.storeAdmin,
           depFn: metadata.options.deps,
           deepEqual: metadata.options.deepEqual,
         });
+
+        Object.defineProperty(this.storeAdmin.instance, metadata.propertyKey, {
+          ...descriptor,
+          get: () => memoized.getValue("Store"),
+        });
+
         this.getters.set(metadata.propertyKey, memoized);
       }
-    });
-
-    this.getters.forEach((memoized, propertyKey) => {
-      const desc = Object.getOwnPropertyDescriptor(
-        Object.getPrototypeOf(this.storeAdmin.instance),
-        propertyKey
-      );
-
-      Object.defineProperty(this.storeAdmin.instance, propertyKey, {
-        ...desc,
-        get: () => memoized.getValue("Store"),
-      });
     });
 
     this.storeAdmin.hooksManager.reactHooks.add({

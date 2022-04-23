@@ -21,6 +21,10 @@ export class StoreForConsumerComponentProxy implements ProxyHandler<object> {
       );
     }
 
+    if (storeAdmin?.methodsManager.methods.has(propertyKey)) {
+      return storeAdmin.methodsManager.methods.get(propertyKey)?.storeBound;
+    }
+
     if (storeAdmin?.gettersManager.getters.has(propertyKey)) {
       return storeAdmin.gettersManager.getters.get(propertyKey)?.getValue("State");
     }

@@ -1,10 +1,10 @@
 import { STORE_ADMINISTRATION } from "../../constant";
 import { StoreForConsumerComponentProxy } from "../../proxy/storeForConsumerComponentProxy";
+import { StoreEffectsManager } from "./effects/storeEffectsManager";
 import { StoreGettersManager } from "./getters/storeGettersManager";
 import { HooksManager } from "./hooksManager";
 import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
 import { PropsManager } from "./propsManager";
-import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreMethodsManager } from "./storeMethodsManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
 import { ClassType } from "src/types";
@@ -60,8 +60,8 @@ export class StoreAdministrator {
     this.propertyKeysManager.registerUseStates();
     this.propertyKeysManager.makeAllObservable();
     this.effectsManager.registerEffects();
-    this.gettersManager.makeAllAsComputed();
-    this.methodsManager.makeAllAutoBound();
+    this.gettersManager.registerMemos();
+    this.methodsManager.bindMethods();
   }
 
   renderConsumers(relax?: boolean) {

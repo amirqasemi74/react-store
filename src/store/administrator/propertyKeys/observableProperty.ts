@@ -23,7 +23,7 @@ export class ObservableProperty {
     public isReadOnly?: boolean
   ) {
     this.isPrimitive = isPrimitive(value);
-    value = this.makeDeepObservable(value, isReadOnly);
+    value = this.makeDeepObservable(value);
     const _val = this.isPrimitive ? value : { $: value };
     this.value = {
       state: _val,
@@ -43,10 +43,10 @@ export class ObservableProperty {
     return this._reactSetState;
   }
 
-  setValue(value: unknown, to: "State" | "Store", readonly?: boolean) {
+  setValue(value: unknown, to: "State" | "Store") {
     this.isPrimitive = isPrimitive(value);
     if (to === "Store") {
-      value = this.makeDeepObservable(value, readonly);
+      value = this.makeDeepObservable(value);
     }
     switch (to) {
       case "State":
@@ -75,18 +75,19 @@ export class ObservableProperty {
     }
   }
 
-  private makeDeepObservable(value: unknown, readonly?: boolean) {
+  private makeDeepObservable(value: unknown) {
     const observable = adtProxyBuilder({
       value,
       proxiedValuesStorage: this.proxiedValuesStorage,
-      onSet: () => {
-        this.isSetStatePending = false;
-        if (!readonly) {
-          this.isSetStatePending = true;
-          this.storeAdmin.renderConsumers();
-        }
-      },
+      onSet: () => this.doOnSet(),
     });
     return observable;
+  }
+
+  doOnSet() {
+    if (!this.isReadOnly) {
+      this.isSetStatePending = true;
+      this.storeAdmin.renderConsumers();
+    }
   }
 }
