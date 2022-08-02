@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/extend-expect";
 import { render, screen, waitFor } from "@testing-library/react";
 import React, { useEffect } from "react";
 
-describe("Pure React Hook Compatibility", () => {
+describe("Pure React Compatibility", () => {
   it("should render on calling action in deeper pure react useEffect", async () => {
     @Store()
     class SampleStore {

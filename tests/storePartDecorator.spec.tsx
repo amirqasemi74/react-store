@@ -10,8 +10,8 @@ import {
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
+import { ReadonlyProperty } from "src/store/administrator/propertyKeys/readonlyProperty";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
-import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
 describe("Store Parts", () => {
   it("should store part state change rerender it's consumers", () => {
@@ -141,8 +141,8 @@ describe("Store Parts", () => {
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
         "validator"
-      )?.isReadOnly
-    ).toBeTruthy();
+      )
+    ).toBeInstanceOf(ReadonlyProperty);
   });
 
   it("should inject dependencies", () => {

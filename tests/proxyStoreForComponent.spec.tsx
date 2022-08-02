@@ -56,7 +56,15 @@ describe("Proxy Store For Consumers Component", () => {
     let store!: TestStore;
     @Store()
     class TestStore {
-      val = [1, { a: 1 }];
+      val = [1, { a: 1 }] as any;
+
+      constructor() {
+        this.x();
+      }
+
+      x() {
+        this.val[1].a = 3;
+      }
     }
 
     const App = connect(() => {
@@ -64,6 +72,7 @@ describe("Proxy Store For Consumers Component", () => {
       return <p>{JSON.stringify(store.val)}</p>;
     }, TestStore);
 
+    debugger;
     render(<App />);
 
     expect(store.val[TARGET]).toBeUndefined();

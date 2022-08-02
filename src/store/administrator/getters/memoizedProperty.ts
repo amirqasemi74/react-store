@@ -44,6 +44,10 @@ export class MemoizedProperty {
 
   tryRecomputeIfNeed() {
     const isEqual = this.deepEqual ? dequal : Object.is;
+    /**
+     * Here because we get deps for instanceForComponents, it's unproxied
+     * by default. So we don't need to make it unproxy
+     */
     const depsValues = this.manualDepsFn(this.storeAdmin.instanceForComponents);
 
     if (depsValues.some((v, i) => !isEqual(v, this.preDepValues?.[i]))) {

@@ -1,10 +1,18 @@
-import { Effect, Observable, Store, connect, useStore } from "@react-store/core";
+import {
+  Effect,
+  Injectable,
+  Observable,
+  Store,
+  connect,
+  useStore,
+} from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
+import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
-describe("Properties Observability", () => {
+describe("Property Keys Observability", () => {
   it("should observe primitive types", () => {
     let store!: PrimitiveTypesStore;
 
@@ -256,7 +264,7 @@ describe("Properties Observability", () => {
     }
 
     const App: React.FC = connect(() => {
-      const vm = useStore(SavedProxiedValueStore);
+      useStore(SavedProxiedValueStore);
       return <div>App</div>;
     }, SavedProxiedValueStore);
 
@@ -420,6 +428,156 @@ describe("Properties Observability", () => {
       });
 
       expect(renderCount).toBe(1);
+    });
+  });
+
+  describe("Pure Store Class Properties", () => {
+    it("should inject stores as pure class property", () => {
+      let lowerStore!: LowerStore;
+
+      @Store()
+      class UpperStore {}
+
+      @Store()
+      class LowerStore {
+        constructor(public upperStore: UpperStore) {
+          lowerStore = this;
+        }
+      }
+
+      const App = connect(
+        connect(() => {
+          useStore(LowerStore);
+          return <>App</>;
+        }, LowerStore),
+        UpperStore
+      );
+
+      render(<App />);
+      expect(lowerStore.upperStore).toBe(getUnproxiedValue(lowerStore.upperStore));
+    });
+
+    it("should inject Injectables as pure class property", () => {
+      let store!: UserStore;
+
+      @Injectable()
+      class UserService {}
+
+      @Store()
+      class UserStore {
+        constructor(public userService: UserService) {
+          store = this;
+        }
+      }
+
+      const App = connect(() => {
+        useStore(UserStore);
+        return <>App</>;
+      }, UserStore);
+
+      render(<App />);
+      expect(store.userService).toBe(getUnproxiedValue(store.userService));
+    });
+  });
+
+  describe("Deep Full Unproxy", () => {
+    it("should deep full unproxy value when assgins to store class property", () => {
+      let upperStore!: UpperStore;
+      let lowerStore!: LowerStore;
+
+      @Store()
+      class UpperStore {
+        user = { username: "amir", password: "1234" };
+
+        constructor() {
+          upperStore = this;
+        }
+
+        changeUser(user: any) {
+          this.user = user;
+        }
+      }
+
+      @Store()
+      class LowerStore {
+        user = { username: "reza", password: "4321" };
+
+        constructor(public upperStore: UpperStore) {
+          lowerStore = this;
+        }
+      }
+
+      const LowerCmp = connect(() => {
+        const lst = useStore(LowerStore);
+        return <>{JSON.stringify(lst.user)}</>;
+      }, LowerStore);
+
+      const App = connect(() => {
+        useStore(UpperStore);
+        return <LowerCmp />;
+      }, UpperStore);
+
+      render(<App />);
+
+      act(() => {
+        lowerStore.upperStore.changeUser(lowerStore.user);
+      });
+
+      expect(getUnproxiedValue(upperStore.user)).toBe(
+        getUnproxiedValue(getUnproxiedValue(upperStore.user))
+      );
+    });
+
+    it("should deep full unproxy on set array element", () => {
+      let store!: ArrayStore;
+
+      @Store()
+      class ArrayStore {
+        obj = { a: 1 };
+
+        array: any = [0];
+        constructor() {
+          store = this;
+        }
+      }
+
+      const App = connect(() => <>App</>, ArrayStore);
+
+      render(<App />);
+
+      act(() => {
+        store.array[1] = store.obj;
+      });
+
+      expect(getUnproxiedValue(store.array[1])).toBe(
+        getUnproxiedValue(getUnproxiedValue(store.array[1]))
+      );
+    });
+
+    it("should deep full unproxy on set object property", () => {
+      let store!: ArrayStore;
+
+      @Store()
+      class ArrayStore {
+        obj = { a: 1 };
+
+        array: any = [0];
+        constructor() {
+          store = this;
+        }
+      }
+
+      const App = connect(() => <>App</>, ArrayStore);
+
+      render(<App />);
+
+      act(() => {
+        store.obj.a = store.array;
+      });
+
+      expect(getUnproxiedValue(store.obj.a)).toBe(
+        getUnproxiedValue(getUnproxiedValue(store.obj.a))
+      );
     });
   });
 });

@@ -3,6 +3,7 @@ import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
+import { ReadonlyProperty } from "src/store/administrator/propertyKeys/readonlyProperty";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Props Decorator", () => {
@@ -106,7 +107,7 @@ describe("Props Decorator", () => {
     expect(getByText("amirhossein")).toBeInTheDocument();
   });
 
-  it("should be readonly @Props property key", () => {
+  it("should @Props property key be readonly", () => {
     let store!: UserStore;
     const errorMock = jest.spyOn(console, "error").mockImplementation();
     @Store()
@@ -128,8 +129,7 @@ describe("Props Decorator", () => {
 
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("props")
-        ?.isReadOnly
-    ).toBeTruthy();
+    ).toBeInstanceOf(ReadonlyProperty);
 
     act(() => {
       store.props = {};

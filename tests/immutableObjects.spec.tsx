@@ -1,7 +1,6 @@
 import { Effect, Store, connect, useStore } from "@react-store/core";
 import { render } from "@testing-library/react";
 import React from "react";
-import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Immutable Objects & Arrays", () => {
   it("should inner immutable object have same instance ref in each render", () => {
@@ -31,7 +30,6 @@ describe("Immutable Objects & Arrays", () => {
         @Effect("obj.c.d")
         frozenAccess() {
           this.obj.c.d;
-          debugger;
         }
       }
 
@@ -44,11 +42,6 @@ describe("Immutable Objects & Arrays", () => {
 
       expect(store.obj).toStrictEqual({ a: 1, b: 2, c: { d: 1 } });
       expect(store.obj.c).toStrictEqual({ d: 1 });
-
-      // expect(
-      //   StoreAdministrator.get(store)!.effectsManager.effects.get("frozenAccess")
-      //     ?.deps
-      // ).toStrictEqual([["obj", "c", "d"]]);
     });
 
     it("should return correct value of frozen arrays", () => {

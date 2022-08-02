@@ -2,7 +2,6 @@ import { Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import React from "react";
-import { clearContainer } from "src/container/container";
 
 describe("Store", () => {
   it("should each component which use store, have same instance of it", () => {

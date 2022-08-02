@@ -9,6 +9,7 @@ import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React, { memo } from "react";
 import { act } from "react-dom/test-utils";
+import { ReadonlyProperty } from "src/store/administrator/propertyKeys/readonlyProperty";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Dependency Injection", () => {
@@ -87,8 +88,8 @@ describe("Dependency Injection", () => {
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
         "postService"
-      )?.isReadOnly
-    ).toBeTruthy();
+      )
+    ).toBeInstanceOf(ReadonlyProperty);
   });
 
   it("should upper store inject into lower store", () => {
@@ -173,8 +174,7 @@ describe("Dependency Injection", () => {
     );
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("appStore")
-        ?.isReadOnly
-    ).toBeTruthy();
+    ).toBeInstanceOf(ReadonlyProperty);
   });
 
   it("Upper store mutations should rerender it's consumers", () => {

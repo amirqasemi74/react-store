@@ -1,5 +1,6 @@
 import { StoreAdministrator } from "../storeAdministrator";
 import { ObservableProperty } from "./observableProperty";
+import { ReadonlyProperty } from "./readonlyProperty";
 import { useState } from "react";
 import { InjectableMetadataUtils } from "src/container/decorators/Injectable";
 import { HooksMetadataUtils } from "src/decorators/hook";
@@ -11,7 +12,10 @@ import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
-  readonly propertyKeys = new Map<PropertyKey, ObservableProperty>();
+  readonly propertyKeys = new Map<
+    PropertyKey,
+    ObservableProperty | ReadonlyProperty
+  >();
 
   private readonly readonlyPropertyKeys: Array<{
     matcher: (propertyKey: PropertyKey) => boolean;
@@ -69,6 +73,7 @@ export class StorePropertyKeysManager {
           }.${propertyKey.toString()}\` is an injected @Injectable() , so can't be mutated.`
         ),
     });
+
     // Injected Stores
     const storeMatcher = (propertyKey: PropertyKey) => {
       const type = getUnproxiedValue(
@@ -92,14 +97,12 @@ export class StorePropertyKeysManager {
       const isReadOnly = this.readonlyPropertyKeys.some(({ matcher }) =>
         matcher(propertyKey)
       );
-
+      const value = this.storeAdmin.instance[propertyKey];
       this.propertyKeys.set(
         propertyKey,
-        new ObservableProperty(
-          this.storeAdmin,
-          this.storeAdmin.instance[propertyKey],
-          isReadOnly
-        )
+        isReadOnly
+          ? new ReadonlyProperty(value)
+          : new ObservableProperty(this.storeAdmin, value)
       );
 
       // Define setter and getter
@@ -115,8 +118,7 @@ export class StorePropertyKeysManager {
   }
 
   private onGetPropertyKey(propertyKey: PropertyKey) {
-    const value = this.propertyKeys.get(propertyKey)?.getValue("Store");
-    return value;
+    return this.propertyKeys.get(propertyKey)?.getValue("Store");
   }
 
   /**
@@ -127,35 +129,41 @@ export class StorePropertyKeysManager {
   onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force?: boolean) {
     value = deepUnproxy(value);
     const info = this.propertyKeys.get(propertyKey)!;
-    const preValue = info?.getValue("Store");
 
-    if (info.isReadOnly && !force) {
-      this.readonlyPropertyKeys
-        .find(({ matcher }) => matcher(propertyKey))
-        ?.onSet(propertyKey);
-    } else {
+    const storeValueAndRenderIfNeed = () => {
+      const preValue = info?.getValue("Store");
       info.setValue(value, "Store");
-    }
-
-    // Props property key must not affect renders status at all.
-    if (!info.isReadOnly || force) {
-      info.isSetStatePending = !info.isReadOnly;
       const purePreValue = getUnproxiedValue(Object(preValue)) || preValue;
       if (purePreValue !== value) {
         this.storeAdmin.renderConsumers(force);
+      }
+    };
+
+    if (info instanceof ObservableProperty) {
+      info.isSetStatePending = true;
+      storeValueAndRenderIfNeed();
+    }
+
+    if (info instanceof ReadonlyProperty) {
+      if (force) {
+        storeValueAndRenderIfNeed();
+      } else {
+        this.readonlyPropertyKeys
+          .find(({ matcher }) => matcher(propertyKey))
+          ?.onSet(propertyKey);
       }
     }
   }
 
   hasPendingSetStates() {
     return Array.from(this.propertyKeys.values()).some(
-      (info) => info.isSetStatePending
+      (info) => info instanceof ObservableProperty && info.isSetStatePending
     );
   }
 
   doPendingSetStates() {
     this.propertyKeys.forEach((info) => {
-      if (info.isSetStatePending) {
+      if (info instanceof ObservableProperty && info.isSetStatePending) {
         info.reactSetState?.();
       }
     });
@@ -168,8 +176,11 @@ export class StorePropertyKeysManager {
       when: "AFTER_INSTANCE",
       hook: () => {
         const propertyKeysInfo = useFixedLazyRef(() =>
-          Array.from(this.propertyKeys.values()).filter((info) => !info.isReadOnly)
-        );
+          Array.from(this.propertyKeys.values()).filter(
+            (info) => info instanceof ObservableProperty
+          )
+        ) as ObservableProperty[];
+
         propertyKeysInfo.forEach((info) => {
           const [state, setState] = useState(() =>
             info.isPrimitive ? info.getValue("Store") : { $: info.getValue("Store") }

@@ -1,18 +1,33 @@
+import { ObservableProperty } from "../propertyKeys/observableProperty";
 import { StoreAdministrator } from "../storeAdministrator";
 import { adtProxyBuilder } from "src/proxy/adtProxy/adtProxyBuilder";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 
+/**
+ * Effect context must be proxied to use value from state insteadOf store
+ * because we have hooks like useDeferreValue or useTransition can others hooks cause
+ * rerenders but these hooks value not change in that render
+ * So we must bind effect context to state values.
+ */
 export class EffectProxy implements ProxyHandler<object> {
   directMutatedStoreProperties = new Map<PropertyKey, unknown>();
 
   constructor(private storeAdmin: StoreAdministrator) {}
 
   get(target: object, propertyKey: PropertyKey, receiver: unknown) {
+    /**
+     * Because we change effect context to state if we set value it will be
+     * done async and if we read the value immediately it doesn't work
+     * so we make trick here only for primitive types
+     */
     if (this.directMutatedStoreProperties.has(propertyKey)) {
       return this.directMutatedStoreProperties.get(propertyKey);
     }
 
-    // Property Key
+    /**
+     * Here we switch effect context to `State`
+     * There is question why we need it?
+     */
     if (this.storeAdmin?.propertyKeysManager.propertyKeys.has(propertyKey)) {
       const value = this.storeAdmin?.propertyKeysManager.propertyKeys
         .get(propertyKey)
@@ -27,9 +42,11 @@ export class EffectProxy implements ProxyHandler<object> {
         value,
         proxiedValuesStorage: new Map(),
         onSet: () =>
-          this.storeAdmin.propertyKeysManager.propertyKeys
-            .get(propertyKey)
-            ?.doOnSet(),
+          (
+            this.storeAdmin.propertyKeysManager.propertyKeys.get(
+              propertyKey
+            ) as ObservableProperty
+          )?.doOnSet(),
       });
     }
 
@@ -41,6 +58,7 @@ export class EffectProxy implements ProxyHandler<object> {
     }
 
     /**
+     * Methods should bind to effect context:
      * There is no need to bind methods to effect context because when we call method in
      * effect context using this keyword, the method is automatically bind to effect context
      */

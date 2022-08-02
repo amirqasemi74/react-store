@@ -2,6 +2,7 @@ import { Effect, Hook, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { act, render, waitFor } from "@testing-library/react";
 import React, { useEffect, useState } from "react";
+import { ReadonlyProperty } from "src/store/administrator/propertyKeys/readonlyProperty";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Hook Decorator", () => {
@@ -63,7 +64,7 @@ describe("Hook Decorator", () => {
     await waitFor(() => expect(getByText("https://google.com")).toBeInTheDocument());
   });
 
-  it("should hook property key be readonly", async () => {
+  it("should Hook property key be readonly", async () => {
     const errorMock = jest.spyOn(console, "error").mockImplementation();
     let store!: HooksStore;
     const useUrl = () => {
@@ -94,10 +95,10 @@ describe("Hook Decorator", () => {
     expect(errorMock).toBeCalledWith(
       "`HooksStore.url` is decorated with `@Hook(...)`, so can't be mutated."
     );
+    debugger;
     expect(
       StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("url")
-        ?.isReadOnly
-    ).toBeTruthy();
+    ).toBeInstanceOf(ReadonlyProperty);
     expect(store.url).toBe("url");
   });
 });

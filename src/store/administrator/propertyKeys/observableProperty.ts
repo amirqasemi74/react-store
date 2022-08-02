@@ -17,11 +17,7 @@ export class ObservableProperty {
 
   private _reactSetState?: () => void;
 
-  constructor(
-    private storeAdmin: StoreAdministrator,
-    value: unknown,
-    public isReadOnly?: boolean
-  ) {
+  constructor(private storeAdmin: StoreAdministrator, value: unknown) {
     this.isPrimitive = isPrimitive(value);
     value = this.makeDeepObservable(value);
     const _val = this.isPrimitive ? value : { $: value };
@@ -57,9 +53,6 @@ export class ObservableProperty {
   }
 
   getValue(from: "State" | "Store") {
-    if (this.isReadOnly) {
-      from = "Store";
-    }
     switch (from) {
       case "State":
         return this.isPrimitive
@@ -85,9 +78,7 @@ export class ObservableProperty {
   }
 
   doOnSet() {
-    if (!this.isReadOnly) {
-      this.isSetStatePending = true;
-      this.storeAdmin.renderConsumers();
-    }
+    this.isSetStatePending = true;
+    this.storeAdmin.renderConsumers();
   }
 }
