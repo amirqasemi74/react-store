@@ -1,6 +1,6 @@
 import { Effect, Observable, Store, connect, useStore } from "@react-store/core";
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useDeferredValue, useState } from "react";
 import { act } from "react-dom/test-utils";
 import { clearContainer } from "src/container/container";
 
@@ -349,8 +349,8 @@ describe("Effects", () => {
       render(<User />);
     });
 
-    it("should store method bind to effect context if is called from effect", () => {
-      expect.assertions(1);
+    it("should store method bind to effect context if is called from effect", async () => {
+      expect.assertions(2);
 
       @Store()
       class UserStore {
@@ -361,7 +361,7 @@ describe("Effects", () => {
         }
 
         @Effect([])
-        changePassword() {
+        async changePassword() {
           this.password = "pass2";
           this.getPassword();
         }
@@ -369,15 +369,15 @@ describe("Effects", () => {
 
       const User = connect(() => {
         const vm = useStore(UserStore);
-        return (
-          <>
-            <p>{vm.password}</p>
-          </>
-        );
+
+        return <p>{vm.password}</p>;
       }, UserStore);
 
-      render(<User />);
+      const { getByText } = render(<User />);
+
+      await waitFor(() => expect(getByText("pass2")).toBeInTheDocument());
     });
+
   });
 
   describe("Parent Class", () => {

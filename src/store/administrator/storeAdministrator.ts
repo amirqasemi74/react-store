@@ -1,11 +1,11 @@
 import { STORE_ADMINISTRATION } from "../../constant";
 import { StoreForConsumerComponentProxy } from "../../proxy/storeForConsumerComponentProxy";
-import { StoreEffectsManager } from "./effects/storeEffectsManager";
 import { StoreGettersManager } from "./getters/storeGettersManager";
 import { HooksManager } from "./hooksManager";
+import { StoreMethodsManager } from "./methods/storeMethodsManager";
 import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
 import { PropsManager } from "./propsManager";
-import { StoreMethodsManager } from "./storeMethodsManager";
+import { StoreEffectsManager } from "./storeEffectsManager";
 import { StoreStorePartsManager } from "./storeStorePartsManager";
 import { ClassType } from "src/types";
 

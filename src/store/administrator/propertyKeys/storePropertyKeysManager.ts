@@ -142,15 +142,18 @@ export class StorePropertyKeysManager {
     if (info instanceof ObservableProperty) {
       info.isSetStatePending = true;
       storeValueAndRenderIfNeed();
+      return true;
     }
 
     if (info instanceof ReadonlyProperty) {
       if (force) {
         storeValueAndRenderIfNeed();
+        return true;
       } else {
         this.readonlyPropertyKeys
           .find(({ matcher }) => matcher(propertyKey))
           ?.onSet(propertyKey);
+        return false;
       }
     }
   }

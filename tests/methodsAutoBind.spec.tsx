@@ -1,5 +1,12 @@
-import { AutoWire, Store, StorePart, connect, useStore } from "@react-store/core";
-import { render } from "@testing-library/react";
+import {
+  AutoWire,
+  Effect,
+  Store,
+  StorePart,
+  connect,
+  useStore,
+} from "@react-store/core";
+import { render, waitFor } from "@testing-library/react";
 import React from "react";
 
 describe("Methods Auto Bind", () => {
@@ -66,5 +73,33 @@ describe("Methods Auto Bind", () => {
     render(<App />);
 
     expect(store.method()).toBe(6);
+  });
+
+  it("should bind methods inside store class", async () => {
+    @Store()
+    class UserStore {
+      username = "amir";
+
+      changeUsername() {
+        this.username = "reza";
+      }
+
+      @Effect([])
+      onMount() {
+        setTimeout(this.changeUsername, 0);
+      }
+    }
+
+    const User = connect(() => {
+      const st = useStore(UserStore);
+
+      return <>{st.username}</>;
+    }, UserStore);
+
+    const { getByText } = render(<User />);
+
+    expect(getByText("amir")).toBeInTheDocument();
+
+    await waitFor(() => expect(getByText("reza")).toBeInTheDocument());
   });
 });
