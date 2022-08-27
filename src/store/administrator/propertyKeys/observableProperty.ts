@@ -52,15 +52,18 @@ export class ObservableProperty {
     }
   }
 
-  getValue(from: "State" | "Store") {
+  getValue(from: "State" | "Store", doUnproxy = true) {
     switch (from) {
-      case "State":
-        return this.isPrimitive
+      case "State": {
+        const value = this.isPrimitive
           ? this.value.state
           : // due to performance we return pure values of store properties
             // not proxied ones, pure value does not collect access logs
             // and this is good
-            getUnproxiedValue((this.value.state as { $: unknown } | undefined)?.$);
+            (this.value.state as { $: unknown } | undefined)?.$;
+
+        return doUnproxy ? getUnproxiedValue(value) : value;
+      }
       case "Store":
         return this.isPrimitive
           ? this.value.store
