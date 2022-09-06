@@ -1,6 +1,6 @@
 import { Effect, Observable, Store, connect, useStore } from "@react-store/core";
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import React, { ChangeEvent, useDeferredValue, useState } from "react";
+import React, { ChangeEvent } from "react";
 import { act } from "react-dom/test-utils";
 import { clearContainer } from "src/container/container";
 
@@ -378,6 +378,54 @@ describe("Effects", () => {
       await waitFor(() => expect(getByText("pass2")).toBeInTheDocument());
     });
 
+    it("should clear direct mutated properties between effects execution", () => {
+      expect.assertions(1);
+      @Store()
+      class UserStore {
+        password = "pass";
+
+        @Effect([])
+        effect1() {
+          this.password = "pass2";
+        }
+
+        @Effect([])
+        effect2() {
+          expect(this.password).toBe("pass");
+        }
+      }
+
+      const User = connect(() => {
+        const vm = useStore(UserStore);
+        return <p>{vm.password}</p>;
+      }, UserStore);
+
+      render(<User />);
+    });
+
+    it("should async effect have correct change value after async action", (done) => {
+      expect.assertions(1);
+      @Store()
+      class UserStore {
+        password = "pass";
+
+        @Effect([])
+        async effect1() {
+          this.password = "pass2";
+          await new Promise((res) => setTimeout(res, 0));
+          expect(this.password).toBe("pass2");
+          done();
+        }
+      }
+
+      const User = connect(() => {
+        const vm = useStore(UserStore);
+
+        return <p>{vm.password}</p>;
+      }, UserStore);
+
+      render(<User />);
+    });
   });
 
   describe("Parent Class", () => {

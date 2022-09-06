@@ -16,18 +16,18 @@ export class StoreMethodsManager {
       .filter(([key]) => key !== "constructor")
       .filter(([, desc]) => desc.value) // only methods not getter or setter
       .forEach(([methodKey, descriptor]) => {
-        this.methods.set(methodKey, descriptor.value?.bind(context));
+        this.methods.set(methodKey, (...args) => {
+          const res = (descriptor.value as Func)?.apply(context, args);
+          this.handler.directMutatedStoreProperties.clear();
+          return res;
+        });
+
         Object.defineProperty(this.storeAdmin.instance, methodKey, {
           enumerable: false,
           configurable: true,
           get: () => this.methods.get(methodKey),
         });
       });
-
-    this.storeAdmin.hooksManager.reactHooks.add({
-      when: "AFTER_INSTANCE",
-      hook: () => this.handler.directMutatedStoreProperties.clear(),
-    });
   }
 
   private getMethodsPropertyDescriptors(
