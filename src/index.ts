@@ -1,4 +1,4 @@
-export { getFromContainer } from "./container/container";
+export { ReactStore } from "./reactStore";
 export { Injectable, Scope } from "./container/decorators/Injectable";
 export { Injector } from "./container/Injector";
 export { useStore } from "./hooks/useStore";

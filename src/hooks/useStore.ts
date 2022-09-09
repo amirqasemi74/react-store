@@ -1,12 +1,12 @@
+import { ReactStore } from "..";
 import { ReactApplicationContext } from "../appContext";
 import { useContext } from "react";
-import { getFromContainer } from "src/container/container";
 import { ClassType } from "src/types";
 
 export const useStore = <T extends ClassType>(storeType: T): InstanceType<T> => {
-  const StoreContext = getFromContainer(
-    ReactApplicationContext
-  ).getStoreReactContext(storeType);
+  const StoreContext = ReactStore.container
+    .resolve(ReactApplicationContext)
+    .getStoreReactContext(storeType);
 
   if (!StoreContext) {
     throw new Error(

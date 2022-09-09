@@ -1,32 +1,46 @@
 import { InjectableMetadataUtils, Scope } from "./decorators/Injectable";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
-import { ClassType } from "src/types";
+import { ClassType, Func } from "src/types";
+import { isClass } from "src/utils/isClass";
 
 class Container {
-  private instances = new Map<ClassType, InstanceType<ClassType>>();
+  private readonly instances = new Map<InjectableToken, unknown>();
 
-  resolve<T>(SomeClass: ClassType<T>): InstanceType<ClassType<T>> {
-    const scope = InjectableMetadataUtils.get(SomeClass);
+  resolve<T>(token: InjectableToken<T>): T extends ClassType ? InstanceType<T> : T {
+    const scope = isClass(token)
+      ? InjectableMetadataUtils.get(token)
+      : Scope.SINGLETON;
 
     if (!scope) {
-      throw new Error(
-        `\`class ${SomeClass.name}\` has not been decorated with @Injectable()`
-      );
+      if (isClass(token)) {
+        throw new Error(
+          `\`class ${token.name}\` has not been decorated with @Injectable()`
+        );
+      } else {
+        throw new Error(`\`${token.toString()}\` can't be retrieved from container`);
+      }
     }
 
-    switch (scope) {
-      case Scope.TRANSIENT: {
-        return new SomeClass(...this.resolveDependencies(SomeClass));
-      }
-      case Scope.SINGLETON:
-      default: {
-        let instance = this.instances.get(SomeClass);
-        if (!instance) {
-          instance = new SomeClass(...this.resolveDependencies(SomeClass));
-          this.instances.set(SomeClass, instance);
+    if (isClass(token)) {
+      switch (scope) {
+        case Scope.TRANSIENT: {
+          //eslint-disable-next-line
+          return new token(...this.resolveDependencies(token)) as any;
         }
-        return instance as InstanceType<ClassType<T>>;
+        case Scope.SINGLETON:
+        default: {
+          let instance = this.instances.get(token);
+          if (!instance) {
+            instance = new token(...this.resolveDependencies(token));
+            this.instances.set(token, instance);
+          }
+          //eslint-disable-next-line
+          return instance as any;
+        }
       }
+    } else {
+      //eslint-disable-next-line
+      return this.instances.get(token) as any;
     }
   }
 
@@ -37,26 +51,42 @@ class Container {
     ).map((dep) => this.resolve(dep.type));
   }
 
+  defineInjectable(
+    injectable: //eslint-disable-next-line
+    | { token: InjectableToken; value: any }
+      | { token: InjectableToken; class: ClassType }
+      | { token: InjectableToken; factory: Func; inject?: Array<InjectableToken> }
+  ) {
+    const token = injectable.token;
+    if ("value" in injectable) {
+      this.instances.set(token, injectable.value);
+    } else if ("class" in injectable) {
+      if (isClass(token)) {
+        this.instances.set(
+          token,
+          new injectable.class(...this.resolveDependencies(token))
+        );
+      } else {
+        this.instances.set(token, new injectable.class());
+      }
+    } else {
+      this.instances.set(
+        token,
+        injectable.factory(...(injectable.inject || []).map((t) => this.resolve(t)))
+      );
+    }
+  }
+
   remove(someClass: ClassType) {
     this.instances.delete(someClass);
   }
 
-  clearContainer() {
+  clear() {
     this.instances.clear();
   }
 }
 
-export const defaultContainer = new Container();
+export const container = new Container();
 
-export const getFromContainer = <T extends ClassType>(
-  someClass: T,
-  container = defaultContainer
-): InstanceType<T> => container.resolve(someClass) as InstanceType<T>;
-
-export const removeFromContainer = (
-  someClass: ClassType,
-  container = defaultContainer
-) => container.remove(someClass);
-
-export const clearContainer = (container = defaultContainer) =>
-  container.clearContainer();
+//eslint-disable-next-line
+type InjectableToken<T = any> = string | symbol | ClassType<T>;

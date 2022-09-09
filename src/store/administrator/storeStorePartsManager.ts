@@ -4,10 +4,10 @@ import {
   ReactApplicationContext,
   StoreAdministratorReactContext,
 } from "src/appContext";
-import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { StorePartMetadataUtils } from "src/decorators/storePart";
 import { WireMetadataUtils } from "src/decorators/wire";
+import { ReactStore } from "src/reactStore";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
@@ -47,7 +47,7 @@ export class StoreStorePartsManager {
 
     const storePartDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<ClassType, StoreAdministratorReactContext>();
-      const appContext = getFromContainer(ReactApplicationContext);
+      const appContext = ReactStore.container.resolve(ReactApplicationContext);
 
       storePartDepTypes.forEach((dep) => {
         if (dep.type === storePartType) {
@@ -81,7 +81,8 @@ export class StoreStorePartsManager {
       storePartDepTypes.map(
         (dep) =>
           storPartStoricalDepsValues.find((sdv) => sdv.storeAdmin.type === dep.type)
-            ?.storeAdmin.instance || getFromContainer(dep.type as ClassType)
+            ?.storeAdmin.instance ||
+          ReactStore.container.resolve(dep.type as ClassType)
       )
     );
   }

@@ -1,12 +1,18 @@
-import { Effect, Observable, Store, connect, useStore } from "@react-store/core";
+import {
+  Effect,
+  Observable,
+  ReactStore,
+  Store,
+  connect,
+  useStore,
+} from "@react-store/core";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { ChangeEvent } from "react";
 import { act } from "react-dom/test-utils";
-import { clearContainer } from "src/container/container";
 
 describe("Effects", () => {
   beforeEach(() => {
-    clearContainer();
+    ReactStore.container.clear();
   });
 
   it("should effect be called on each render", async () => {

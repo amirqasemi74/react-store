@@ -1,10 +1,10 @@
+import { ReactStore } from "..";
 import {
   ReactApplicationContext,
   StoreAdministratorReactContext,
 } from "../appContext";
 import { StoreFactory } from "./storeFactory";
 import React, { useMemo, useRef } from "react";
-import { getFromContainer } from "src/container/container";
 import { StoreMetadataUtils } from "src/decorators/store";
 import { ClassType } from "src/types";
 import { useForceUpdate } from "src/utils/useForceUpdate";
@@ -25,7 +25,7 @@ export const StoreProvider = React.memo(({ type, render, props }: Props) => {
       throw new Error(`\`${type.name}\` does not decorated with @Store()`);
     }
 
-    const appContext = getFromContainer(ReactApplicationContext);
+    const appContext = ReactStore.container.resolve(ReactApplicationContext);
     let context = appContext.getStoreReactContext(type);
     if (!context) {
       context =

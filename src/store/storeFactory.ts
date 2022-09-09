@@ -1,3 +1,4 @@
+import { ReactStore } from "..";
 import {
   ReactApplicationContext,
   StoreAdministratorReactContext,
@@ -5,7 +6,6 @@ import {
 import { StoreAdministratorReactHooks } from "./administrator/hooksManager";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { useContext } from "react";
-import { getFromContainer } from "src/container/container";
 import { InjectMetadataUtils } from "src/container/decorators/inject";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
@@ -57,7 +57,7 @@ export class StoreFactory {
 
     const storeDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<ClassType, StoreAdministratorReactContext>();
-      const appContext = getFromContainer(ReactApplicationContext);
+      const appContext = ReactStore.container.resolve(ReactApplicationContext);
 
       // Find dependencies which is store type
       // then resolve them from context
@@ -92,7 +92,8 @@ export class StoreFactory {
       storeDeps.map(
         (dep) =>
           storicalDepsValues.find((sdv) => sdv.storeAdmin.type === dep.type)
-            ?.storeAdmin.instance || getFromContainer(dep.type as ClassType)
+            ?.storeAdmin.instance ||
+          ReactStore.container.resolve(dep.type as ClassType)
       )
     );
   }

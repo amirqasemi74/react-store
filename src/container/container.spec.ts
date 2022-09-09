@@ -1,10 +1,9 @@
-import { Inject, Injectable, Scope } from "..";
+import { Inject, Injectable, ReactStore, Scope } from "..";
 import { Injector } from "./Injector";
-import { clearContainer, getFromContainer, removeFromContainer } from "./container";
 
 describe("IOC Container", () => {
   beforeEach(() => {
-    clearContainer();
+    ReactStore.container.clear();
     jest.restoreAllMocks();
   });
 
@@ -30,15 +29,18 @@ describe("IOC Container", () => {
     class App2 {
       constructor(public user1: UserInfo1, public user2: UserInfo2) {}
     }
-
-    expect(getFromContainer(App1).user1).toBeDefined();
-    expect(getFromContainer(App1).user2).toBeDefined();
-    expect(getFromContainer(App1).user1).toBe(getFromContainer(App1).user1);
-    expect(getFromContainer(App1).user2).toBe(getFromContainer(App1).user2);
-    expect(getFromContainer(App1).user1.username).toBe("user1");
-    expect(getFromContainer(App1).user2.username).toBe("user2");
-    expect(getFromContainer(App2).user1.username).toBe("user1");
-    expect(getFromContainer(App2).user2.username).toBe("user2");
+    expect(ReactStore.container.resolve(App1).user1).toBeDefined();
+    expect(ReactStore.container.resolve(App1).user2).toBeDefined();
+    expect(ReactStore.container.resolve(App1).user1).toBe(
+      ReactStore.container.resolve(App1).user1
+    );
+    expect(ReactStore.container.resolve(App1).user2).toBe(
+      ReactStore.container.resolve(App1).user2
+    );
+    expect(ReactStore.container.resolve(App1).user1.username).toBe("user1");
+    expect(ReactStore.container.resolve(App1).user2.username).toBe("user2");
+    expect(ReactStore.container.resolve(App2).user1.username).toBe("user1");
+    expect(ReactStore.container.resolve(App2).user2.username).toBe("user2");
   });
 
   it("should remove singleton instance", () => {
@@ -47,10 +49,10 @@ describe("IOC Container", () => {
       username = "test";
     }
 
-    expect(getFromContainer(App)).toBeDefined();
-    const app1 = getFromContainer(App);
-    clearContainer();
-    const app2 = getFromContainer(App);
+    expect(ReactStore.container.resolve(App)).toBeDefined();
+    const app1 = ReactStore.container.resolve(App);
+    ReactStore.container.clear();
+    const app2 = ReactStore.container.resolve(App);
     expect(app2).toBeDefined();
     expect(app1).not.toBe(app2);
   });
@@ -64,9 +66,9 @@ describe("IOC Container", () => {
         createCount++;
       }
     }
-    getFromContainer(A);
-    removeFromContainer(A);
-    getFromContainer(A);
+    ReactStore.container.resolve(A);
+    ReactStore.container.remove(A);
+    ReactStore.container.resolve(A);
     expect(createCount).toBe(2);
   });
 
@@ -76,9 +78,13 @@ describe("IOC Container", () => {
       class App {
         p1 = Math.random();
       }
-      expect(getFromContainer(App)).toBeInstanceOf(App);
-      expect(getFromContainer(App)).toBe(getFromContainer(App));
-      expect(getFromContainer(App).p1).toBe(getFromContainer(App).p1);
+      expect(ReactStore.container.resolve(App)).toBeInstanceOf(App);
+      expect(ReactStore.container.resolve(App)).toBe(
+        ReactStore.container.resolve(App)
+      );
+      expect(ReactStore.container.resolve(App).p1).toBe(
+        ReactStore.container.resolve(App).p1
+      );
     });
 
     it("should resolve deps with transient scope", () => {
@@ -86,9 +92,13 @@ describe("IOC Container", () => {
       class App {
         p1 = Math.random();
       }
-      expect(getFromContainer(App)).toBeInstanceOf(App);
-      expect(getFromContainer(App)).not.toBe(getFromContainer(App));
-      expect(getFromContainer(App).p1).not.toBe(getFromContainer(App).p1);
+      expect(ReactStore.container.resolve(App)).toBeInstanceOf(App);
+      expect(ReactStore.container.resolve(App)).not.toBe(
+        ReactStore.container.resolve(App)
+      );
+      expect(ReactStore.container.resolve(App).p1).not.toBe(
+        ReactStore.container.resolve(App).p1
+      );
     });
   });
 
@@ -104,7 +114,7 @@ describe("IOC Container", () => {
       constructor(public injector: Injector, @Inject(B) public a: A) {}
     }
 
-    const c = getFromContainer(C);
+    const c = ReactStore.container.resolve(C);
     expect(c.a).toBeInstanceOf(B);
   });
 
@@ -117,7 +127,7 @@ describe("IOC Container", () => {
           expect(injector).toBeInstanceOf(Injector);
         }
       }
-      getFromContainer(UserService);
+      ReactStore.container.resolve(UserService);
     });
 
     it("should resolve dependency with injector", () => {
@@ -131,7 +141,7 @@ describe("IOC Container", () => {
           expect(injector.get(UserService)).toBeInstanceOf(UserService);
         }
       }
-      getFromContainer(ToDoService);
+      ReactStore.container.resolve(ToDoService);
     });
 
     it("should resolve dependency with injector in lazy mode", () => {
@@ -149,7 +159,7 @@ describe("IOC Container", () => {
           });
         }
       }
-      getFromContainer(ToDoService);
+      ReactStore.container.resolve(ToDoService);
       return wait!;
     });
 
@@ -177,7 +187,7 @@ describe("IOC Container", () => {
           expect(userService).toBeInstanceOf(UserService);
         }
       }
-      getFromContainer(ToDoService);
+      ReactStore.container.resolve(ToDoService);
 
       return wait;
     });
@@ -196,7 +206,7 @@ describe("IOC Container", () => {
       @Injectable()
       class C extends B {}
 
-      const c = getFromContainer(C);
+      const c = ReactStore.container.resolve(C);
       expect(c.a).toBeInstanceOf(A);
     });
 
@@ -219,7 +229,7 @@ describe("IOC Container", () => {
         }
       }
 
-      const c = getFromContainer(C);
+      const c = ReactStore.container.resolve(C);
       expect(c.a1).toBeInstanceOf(A1);
       expect(c.a2).toBeInstanceOf(A2);
     });
@@ -231,7 +241,7 @@ describe("IOC Container", () => {
 
       try {
         class A {}
-        getFromContainer(A);
+        ReactStore.container.resolve(A);
       } catch (error: any) {
         expect(error.message).toBe(
           "`class A` has not been decorated with @Injectable()"
@@ -251,7 +261,7 @@ describe("IOC Container", () => {
           constructor(@Inject(A) a: A) {}
         }
 
-        getFromContainer(B);
+        ReactStore.container.resolve(B);
       } catch (error: any) {
         expect(error.message).toBe(
           "Dependencies are injecting by @Inject() as parameter and class decorator for `class B`. Use one of them."
@@ -273,7 +283,7 @@ describe("IOC Container", () => {
       expect(warnMock).toHaveBeenLastCalledWith(
         "Dependencies are automatically detected for `class B`. Remove @Inject(...)"
       );
-      getFromContainer(B);
+      ReactStore.container.resolve(B);
     });
   });
 
@@ -295,7 +305,7 @@ describe("IOC Container", () => {
         constructor(public a: A) {}
       }
 
-      const b = getFromContainer(B);
+      const b = ReactStore.container.resolve(B);
       expect(b.a).toBeInstanceOf(A);
       expect(Reflect.getOwnMetadata("design:paramtypes", B)).toBeNull();
     });
