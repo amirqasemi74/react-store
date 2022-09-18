@@ -13,10 +13,14 @@
     "noImplicitAny": false,
     "jsx": "react",
     "paths": {
-      "@react-store/core": ["src"],
-      "sampleApp": ["sampleApp"]
+      "@react-store/core": [
+        "src"
+      ],
     },
     "sourceMap": true
   },
-  "include": ["src", "tests", "sampleApp"]
+  "include": [
+    "src",
+    "tests",
+  ]
 }

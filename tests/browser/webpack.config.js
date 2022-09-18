@@ -1,7 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { resolve } = require("path");
 
-const srcDir = resolve(__dirname, "../src");
+const srcDir = resolve(__dirname, "../../src");
 const sampleAppDir = resolve(__dirname);
 
 module.exports = {
@@ -30,6 +30,9 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: resolve(sampleAppDir, "index.html"),
+    }),
+    new webpack.ProvidePlugin({
+      React: "react",
     }),
   ],
   devServer: {

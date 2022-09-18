@@ -1,24 +1,42 @@
 import type { StoreAdministrator } from "../storeAdministrator";
 import { MethodProxyHandler } from "./methodProxyHandler";
+import { PROXY_HANDLER_TYPE } from "src/constant";
+import { StoreForConsumerComponentProxy } from "src/proxy/storeForConsumerComponentProxy";
 import { Func } from "src/types";
 
 export class StoreMethodsManager {
   private methods = new Map<string, Func>();
 
-  handler = new MethodProxyHandler(this.storeAdmin);
-
   constructor(private storeAdmin: StoreAdministrator) {}
 
   bindMethods() {
-    const context = new Proxy(this.storeAdmin.instance, this.handler);
-
     Object.entries(this.getMethodsPropertyDescriptors(this.storeAdmin.instance))
       .filter(([key]) => key !== "constructor")
       .filter(([, desc]) => desc.value) // only methods not getter or setter
       .forEach(([methodKey, descriptor]) => {
-        this.methods.set(methodKey, (...args) => {
+        const self = this; //eslint-disable-line
+
+        this.methods.set(methodKey, function (this: unknown, ...args) {
+          /**
+           * if:
+           * 1. function has no this
+           * 2. or this === window
+           * 3. or this is equal useStore context
+           * we created own context for it
+           */
+          const context =
+            !this ||
+            this === window ||
+            (typeof this === "object" &&
+              Reflect.get(this, PROXY_HANDLER_TYPE) ===
+                StoreForConsumerComponentProxy)
+              ? new Proxy(
+                  self.storeAdmin.instance,
+                  new MethodProxyHandler(self.storeAdmin)
+                )
+              : this;
+
           const res = (descriptor.value as Func)?.apply(context, args);
-          this.handler.directMutatedStoreProperties.clear();
           return res;
         });
 
