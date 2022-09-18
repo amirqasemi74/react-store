@@ -10,7 +10,7 @@ import { render, waitFor } from "@testing-library/react";
 import React from "react";
 
 describe("Methods Auto Bind", () => {
-  it("should auto bound store methods", () => {
+  it("should auto bind store methods", () => {
     let store!: MethodsStore;
 
     @StorePart()
@@ -101,5 +101,27 @@ describe("Methods Auto Bind", () => {
     expect(getByText("amir")).toBeInTheDocument();
 
     await waitFor(() => expect(getByText("reza")).toBeInTheDocument());
+  });
+
+  it("should bind store methods to store context even if method called with other context", () => {
+    let store!: MethodsStore;
+    @Store()
+    class MethodsStore {
+      c = 2;
+
+      d() {
+        return this.c;
+      }
+    }
+
+    const App = connect(() => {
+      store = useStore(MethodsStore);
+      return <></>;
+    }, MethodsStore);
+
+    render(<App />);
+
+    const d = store.d;
+    expect(d.apply({ c: 4 })).toBe(2);
   });
 });

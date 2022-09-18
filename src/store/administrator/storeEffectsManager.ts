@@ -56,8 +56,11 @@ export class StoreEffectsManager {
   }
 
   private runEffect(effectKey: PropertyKey, storeAdmin: StoreAdministrator) {
-    // Run Effect
-    const clearEffect = (storeAdmin.instance[effectKey] as Func)?.() as
+    /**
+     * Run Effect
+     *  Context of effect function execution will be handled in methods manager
+     * */
+    const clearEffect = (storeAdmin.instance[effectKey] as Func)?.apply(null) as
       | Func<void>
       | undefined;
 
