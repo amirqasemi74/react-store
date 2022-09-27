@@ -384,7 +384,7 @@ describe("Effects", () => {
       await waitFor(() => expect(getByText("pass2")).toBeInTheDocument());
     });
 
-    it("should clear direct mutated properties between effects execution", () => {
+    it("should direct mutated properties doesn't share between effects execution", () => {
       expect.assertions(1);
       @Store()
       class UserStore {

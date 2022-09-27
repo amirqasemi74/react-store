@@ -39,7 +39,12 @@ export class MethodProxyHandler implements ProxyHandler<object> {
 
   set(_: object, propertyKey: PropertyKey, value: unknown) {
     if (this.storeAdmin?.propertyKeysManager.onSetPropertyKey(propertyKey, value)) {
-      this.directMutatedStoreProperties.set(propertyKey, value);
+      this.directMutatedStoreProperties.set(
+        propertyKey,
+        this.storeAdmin.propertyKeysManager.propertyKeys
+          .get(propertyKey)
+          ?.getValue("Store")
+      );
     }
     return true;
   }
