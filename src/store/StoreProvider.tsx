@@ -5,8 +5,9 @@ import {
 } from "../appContext";
 import { StoreFactory } from "./storeFactory";
 import React, { useMemo, useRef } from "react";
-import { StoreMetadataUtils } from "src/decorators/store";
+import { StoreMetadata } from "src/decorators/store";
 import { ClassType } from "src/types";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 import { useForceUpdate } from "src/utils/useForceUpdate";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
@@ -21,7 +22,7 @@ export const StoreProvider = React.memo(({ type, render, props }: Props) => {
   const isRenderRelax = useRef(true);
   const [forceRenderId, forceRenderContext] = useForceUpdate();
   const TheContext = useFixedLazyRef(() => {
-    if (!StoreMetadataUtils.is(type)) {
+    if (!decoratorsMetadataStorage.get<StoreMetadata>("Store", type).length) {
       throw new Error(`\`${type.name}\` does not decorated with @Store()`);
     }
 

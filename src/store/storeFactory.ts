@@ -6,7 +6,7 @@ import {
 import { StoreAdministratorReactHooks } from "./administrator/hooksManager";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { useContext } from "react";
-import { InjectMetadataUtils } from "src/container/decorators/inject";
+import { getClassDependenciesType } from "src/decorators/inject";
 import { ClassType } from "src/types";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 import { useWillMount } from "src/utils/useWillMount";
@@ -51,9 +51,8 @@ export class StoreFactory {
    */
   //TODO: merge with store part resolve deps
   private static resolveStoreDeps(storeType: ClassType) {
-    const storeDeps = useFixedLazyRef(() =>
-      InjectMetadataUtils.getDependenciesDecoratedWith(storeType, "STORE")
-    );
+    // STORE
+    const storeDeps = useFixedLazyRef(() => getClassDependenciesType(storeType));
 
     const storeDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<ClassType, StoreAdministratorReactContext>();
@@ -62,17 +61,17 @@ export class StoreFactory {
       // Find dependencies which is store type
       // then resolve them from context
       //TODO: for global stores
-      storeDeps.forEach((dep) => {
-        if (dep.type === storeType) {
+      storeDeps.forEach((depType) => {
+        if (depType === storeType) {
           throw new Error(
             `You can't inject ${storeType.name} into ${storeType.name}!`
           );
         }
-        const storeContext = appContext.getStoreReactContext(dep.type);
+        const storeContext = appContext.getStoreReactContext(depType);
         if (!storeContext) {
           return;
         }
-        storeDepsContexts.set(dep.type, storeContext);
+        storeDepsContexts.set(depType, storeContext);
       });
 
       return Array.from(storeDepsContexts.entries());
@@ -90,10 +89,10 @@ export class StoreFactory {
 
     return useFixedLazyRef(() =>
       storeDeps.map(
-        (dep) =>
-          storicalDepsValues.find((sdv) => sdv.storeAdmin.type === dep.type)
+        (depType) =>
+          storicalDepsValues.find((sdv) => sdv.storeAdmin.type === depType)
             ?.storeAdmin.instance ||
-          ReactStore.container.resolve(dep.type as ClassType)
+          ReactStore.container.resolve(depType as ClassType)
       )
     );
   }

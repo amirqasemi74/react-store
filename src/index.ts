@@ -1,5 +1,5 @@
 export { ReactStore } from "./reactStore";
-export { Injectable, Scope } from "./container/decorators/Injectable";
+export { Injectable, Scope } from "./decorators/Injectable";
 export { Injector } from "./container/Injector";
 export { useStore } from "./hooks/useStore";
 export { connect } from "./store/connect";
@@ -7,7 +7,7 @@ export { StoreProvider } from "./store/StoreProvider";
 export { Props } from "./decorators/props";
 export { Effect } from "./decorators/effect";
 export { Store } from "./decorators/store";
-export { Inject } from "./container/decorators/inject";
+export { Inject } from "./decorators/inject";
 export { StorePart } from "./decorators/storePart";
 export { Observable } from "./decorators/observable";
 export { Wire } from "./decorators/wire";

@@ -1,5 +1,6 @@
 import { StoreAdministrator } from "./storeAdministrator";
-import { StorePropsMetadataUtils } from "src/decorators/props";
+import { PropsMetadata } from "src/decorators/props";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 
 export class PropsManager {
   constructor(private storeAdmin: StoreAdministrator) {}
@@ -8,7 +9,10 @@ export class PropsManager {
     this.storeAdmin.hooksManager.reactHooks.add({
       when: "AFTER_INSTANCE",
       hook: (storeAdmin, props) => {
-        const propsPropertyKey = StorePropsMetadataUtils.get(storeAdmin.type);
+        const propsPropertyKey = decoratorsMetadataStorage.get<PropsMetadata>(
+          "Props",
+          storeAdmin.type
+        )[0];
         if (propsPropertyKey) {
           storeAdmin.propertyKeysManager.onSetPropertyKey(
             propsPropertyKey,

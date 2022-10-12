@@ -1,9 +1,10 @@
 import { arrayProxyBuilder } from "./array.proxyBuilder";
 import { mapProxyBuilder } from "./map.proxyBuilder";
 import { objectProxyBuilder } from "./object.proxyBuilder";
-import { ObservableMetadataUtils } from "src/decorators/observable";
-import { StoreMetadataUtils } from "src/decorators/store";
-import { StorePartMetadataUtils } from "src/decorators/storePart";
+import { ObservableMetadata } from "src/decorators/observable";
+import { StoreMetadata } from "src/decorators/store";
+import { StorePartMetadata } from "src/decorators/storePart";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 
 export interface BaseAdtProxyBuilderArgs {
   onSet?: () => void;
@@ -27,9 +28,13 @@ export const adtProxyBuilder = ({ value, ...restOfArgs }: AdtProxyBuilderArgs) =
     if (
       (valType === Object ||
         (value instanceof Object &&
-          (ObservableMetadataUtils.is(valType) ||
-            StoreMetadataUtils.is(valType) ||
-            StorePartMetadataUtils.is(valType)))) &&
+          (decoratorsMetadataStorage.get<ObservableMetadata>(
+            "Observable",
+            valType
+          )[0] ||
+            decoratorsMetadataStorage.get<StoreMetadata>("Store", valType).length ||
+            decoratorsMetadataStorage.get<StorePartMetadata>("StorePart", valType)
+              .length))) &&
       doObjectProxy
     ) {
       return objectProxyBuilder({

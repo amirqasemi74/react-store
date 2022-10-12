@@ -4,11 +4,11 @@ import {
   ReactApplicationContext,
   StoreAdministratorReactContext,
 } from "src/appContext";
-import { InjectMetadataUtils } from "src/container/decorators/inject";
-import { StorePartMetadataUtils } from "src/decorators/storePart";
-import { WireMetadataUtils } from "src/decorators/wire";
+import { getClassDependenciesType } from "src/decorators/inject";
+import { WireMetadata } from "src/decorators/wire";
 import { ReactStore } from "src/reactStore";
 import { ClassType } from "src/types";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StoreStorePartsManager {
@@ -17,9 +17,11 @@ export class StoreStorePartsManager {
   constructor(private storeAdmin: StoreAdministrator) {}
 
   private get storePartWires() {
-    return WireMetadataUtils.getAll(this.storeAdmin.type).filter((wire) =>
-      StorePartMetadataUtils.is(wire.type)
-    );
+    return decoratorsMetadataStorage
+      .get<WireMetadata>("Wire", this.storeAdmin.type)
+      .filter(
+        (wire) => decoratorsMetadataStorage.get("StorePart", wire.type).length
+      );
   }
 
   createInstances() {
@@ -41,25 +43,26 @@ export class StoreStorePartsManager {
   }
 
   private resolveStorePartsDeps(storePartType: ClassType) {
+    // STORE_PART
     const storePartDepTypes = useFixedLazyRef(() =>
-      InjectMetadataUtils.getDependenciesDecoratedWith(storePartType, "STORE_PART")
+      getClassDependenciesType(storePartType)
     );
 
     const storePartDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<ClassType, StoreAdministratorReactContext>();
       const appContext = ReactStore.container.resolve(ReactApplicationContext);
 
-      storePartDepTypes.forEach((dep) => {
-        if (dep.type === storePartType) {
+      storePartDepTypes.forEach((depType) => {
+        if (depType === storePartType) {
           throw new Error(
             `You can't inject ${storePartType.name} into ${storePartType.name}!`
           );
         }
-        const storeContext = appContext.getStoreReactContext(dep.type);
+        const storeContext = appContext.getStoreReactContext(depType);
         if (!storeContext) {
           return;
         }
-        storeDepsContexts.set(dep.type, storeContext);
+        storeDepsContexts.set(depType, storeContext);
       });
 
       return Array.from(storeDepsContexts.entries());
@@ -79,10 +82,10 @@ export class StoreStorePartsManager {
 
     return useFixedLazyRef(() =>
       storePartDepTypes.map(
-        (dep) =>
-          storPartStoricalDepsValues.find((sdv) => sdv.storeAdmin.type === dep.type)
+        (depType) =>
+          storPartStoricalDepsValues.find((sdv) => sdv.storeAdmin.type === depType)
             ?.storeAdmin.instance ||
-          ReactStore.container.resolve(dep.type as ClassType)
+          ReactStore.container.resolve(depType as ClassType)
       )
     );
   }

@@ -1,4 +1,4 @@
-import { Inject, Injectable, ReactStore } from "..";
+import { Inject, Injectable, ReactStore } from "../src";
 
 describe("Define Injectable", () => {
   beforeEach(() => {

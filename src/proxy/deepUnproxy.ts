@@ -1,4 +1,5 @@
-import { ObservableMetadataUtils } from "src/decorators/observable";
+import { ObservableMetadata } from "src/decorators/observable";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { isPrimitive } from "src/utils/isPrimitive";
 
@@ -12,7 +13,8 @@ export const deepUnproxy = (val: unknown) => {
   if (
     valType === Array ||
     valType === Object ||
-    (unproxied instanceof Object && ObservableMetadataUtils.is(valType))
+    (unproxied instanceof Object &&
+      decoratorsMetadataStorage.get<ObservableMetadata>("Observable", valType)[0])
   ) {
     Object.getOwnPropertyNames(unproxied).forEach((key: PropertyKey) => {
       unproxied[key] = deepUnproxy(unproxied[key]);

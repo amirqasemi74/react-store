@@ -1,6 +1,7 @@
 import { StoreAdministrator } from "../storeAdministrator";
 import { MemoizedProperty } from "./memoizedProperty";
-import { MemosMetadataUtils } from "src/decorators/memo";
+import { MemoMetadata } from "src/decorators/memo";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 
 export class StoreGettersManager {
   readonly getters = new Map<PropertyKey, MemoizedProperty>();
@@ -40,8 +41,11 @@ export class StoreGettersManager {
   get memosMetaData() {
     // For overridden store methods we have two metadata
     // so we must filter duplicate ones
-    return MemosMetadataUtils.get(this.storeAdmin.type).filter(
-      (v, i, data) => i === data.findIndex((vv) => vv.propertyKey === v.propertyKey)
-    );
+    return decoratorsMetadataStorage
+      .get<MemoMetadata>("Memo", this.storeAdmin.type)
+      .filter(
+        (v, i, data) =>
+          i === data.findIndex((vv) => vv.propertyKey === v.propertyKey)
+      );
   }
 }

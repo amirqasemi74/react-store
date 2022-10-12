@@ -1,5 +1,5 @@
-import { Inject, Injectable, ReactStore, Scope } from "..";
-import { Injector } from "./Injector";
+import { Inject, Injectable, ReactStore, Scope } from "../src";
+import { Injector } from "../src/container/Injector";
 
 describe("IOC Container", () => {
   beforeEach(() => {

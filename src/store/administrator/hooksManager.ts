@@ -1,5 +1,6 @@
 import { StoreAdministrator } from "./storeAdministrator";
-import { HooksMetadataUtils } from "src/decorators/hook";
+import { HookMetadata } from "src/decorators/hook";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 
 export class HooksManager {
   reactHooks = new Set<StoreAdministratorReactHooks>();
@@ -7,19 +8,21 @@ export class HooksManager {
   constructor(private storeAdmin: StoreAdministrator) {}
 
   register() {
-    HooksMetadataUtils.get(this.storeAdmin.type).forEach(({ hook, propertyKey }) => {
-      this.reactHooks.add({
-        when: "AFTER_INSTANCE",
-        hook: () => hook(this.storeAdmin.instanceForComponents),
-        result: (res) => {
-          this.storeAdmin.propertyKeysManager.onSetPropertyKey(
-            propertyKey,
-            res,
-            true
-          );
-        },
+    decoratorsMetadataStorage
+      .get<HookMetadata>("Hook", this.storeAdmin.type)
+      .forEach(({ hook, propertyKey }) => {
+        this.reactHooks.add({
+          when: "AFTER_INSTANCE",
+          hook: () => hook(this.storeAdmin.instanceForComponents),
+          result: (res) => {
+            this.storeAdmin.propertyKeysManager.onSetPropertyKey(
+              propertyKey,
+              res,
+              true
+            );
+          },
+        });
       });
-    });
   }
 }
 

@@ -2,12 +2,11 @@ import { StoreAdministrator } from "../storeAdministrator";
 import { ObservableProperty } from "./observableProperty";
 import { ReadonlyProperty } from "./readonlyProperty";
 import { useState } from "react";
-import { InjectableMetadataUtils } from "src/container/decorators/Injectable";
-import { HooksMetadataUtils } from "src/decorators/hook";
-import { StorePropsMetadataUtils } from "src/decorators/props";
-import { StoreMetadataUtils } from "src/decorators/store";
-import { WireMetadataUtils } from "src/decorators/wire";
+import { HookMetadata } from "src/decorators/hook";
+import { PropsMetadata } from "src/decorators/props";
+import { WireMetadata } from "src/decorators/wire";
 import { deepUnproxy } from "src/proxy/deepUnproxy";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
@@ -26,7 +25,9 @@ export class StorePropertyKeysManager {
     // @Props
     this.readonlyPropertyKeys.push({
       matcher: (propertyKey) =>
-        StorePropsMetadataUtils.is(storeAdmin.type, propertyKey),
+        decoratorsMetadataStorage
+          .get<PropsMetadata>("Props", storeAdmin.type)
+          .some((pk) => pk === propertyKey),
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -37,7 +38,9 @@ export class StorePropertyKeysManager {
     // @Wire
     this.readonlyPropertyKeys.push({
       matcher: (propertyKey) =>
-        WireMetadataUtils.is(this.storeAdmin.type, propertyKey),
+        decoratorsMetadataStorage
+          .get<WireMetadata>("Wire", this.storeAdmin.type)
+          .some((md) => md.propertyKey === propertyKey),
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -49,7 +52,9 @@ export class StorePropertyKeysManager {
     // @Hook
     this.readonlyPropertyKeys.push({
       matcher: (propertyKey) =>
-        HooksMetadataUtils.is(this.storeAdmin.type, propertyKey),
+        decoratorsMetadataStorage
+          .get<HookMetadata>("Hook", this.storeAdmin.type)
+          .some((md) => md.propertyKey === propertyKey),
       onSet: (propertyKey) =>
         console.error(
           `\`${
@@ -64,7 +69,7 @@ export class StorePropertyKeysManager {
         const type = getUnproxiedValue(
           this.storeAdmin.instance[propertyKey]
         )?.constructor;
-        return type && InjectableMetadataUtils.is(type);
+        return type && decoratorsMetadataStorage.get("Injectable", type).length;
       },
       onSet: (propertyKey) =>
         console.error(
@@ -79,7 +84,7 @@ export class StorePropertyKeysManager {
       const type = getUnproxiedValue(
         this.storeAdmin.instance[propertyKey]
       )?.constructor;
-      return type && StoreMetadataUtils.is(type);
+      return type && !!decoratorsMetadataStorage.get("Store", type).length;
     };
     this.readonlyPropertyKeys.push({
       matcher: storeMatcher,

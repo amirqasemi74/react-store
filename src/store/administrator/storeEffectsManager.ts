@@ -3,8 +3,9 @@ import cloneDeep from "clone-deep";
 import { dequal } from "dequal";
 import isPromise from "is-promise";
 import { useEffect, useRef } from "react";
-import { EffectsMetadataUtils, ManualEffectOptions } from "src/decorators/effect";
+import { EffectMetaData, ManualEffectOptions } from "src/decorators/effect";
 import { Func } from "src/types";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 
 export class StoreEffectsManager {
   readonly effects = new Map<PropertyKey, { clear?: Func<void> }>();
@@ -76,9 +77,12 @@ export class StoreEffectsManager {
   get effectsMetaData() {
     // For overridden store methods we have two metadata
     // so we must filter duplicate ones
-    return EffectsMetadataUtils.get(this.storeAdmin.type).filter(
-      (v, i, data) => i === data.findIndex((vv) => vv.propertyKey === v.propertyKey)
-    );
+    return decoratorsMetadataStorage
+      .get<EffectMetaData>("Effect", this.storeAdmin.type)
+      .filter(
+        (v, i, data) =>
+          i === data.findIndex((vv) => vv.propertyKey === v.propertyKey)
+      );
   }
 
   setClearEffect(effectKey: PropertyKey, clear: Func<void>) {

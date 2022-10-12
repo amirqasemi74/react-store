@@ -1,3 +1,4 @@
+import { decoratorsMetadataStorage } from "../utils/decoratorsMetadataStorage";
 import lodashGet from "lodash/get";
 import type { ClassType } from "src/types";
 
@@ -17,42 +18,19 @@ export function Effect<T extends object>(
       depsFn = (o) => [lodashGet(o, deps)];
     }
 
-    EffectsMetadataUtils.add(target.constructor as ClassType, {
-      options: {
-        deps: depsFn,
-        deepEqual,
-      } as ManualEffectOptions,
-      propertyKey,
-    });
+    decoratorsMetadataStorage.add<EffectMetaData>(
+      "Effect",
+      target.constructor as ClassType,
+      {
+        options: {
+          deps: depsFn,
+          deepEqual,
+        } as ManualEffectOptions,
+        propertyKey,
+      }
+    );
     return descriptor;
   };
-}
-
-export class EffectsMetadataUtils {
-  private static readonly KEY = Symbol();
-
-  static getOwn(storeType: ClassType): EffectMetaData[] {
-    let effects = Reflect.getOwnMetadata(this.KEY, storeType);
-    if (!effects) {
-      effects = [];
-      Reflect.defineMetadata(this.KEY, effects, storeType);
-    }
-    return effects;
-  }
-
-  static get(storeType: ClassType): EffectMetaData[] {
-    // TODO: Effects must be returns only for @Store & @StorePart
-    let effects = this.getOwn(storeType);
-    const parentClass = Reflect.getPrototypeOf(storeType) as ClassType;
-    if (parentClass) {
-      effects = effects.concat(this.get(parentClass));
-    }
-    return effects;
-  }
-
-  static add(storeType: ClassType, metadata: EffectMetaData) {
-    this.getOwn(storeType).push(metadata);
-  }
 }
 
 export interface ManualEffectOptions<T extends object = object> {

@@ -1,6 +1,8 @@
-import { InjectableMetadataUtils, Scope } from "./decorators/Injectable";
-import { InjectMetadataUtils } from "src/container/decorators/inject";
+import { Scope } from "..";
+import { InjectableMetadata } from "src/decorators/Injectable";
+import { getClassDependenciesType } from "src/decorators/inject";
 import { ClassType, Func } from "src/types";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 import { isClass } from "src/utils/isClass";
 
 class Container {
@@ -8,7 +10,7 @@ class Container {
 
   resolve<T>(token: InjectableToken<T>): T extends ClassType ? InstanceType<T> : T {
     const scope = isClass(token)
-      ? InjectableMetadataUtils.get(token)
+      ? decoratorsMetadataStorage.get<InjectableMetadata>("Injectable", token)[0]
       : Scope.SINGLETON;
 
     if (!scope) {
@@ -45,10 +47,8 @@ class Container {
   }
 
   resolveDependencies(someClass: ClassType) {
-    return InjectMetadataUtils.getDependenciesDecoratedWith(
-      someClass,
-      "INJECTABLE"
-    ).map((dep) => this.resolve(dep.type));
+    // INJECTABLE
+    return getClassDependenciesType(someClass).map((type) => this.resolve(type));
   }
 
   defineInjectable(
