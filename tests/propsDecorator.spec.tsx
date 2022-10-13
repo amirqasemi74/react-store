@@ -3,7 +3,10 @@ import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
-import { ReadonlyProperty } from "src/store/administrator/propertyKeys/readonlyProperty";
+import {
+  ReadonlyProperty,
+  UnobservableProperty,
+} from "src/store/administrator/propertyKeys/unobservableProperty";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Props Decorator", () => {
@@ -127,9 +130,14 @@ describe("Props Decorator", () => {
 
     render(<App username="amir" />);
 
-    expect(
-      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("props")
-    ).toBeInstanceOf(ReadonlyProperty);
+    const pkInfo = StoreAdministrator.get(
+      store
+    )!.propertyKeysManager.observablePropertyKeys.get(
+      "props"
+    ) as UnobservableProperty;
+
+    expect(pkInfo).toBeInstanceOf(UnobservableProperty);
+    expect(pkInfo.isReadonly).toBeTruthy();
 
     act(() => {
       store.props = {};

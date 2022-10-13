@@ -15,3 +15,4 @@ export { AutoWire } from "./decorators/autoWire";
 export { toPlainObj } from "./utils/toPlainObj";
 export { Hook } from "./decorators/hook";
 export { Memo } from "./decorators/memo";
+export { Unobserve } from "./decorators/unobserve";

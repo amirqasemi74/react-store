@@ -2,7 +2,7 @@ import { Effect, Hook, Store, connect, useStore } from "@react-store/core";
 import "@testing-library/jest-dom/extend-expect";
 import { act, render, waitFor } from "@testing-library/react";
 import React, { useEffect, useState } from "react";
-import { ReadonlyProperty } from "src/store/administrator/propertyKeys/readonlyProperty";
+import { UnobservableProperty } from "src/store/administrator/propertyKeys/unobservableProperty";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Hook Decorator", () => {
@@ -95,10 +95,14 @@ describe("Hook Decorator", () => {
     expect(errorMock).toBeCalledWith(
       "`HooksStore.url` is decorated with `@Hook(...)`, so can't be mutated."
     );
-    debugger;
-    expect(
-      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("url")
-    ).toBeInstanceOf(ReadonlyProperty);
+
+    const pkInfo = StoreAdministrator.get(
+      store
+    )!.propertyKeysManager.observablePropertyKeys.get("url") as UnobservableProperty;
+
+    expect(pkInfo).toBeInstanceOf(UnobservableProperty);
+    expect(pkInfo.isReadonly).toBeTruthy();
+
     expect(store.url).toBe("url");
   });
 });

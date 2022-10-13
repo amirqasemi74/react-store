@@ -46,7 +46,9 @@ type DecoratorType =
   | "Store"
   | "Inject"
   | "Effect"
-  | "Observable"
   | "StorePart"
+  | "Unobserve"
+  | "Observable"
   | "Injectable";
+
 export const decoratorsMetadataStorage = new DecoratorsMetadataStorage();

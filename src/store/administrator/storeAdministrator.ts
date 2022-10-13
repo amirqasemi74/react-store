@@ -14,29 +14,36 @@ export class StoreAdministrator {
 
   instance: InstanceType<ClassType>;
 
+  renderContext?: (relax?: boolean) => void;
+
   injectedInTos = new Set<StoreAdministrator>();
 
   instanceForComponents: InstanceType<ClassType>;
 
-  renderContext?: (relax?: boolean) => void;
+  propsManager!: PropsManager;
 
-  propsManager = new PropsManager(this);
+  hooksManager!: HooksManager;
 
-  hooksManager = new HooksManager(this);
+  gettersManager!: StoreGettersManager;
 
-  gettersManager = new StoreGettersManager(this);
+  methodsManager!: StoreMethodsManager;
 
-  methodsManager = new StoreMethodsManager(this);
+  effectsManager!: StoreEffectsManager;
 
-  effectsManager = new StoreEffectsManager(this);
+  storePartsManager!: StoreStorePartsManager;
 
-  storePartsManager = new StoreStorePartsManager(this);
-
-  propertyKeysManager = new StorePropertyKeysManager(this);
+  propertyKeysManager!: StorePropertyKeysManager;
 
   constructor(type: ClassType, renderContext?: (relax?: boolean) => void) {
     this.type = type;
     this.renderContext = renderContext;
+    this.propsManager = new PropsManager(this);
+    this.hooksManager = new HooksManager(this);
+    this.gettersManager = new StoreGettersManager(this);
+    this.methodsManager = new StoreMethodsManager(this);
+    this.effectsManager = new StoreEffectsManager(this);
+    this.storePartsManager = new StoreStorePartsManager(this);
+    this.propertyKeysManager = new StorePropertyKeysManager(this);
     this.storePartsManager.createInstances();
   }
 

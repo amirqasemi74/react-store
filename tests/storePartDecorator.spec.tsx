@@ -10,7 +10,7 @@ import {
 import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React from "react";
-import { ReadonlyProperty } from "src/store/administrator/propertyKeys/readonlyProperty";
+import { UnobservableProperty } from "src/store/administrator/propertyKeys/unobservableProperty";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Store Parts", () => {
@@ -138,11 +138,15 @@ describe("Store Parts", () => {
     expect(errorMock).toHaveBeenLastCalledWith(
       "`UserStore.validator` is decorated with `@Wire(...)` or `@AutoWire()`, so can't be mutated."
     );
-    expect(
-      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
-        "validator"
-      )
-    ).toBeInstanceOf(ReadonlyProperty);
+
+    const pkInfo = StoreAdministrator.get(
+      store
+    )!.propertyKeysManager.observablePropertyKeys.get(
+      "validator"
+    ) as UnobservableProperty;
+
+    expect(pkInfo).toBeInstanceOf(UnobservableProperty);
+    expect(pkInfo.isReadonly).toBeTruthy();
   });
 
   it("should inject dependencies", () => {
