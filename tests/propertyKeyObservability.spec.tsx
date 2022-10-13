@@ -3,6 +3,7 @@ import {
   Injectable,
   Observable,
   Store,
+  Unobserve,
   connect,
   useStore,
 } from "@react-store/core";
@@ -431,8 +432,36 @@ describe("Property Keys Observability", () => {
     });
   });
 
-  describe("Pure Store Class Properties", () => {
-    it("should inject stores as pure class property", () => {
+  it("should unobserve store property key", () => {
+    let store!: UserStore;
+    let renderCount = 0;
+    @Store()
+    class UserStore {
+      @Unobserve()
+      username = "amir";
+
+      changeUsername() {
+        this.username = "reza";
+      }
+    }
+
+    const App = connect(() => {
+      const st = useStore(UserStore);
+      store = st;
+      renderCount++;
+      return <>{st.username}</>;
+    }, UserStore);
+
+    const { getByText } = render(<App />);
+
+    expect(getByText("amir")).toBeInTheDocument();
+    act(() => store.changeUsername());
+    expect(getByText("amir")).toBeInTheDocument();
+    expect(renderCount).toBe(1);
+  });
+
+  describe("Readonly Store Class Properties", () => {
+    it("should inject stores as readonly class property", () => {
       let lowerStore!: LowerStore;
 
       @Store()
@@ -457,7 +486,7 @@ describe("Property Keys Observability", () => {
       expect(lowerStore.upperStore).toBe(getUnproxiedValue(lowerStore.upperStore));
     });
 
-    it("should inject Injectables as pure class property", () => {
+    it("should inject Injectable as readonly class property", () => {
       let store!: UserStore;
 
       @Injectable()
@@ -481,7 +510,7 @@ describe("Property Keys Observability", () => {
   });
 
   describe("Deep Full Unproxy", () => {
-    it("should deep full unproxy value when assgins to store class property", () => {
+    it("should deep full unproxy value when assigns to store class property", () => {
       let upperStore!: UpperStore;
       let lowerStore!: LowerStore;
 

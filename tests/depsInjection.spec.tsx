@@ -9,7 +9,7 @@ import "@testing-library/jest-dom/extend-expect";
 import { fireEvent, render } from "@testing-library/react";
 import React, { memo } from "react";
 import { act } from "react-dom/test-utils";
-import { ReadonlyProperty } from "src/store/administrator/propertyKeys/readonlyProperty";
+import { UnobservableProperty } from "src/store/administrator/propertyKeys/unobservableProperty";
 import { StoreAdministrator } from "src/store/administrator/storeAdministrator";
 
 describe("Dependency Injection", () => {
@@ -85,11 +85,14 @@ describe("Dependency Injection", () => {
       "`PostStore.postService` is an injected @Injectable() , so can't be mutated."
     );
 
-    expect(
-      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
-        "postService"
-      )
-    ).toBeInstanceOf(ReadonlyProperty);
+    const pkInfo = StoreAdministrator.get(
+      store
+    )!.propertyKeysManager.observablePropertyKeys.get(
+      "postService"
+    ) as UnobservableProperty;
+
+    expect(pkInfo).toBeInstanceOf(UnobservableProperty);
+    expect(pkInfo.isReadonly).toBeTruthy();
   });
 
   it("should upper store inject into lower store", () => {
@@ -173,8 +176,10 @@ describe("Dependency Injection", () => {
       "`UserStore.appStore` is an injected store, so can't be mutated"
     );
     expect(
-      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get("appStore")
-    ).toBeInstanceOf(ReadonlyProperty);
+      StoreAdministrator.get(store)!.propertyKeysManager.observablePropertyKeys.get(
+        "appStore"
+      )
+    ).toBeInstanceOf(UnobservableProperty);
   });
 
   it("Upper store mutations should rerender it's consumers", () => {

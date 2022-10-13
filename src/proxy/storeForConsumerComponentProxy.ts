@@ -10,8 +10,8 @@ export class StoreForConsumerComponentProxy implements ProxyHandler<object> {
 
     const storeAdmin = StoreAdministrator.get(target);
 
-    if (storeAdmin?.propertyKeysManager.propertyKeys.has(propertyKey)) {
-      const value = storeAdmin?.propertyKeysManager.propertyKeys
+    if (storeAdmin?.propertyKeysManager.observablePropertyKeys.has(propertyKey)) {
+      const value = storeAdmin?.propertyKeysManager.observablePropertyKeys
         .get(propertyKey)
         ?.getValue("State");
 

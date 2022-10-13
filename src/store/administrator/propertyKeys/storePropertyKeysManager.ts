@@ -1,9 +1,10 @@
 import { StoreAdministrator } from "../storeAdministrator";
 import { ObservableProperty } from "./observableProperty";
-import { ReadonlyProperty } from "./readonlyProperty";
+import { UnobservableProperty } from "./unobservableProperty";
 import { useState } from "react";
 import { HookMetadata } from "src/decorators/hook";
 import { PropsMetadata } from "src/decorators/props";
+import { UnobserveMetadata } from "src/decorators/unobserve";
 import { WireMetadata } from "src/decorators/wire";
 import { deepUnproxy } from "src/proxy/deepUnproxy";
 import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
@@ -11,19 +12,21 @@ import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
-  readonly propertyKeys = new Map<
+  readonly observablePropertyKeys = new Map<
     PropertyKey,
-    ObservableProperty | ReadonlyProperty
+    ObservableProperty | UnobservableProperty
   >();
 
-  private readonly readonlyPropertyKeys: Array<{
-    matcher: (propertyKey: PropertyKey) => boolean;
-    onSet: (propertyKey: PropertyKey) => void;
+  private readonly unobservablePropertyKeys: Array<{
+    isReadonly: boolean;
+    onSet?: (pk: PropertyKey) => void;
+    matcher: (pk: PropertyKey) => boolean;
   }> = [];
 
   constructor(private storeAdmin: StoreAdministrator) {
     // @Props
-    this.readonlyPropertyKeys.push({
+    this.unobservablePropertyKeys.push({
+      isReadonly: true,
       matcher: (propertyKey) =>
         decoratorsMetadataStorage
           .get<PropsMetadata>("Props", storeAdmin.type)
@@ -36,7 +39,8 @@ export class StorePropertyKeysManager {
         ),
     });
     // @Wire
-    this.readonlyPropertyKeys.push({
+    this.unobservablePropertyKeys.push({
+      isReadonly: true,
       matcher: (propertyKey) =>
         decoratorsMetadataStorage
           .get<WireMetadata>("Wire", this.storeAdmin.type)
@@ -50,7 +54,8 @@ export class StorePropertyKeysManager {
     });
 
     // @Hook
-    this.readonlyPropertyKeys.push({
+    this.unobservablePropertyKeys.push({
+      isReadonly: true,
       matcher: (propertyKey) =>
         decoratorsMetadataStorage
           .get<HookMetadata>("Hook", this.storeAdmin.type)
@@ -64,7 +69,8 @@ export class StorePropertyKeysManager {
     });
 
     // Injected injectable
-    this.readonlyPropertyKeys.push({
+    this.unobservablePropertyKeys.push({
+      isReadonly: true,
       matcher: (propertyKey) => {
         const type = getUnproxiedValue(
           this.storeAdmin.instance[propertyKey]
@@ -86,7 +92,8 @@ export class StorePropertyKeysManager {
       )?.constructor;
       return type && !!decoratorsMetadataStorage.get("Store", type).length;
     };
-    this.readonlyPropertyKeys.push({
+    this.unobservablePropertyKeys.push({
+      isReadonly: true,
       matcher: storeMatcher,
       onSet: (propertyKey) =>
         console.error(
@@ -95,18 +102,28 @@ export class StorePropertyKeysManager {
           }.${propertyKey.toString()}\` is an injected store, so can't be mutated`
         ),
     });
+
+    //@Unobserve
+    decoratorsMetadataStorage
+      .get<UnobserveMetadata>("Unobserve", storeAdmin.type)
+      .forEach((pk) => {
+        this.unobservablePropertyKeys.push({
+          isReadonly: false,
+          matcher: (_pk) => _pk === pk,
+        });
+      });
   }
 
   makeAllObservable() {
     Object.keys(this.storeAdmin.instance).forEach((propertyKey) => {
-      const isReadOnly = this.readonlyPropertyKeys.some(({ matcher }) =>
+      const unobservablePK = this.unobservablePropertyKeys.find(({ matcher }) =>
         matcher(propertyKey)
       );
       const value = this.storeAdmin.instance[propertyKey];
-      this.propertyKeys.set(
+      this.observablePropertyKeys.set(
         propertyKey,
-        isReadOnly
-          ? new ReadonlyProperty(value)
+        unobservablePK
+          ? new UnobservableProperty(value, unobservablePK.isReadonly)
           : new ObservableProperty(this.storeAdmin, value)
       );
 
@@ -123,7 +140,7 @@ export class StorePropertyKeysManager {
   }
 
   private onGetPropertyKey(propertyKey: PropertyKey) {
-    return this.propertyKeys.get(propertyKey)?.getValue("Store");
+    return this.observablePropertyKeys.get(propertyKey)?.getValue("Store");
   }
 
   /**
@@ -133,7 +150,7 @@ export class StorePropertyKeysManager {
    */
   onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force?: boolean) {
     value = deepUnproxy(value);
-    const info = this.propertyKeys.get(propertyKey)!;
+    const info = this.observablePropertyKeys.get(propertyKey)!;
 
     const storeValueAndRenderIfNeed = () => {
       const preValue = info?.getValue("Store");
@@ -150,27 +167,29 @@ export class StorePropertyKeysManager {
       return true;
     }
 
-    if (info instanceof ReadonlyProperty) {
-      if (force) {
+    if (info instanceof UnobservableProperty) {
+      if (force && info.isReadonly) {
         storeValueAndRenderIfNeed();
         return true;
-      } else {
-        this.readonlyPropertyKeys
+      } else if (info.isReadonly) {
+        this.unobservablePropertyKeys
           .find(({ matcher }) => matcher(propertyKey))
-          ?.onSet(propertyKey);
+          ?.onSet?.(propertyKey);
         return false;
+      } else {
+        info.setValue(value);
       }
     }
   }
 
   hasPendingSetStates() {
-    return Array.from(this.propertyKeys.values()).some(
+    return Array.from(this.observablePropertyKeys.values()).some(
       (info) => info instanceof ObservableProperty && info.isSetStatePending
     );
   }
 
   doPendingSetStates() {
-    this.propertyKeys.forEach((info) => {
+    this.observablePropertyKeys.forEach((info) => {
       if (info instanceof ObservableProperty && info.isSetStatePending) {
         info.reactSetState?.();
       }
@@ -184,7 +203,7 @@ export class StorePropertyKeysManager {
       when: "AFTER_INSTANCE",
       hook: () => {
         const propertyKeysInfo = useFixedLazyRef(() =>
-          Array.from(this.propertyKeys.values()).filter(
+          Array.from(this.observablePropertyKeys.values()).filter(
             (info) => info instanceof ObservableProperty
           )
         ) as ObservableProperty[];

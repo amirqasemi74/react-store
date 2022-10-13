@@ -1,8 +1,8 @@
 {
   "name": "@react-store/core",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "main": "dist/index.js",
-  "repository": "https://github.com/sahabpardaz/react-store.git",
+  "repository": "https://github.com/amirqasemi74/react-store.git",
   "author": "Amir Hossein Qasemi Moqaddam <amir.qasemi74@gmail.com>",
   "license": "MIT",
   "dependencies": {
@@ -70,7 +70,6 @@
     "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --detectOpenHandles",
     "build": "rm -rf dist && rollup -c rollup.config.js",
     "prepare": "husky install && yarn build",
-    "prepublishOnly": "yarn lint && yarn test && yarn build",
     "pub": "npm publish --access public",
     "format": "yarn prettier --write",
     "lint": "yarn eslint 'src/**/*.{ts,tsx}' --max-warnings=0",
