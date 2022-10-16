@@ -1,10 +1,13 @@
 # React Store
 
-**React Store** is a library for better state management in react hooks new world.
+![ci](https://github.com/amirqasemi74/react-store/actions/workflows/ci.yml/badge.svg)
+![npm](https://img.shields.io/npm/dw/@react-store/core)
+![version](https://img.shields.io/npm/v/@react-store/core)
 
-It facilitates to split components into smaller and maintainable ones then share `States` between them.
-It also covers shortcomings of react hooks (believe me!) and let developers to use `class`es to manage their components logic and using it's IOC container.
-<br>The ability to separate components logics and jsx is one of other benefits of this library.
+**React Store** is a state management library for React which facilitates to split components into smaller
+and maintainable ones then share `States` between them and also let developers to use `class`es to manage
+their components logic alongside it's IOC container.
+<br>The ability to separate components logics from JSXes is another benefits of this library.
 
 ## Table of content
 
@@ -22,16 +25,19 @@ First install core library:
 
 `yarn add @react-store/core`
 
-Then enable **decorators** in typescript:
+Then enable **decorators** and **decorators metadata** in typescript:
 
 ```json
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
 }
 ```
 
 You can also use other javascript transpilers such as babel.
+
+> See `example` folder for those how use Create-React-App
 
 ## Usage
 
@@ -51,7 +57,7 @@ export class UserStore {
 }
 ```
 
-Then connect it to the component **Tree** by using `connect`:
+Then connect it to the component **tree** by using `connect` function as component wrapper, call `useStore` and pass it **store class** to access store instance :
 
 ```tsx
 // App.tsx
@@ -72,7 +78,7 @@ export const App = connect((props: Props) => {
 }, UserStore);
 ```
 
-And enjoy to use store in child components by `useStore` hook. pass **Store Class** as first parameter:
+And enjoy to use store in child components.
 
 ```jsx
 import { useStore } from "@react-store/core";
