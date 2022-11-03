@@ -7,7 +7,6 @@
 **React Store** is a state management library for React which facilitates to split components into smaller
 and maintainable ones then share `States` between them and also let developers to use `class`es to manage
 their components logic alongside it's IOC container.
-<br>The ability to separate components logics from JSXes is another benefits of this library.
 
 ## Table of content
 
@@ -48,7 +47,7 @@ Now it's ready. First create a `Store`:
 import { Store } from "@react-store/core";
 
 @Store()
-export class UserStore {
+class UserStore {
   name: string;
 
   onNameChange(e: ChangeEvent) {
@@ -57,7 +56,7 @@ export class UserStore {
 }
 ```
 
-Then connect it to the component **tree** by using `connect` function as component wrapper, call `useStore` and pass it **store class** to access store instance :
+Then connect it to the component **tree** by using `connect` function as component wrapper, call `useStore` and pass it **store class** to access store instance:
 
 ```tsx
 // App.tsx
@@ -67,7 +66,7 @@ interface Props {
   p1: string;
 }
 
-export const App = connect((props: Props) => {
+const App = connect((props: Props) => {
   const st = useStore(UserStore);
   return (
     <div>
@@ -83,7 +82,7 @@ And enjoy to use store in child components.
 ```jsx
 import { useStore } from "@react-store/core";
 
-export function Input() {
+function Input() {
   const st = useStore(UserStore);
   return (
     <div>
@@ -94,26 +93,38 @@ export function Input() {
 }
 ```
 
+## Store property & method
+
+- _Property_: Each store property behind the sense is a `[state, setState] = useState(initVal)` it means when you set store property, actually you are doing `setState` and also when you read the property, actually you are reading the `state` but in reading scenario if you have been mutated `state` before reading it you will receive new value even before any rerender.
+
+- _Method_: Store methods are used for state mutations. store methods are bound to store class instance by default. feel free to use them like below:
+
+```tsx
+function Input() {
+  const st = useStore(UserStore);
+  return <input onChange={st.onNameChange} />;
+}
+```
+
 ## Effects
 
-You can manage side effects with `@Effect()` decorator. Like react dependency array you must define array of dependencies.
-<br>For **clear effects** again like React `useEffect` you can return a function from methods which is decorated with `@Effect`.
+You can manage side effects with `@Effect()` decorator. Like react `useEffect` dependency array you must define an array of dependencies.
+<br>For **clear effect** you can return a function from this method.
 
 ```ts
 @Store()
-export class UserStore {
+class UserStore {
   name: string;
 
   @Effect((_: UserStore) => [_.name])
   nameChanged() {
     console.log("name changed to:", this.name);
-
     return () => console.log("Clear Effect");
   }
 }
 ```
 
-You can also pass object as dependency with **deep equal** mode. just pass **true** as second parameters:
+You also can pass object as dependency item with **deep equal** mode. To do that, pass **true** as second parameters:
 
 ```ts
 @Store()
@@ -127,8 +138,7 @@ export class UserStore {
 }
 ```
 
-Instead of passing a function to effect to detect dependencies you can pass an array of strings or just one string.<br>
-The string can be an object path to define dependencies:
+Instead of passing a function to effect decorator to detect dependencies you can pass an array of paths<br>
 
 ```ts
 @Store()
@@ -138,10 +148,36 @@ export class UserStore {
   @Effect(["user.name"])
   usernameChanged() {}
 
+  // Only one dependency does not need to be warped by an array
   @Effect("user", true)
   userChanged() {}
 }
 ```
+
+## Memo
+
+To memoize a value you can use `@Memo` decorator. Memo decorator parameters is like effect decorator:
+
+```ts
+@Store()
+export class UserStore {
+  user = { name: "", pass: "" };
+
+  // @Memo(["user.name"])
+  @Memo("user.name")
+  get usernameLen() {
+    return this.user.name.length;
+  }
+
+  @Memo(["user"], true)
+  get passLen() {
+    return this.user.pass;
+  }
+}
+```
+
+You can manage side effects with `@Effect()` decorator. Like react `useEffect` dependency array you must define an array of dependencies.
+<br>For **clear effect** you can return a function from this method.
 
 > Methods which decorate with `@Effect()` can be async, but if you want to return `clear effect` function make it sync method
 
@@ -257,19 +293,5 @@ Injection works fine for **stores**. Injectable can be injected into all stores.
 @Inject(AlertsStore)
 class UserStore {
   constructor(private alertsStore: AlertsStore) {}
-}
-```
-
-## Store property & method
-
-- _Property_: Each store property can act like piece of component state and mutating their values will rerender _all_ store users as react context API works. Also in more precise way you can declare _dependencies_ for each user of store to prevent additional rendering and optimization purposes. we will talk about more.
-
-- _Method_: Store methods like Redux actions uses for state mutations. A good practice is to write logics and state mutation codes inside store class methods and use them in components. as you will guess directly mutating state from components will be a bad practice.
-  Store methods are bound to store class instance by default. feel free to use them like below:
-
-```tsx
-function Input() {
-  const st = useStore(UserStore);
-  return <input onChange={st.onNameChange} />;
 }
 ```
