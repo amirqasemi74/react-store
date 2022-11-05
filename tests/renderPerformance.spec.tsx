@@ -1,5 +1,4 @@
 import {
-  AutoWire,
   Effect,
   Hook,
   Store,
@@ -100,8 +99,7 @@ describe("Render Performance", () => {
 
       password = "123";
 
-      @AutoWire()
-      p!: Part;
+      constructor(public p: Part) {}
 
       @Effect([])
       m() {

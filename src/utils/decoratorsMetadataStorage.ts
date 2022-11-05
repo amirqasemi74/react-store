@@ -39,7 +39,6 @@ class DecoratorsMetadataStorage {
 }
 
 type DecoratorType =
-  | "Wire"
   | "Memo"
   | "Hook"
   | "Props"

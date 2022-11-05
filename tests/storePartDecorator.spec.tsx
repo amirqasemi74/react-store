@@ -1,5 +1,4 @@
 import {
-  AutoWire,
   Effect,
   Injectable,
   Store,
@@ -30,8 +29,7 @@ describe("Store Parts", () => {
     class UserStore {
       username = "amirhossein";
 
-      @AutoWire()
-      validator: Validator;
+      constructor(public validator: Validator) {}
     }
 
     const App = () => {
@@ -75,8 +73,8 @@ describe("Store Parts", () => {
     @Store()
     class UserStore {
       username = "amirhossein";
-      @AutoWire()
-      validator: Validator;
+
+      constructor(public validator: Validator) {}
     }
 
     const App = () => {
@@ -107,8 +105,7 @@ describe("Store Parts", () => {
 
     @Store()
     class UserStore {
-      @AutoWire()
-      validator: Validator;
+      constructor(public validator: Validator) {}
 
       resetStorePart() {
         this.validator = "sdf";
@@ -165,8 +162,7 @@ describe("Store Parts", () => {
     }
     @Store()
     class LowerStore {
-      @AutoWire()
-      part: BStorePart;
+      constructor(public part: BStorePart) {}
     }
 
     const App = connect(

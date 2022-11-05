@@ -33,7 +33,6 @@ export class StoreGettersManager {
     });
 
     this.storeAdmin.hooksManager.reactHooks.add({
-      when: "AFTER_INSTANCE",
       hook: () => this.getters.forEach((cp) => cp.tryRecomputeIfNeed()),
     });
   }

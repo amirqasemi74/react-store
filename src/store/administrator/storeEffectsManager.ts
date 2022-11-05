@@ -18,7 +18,6 @@ export class StoreEffectsManager {
     this.effectsMetaData.forEach((metadata) => {
       const handler = this.manualEffectHandler;
       this.storeAdmin.hooksManager.reactHooks.add({
-        when: "AFTER_INSTANCE",
         hook: () => {
           handler.call(this, this.storeAdmin, metadata);
         },

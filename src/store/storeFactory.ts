@@ -3,11 +3,12 @@ import {
   ReactApplicationContext,
   StoreAdministratorReactContext,
 } from "../appContext";
-import { StoreAdministratorReactHooks } from "./administrator/hooksManager";
 import { StoreAdministrator } from "./administrator/storeAdministrator";
 import { useContext } from "react";
 import { getClassDependenciesType } from "src/decorators/inject";
+import { StorePartMetadata } from "src/decorators/storePart";
 import { ClassType } from "src/types";
+import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 import { useWillMount } from "src/utils/useWillMount";
 
@@ -17,31 +18,16 @@ export class StoreFactory {
     renderContext: (relax?: boolean) => void,
     props?: object
   ) {
-    // Has React.UseContext
-    // So must be in render
     const deps = this.resolveStoreDeps(StoreType);
 
-    const storeAdmin = useFixedLazyRef(() => {
-      const storeAdmin = new StoreAdministrator(StoreType, renderContext);
-      // for example if we inject store A into other store B
-      // if then injected store A change all store b consumer must be
-      // notified to rerender base of their deps
-      // so here we save store B ref in store A
-      // to notify B if A changed
-      deps.map(StoreAdministrator.get).forEach((sourceStoreAdmin) => {
-        sourceStoreAdmin?.injectedInTos.add(storeAdmin);
-      });
+    const storeAdmin = useFixedLazyRef(
+      () => new StoreAdministrator(StoreType, renderContext)
+    );
 
-      return storeAdmin;
-    });
-
-    //Store Part will init here
-    //So must be come first
-    this.runHooks("BEFORE_INSTANCE", storeAdmin, props);
     useWillMount(() => {
-      storeAdmin.setInstance(new StoreType(...deps));
+      storeAdmin.createInstance(deps);
     });
-    this.runHooks("AFTER_INSTANCE", storeAdmin, props);
+    this.runHooks(storeAdmin, props);
 
     return storeAdmin;
   }
@@ -49,8 +35,8 @@ export class StoreFactory {
   /**
    * *********************** Dependency Injection *******************
    */
-  //TODO: merge with store part resolve deps
-  private static resolveStoreDeps(storeType: ClassType) {
+
+  private static resolveStoreDeps(storeType: ClassType): unknown[] {
     // STORE
     const storeDeps = useFixedLazyRef(() => getClassDependenciesType(storeType));
 
@@ -60,18 +46,17 @@ export class StoreFactory {
 
       // Find dependencies which is store type
       // then resolve them from context
-      //TODO: for global stores
       storeDeps.forEach((depType) => {
         if (depType === storeType) {
           throw new Error(
             `You can't inject ${storeType.name} into ${storeType.name}!`
           );
         }
+
         const storeContext = appContext.getStoreReactContext(depType);
-        if (!storeContext) {
-          return;
+        if (storeContext) {
+          storeDepsContexts.set(depType, storeContext);
         }
-        storeDepsContexts.set(depType, storeContext);
       });
 
       return Array.from(storeDepsContexts.entries());
@@ -87,32 +72,56 @@ export class StoreFactory {
       return storeAdmin;
     });
 
-    return useFixedLazyRef(() =>
-      storeDeps.map(
+    /**
+     * ********************************************************************
+     */
+    const storeStorePartTypes = useFixedLazyRef(() =>
+      storeDeps.filter(
         (depType) =>
-          storicalDepsValues.find((sdv) => sdv.storeAdmin.type === depType)
-            ?.storeAdmin.instance ||
-          ReactStore.container.resolve(depType as ClassType)
+          !!decoratorsMetadataStorage.get<StorePartMetadata>("StorePart", depType)
+            .length
       )
+    );
+
+    const storeStorePartDepsValues = storeStorePartTypes.map((storePartType) => ({
+      storePartType,
+      deps: this.resolveStoreDeps(storePartType),
+    }));
+
+    return useFixedLazyRef(() =>
+      storeDeps.map((depType) => {
+        const store = storicalDepsValues.find(
+          (sdv) => sdv.storeAdmin.type === depType
+        )?.storeAdmin.instance;
+        if (store) {
+          return store;
+        }
+
+        const isStorePart = storeStorePartTypes.includes(depType);
+        if (isStorePart) {
+          const deps = storeStorePartDepsValues.find(
+            (e) => e.storePartType === depType
+          )!.deps;
+          const storePartAdmin = new StoreAdministrator(depType);
+          storePartAdmin.createInstance(deps);
+          return storePartAdmin.instance;
+        }
+
+        return ReactStore.container.resolve(depType as ClassType);
+      })
     );
   }
 
   /**
    * ************** Hooks *************
    */
-  static runHooks(
-    when: StoreAdministratorReactHooks["when"],
-    storeAdmin: StoreAdministrator,
-    props?: object
-  ) {
-    Array.from(storeAdmin.storePartsManager.storeParts.values()).forEach((spa) =>
-      this.runHooks(when, spa, props)
-    );
-    Array.from(storeAdmin.hooksManager.reactHooks.values())
-      .filter(({ when: _when }) => _when === when)
-      .forEach(({ hook, result }) => {
+  static runHooks(storeAdmin: StoreAdministrator, props?: object) {
+    storeAdmin.storePartAdministrators.forEach(this.runHooks.bind(this));
+    Array.from(storeAdmin.hooksManager.reactHooks.values()).forEach(
+      ({ hook, result }) => {
         const res = hook(storeAdmin, props);
         result?.(res);
-      });
+      }
+    );
   }
 }

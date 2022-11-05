@@ -12,7 +12,6 @@ export class HooksManager {
       .get<HookMetadata>("Hook", this.storeAdmin.type)
       .forEach(({ hook, propertyKey }) => {
         this.reactHooks.add({
-          when: "AFTER_INSTANCE",
           hook: () => hook(this.storeAdmin.instanceForComponents),
           result: (res) => {
             this.storeAdmin.propertyKeysManager.onSetPropertyKey(
@@ -28,6 +27,5 @@ export class HooksManager {
 
 export interface StoreAdministratorReactHooks {
   result?: (...args: any[]) => void;
-  when: "BEFORE_INSTANCE" | "AFTER_INSTANCE";
   hook: (storeAdmin: StoreAdministrator, props?: object) => void;
 }

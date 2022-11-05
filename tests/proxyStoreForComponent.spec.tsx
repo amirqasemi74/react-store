@@ -1,4 +1,4 @@
-import { AutoWire, Store, StorePart, connect, useStore } from "@react-store/core";
+import { Store, StorePart, connect, useStore } from "@react-store/core";
 import { act, render } from "@testing-library/react";
 import React from "react";
 import { PROXY_HANDLER_TYPE, TARGET } from "src/constant";
@@ -89,8 +89,7 @@ describe("Proxy Store For Consumers Component", () => {
 
     @Store()
     class TestStore {
-      @AutoWire()
-      part: TestStorePart;
+      constructor(public part: TestStorePart) {}
 
       get arrLen() {
         return this.part.val.length;

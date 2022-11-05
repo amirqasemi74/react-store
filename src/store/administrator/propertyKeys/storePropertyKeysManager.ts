@@ -2,10 +2,12 @@ import { StoreAdministrator } from "../storeAdministrator";
 import { ObservableProperty } from "./observableProperty";
 import { UnobservableProperty } from "./unobservableProperty";
 import { useState } from "react";
+import { InjectableMetadata } from "src/decorators/Injectable";
 import { HookMetadata } from "src/decorators/hook";
 import { PropsMetadata } from "src/decorators/props";
+import { StoreMetadata } from "src/decorators/store";
+import { StorePartMetadata } from "src/decorators/storePart";
 import { UnobserveMetadata } from "src/decorators/unobserve";
-import { WireMetadata } from "src/decorators/wire";
 import { deepUnproxy } from "src/proxy/deepUnproxy";
 import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
@@ -38,20 +40,6 @@ export class StorePropertyKeysManager {
           }.${propertyKey.toString()}\` is decorated with \`@Props()\`, so can't be mutated.`
         ),
     });
-    // @Wire
-    this.unobservablePropertyKeys.push({
-      isReadonly: true,
-      matcher: (propertyKey) =>
-        decoratorsMetadataStorage
-          .get<WireMetadata>("Wire", this.storeAdmin.type)
-          .some((md) => md.propertyKey === propertyKey),
-      onSet: (propertyKey) =>
-        console.error(
-          `\`${
-            this.storeAdmin.type.name
-          }.${propertyKey.toString()}\` is decorated with \`@Wire(...)\` or \`@AutoWire()\`, so can't be mutated.`
-        ),
-    });
 
     // @Hook
     this.unobservablePropertyKeys.push({
@@ -68,6 +56,26 @@ export class StorePropertyKeysManager {
         ),
     });
 
+    // Injected Store Part
+    this.unobservablePropertyKeys.push({
+      isReadonly: true,
+      matcher: (propertyKey) => {
+        const type = getUnproxiedValue(
+          this.storeAdmin.instance[propertyKey]
+        )?.constructor;
+        return (
+          type &&
+          decoratorsMetadataStorage.get<StorePartMetadata>("StorePart", type).length
+        );
+      },
+      onSet: (propertyKey) =>
+        console.error(
+          `\`${
+            this.storeAdmin.type.name
+          }.${propertyKey.toString()}\` is decorated with \`@StorePart(...)\`, so can't be mutated.`
+        ),
+    });
+
     // Injected injectable
     this.unobservablePropertyKeys.push({
       isReadonly: true,
@@ -75,7 +83,11 @@ export class StorePropertyKeysManager {
         const type = getUnproxiedValue(
           this.storeAdmin.instance[propertyKey]
         )?.constructor;
-        return type && decoratorsMetadataStorage.get("Injectable", type).length;
+        return (
+          type &&
+          decoratorsMetadataStorage.get<InjectableMetadata>("Injectable", type)
+            .length
+        );
       },
       onSet: (propertyKey) =>
         console.error(
@@ -90,7 +102,9 @@ export class StorePropertyKeysManager {
       const type = getUnproxiedValue(
         this.storeAdmin.instance[propertyKey]
       )?.constructor;
-      return type && !!decoratorsMetadataStorage.get("Store", type).length;
+      return (
+        type && !!decoratorsMetadataStorage.get<StoreMetadata>("Store", type).length
+      );
     };
     this.unobservablePropertyKeys.push({
       isReadonly: true,
@@ -200,7 +214,6 @@ export class StorePropertyKeysManager {
    */
   registerUseStates() {
     this.storeAdmin.hooksManager.reactHooks.add({
-      when: "AFTER_INSTANCE",
       hook: () => {
         const propertyKeysInfo = useFixedLazyRef(() =>
           Array.from(this.observablePropertyKeys.values()).filter(

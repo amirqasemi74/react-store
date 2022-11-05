@@ -1,11 +1,4 @@
-import {
-  AutoWire,
-  Effect,
-  Store,
-  StorePart,
-  connect,
-  useStore,
-} from "@react-store/core";
+import { Effect, Store, StorePart, connect, useStore } from "@react-store/core";
 import { render, waitFor } from "@testing-library/react";
 import React from "react";
 import { act } from "react-dom/test-utils";
@@ -24,8 +17,7 @@ describe("Methods", () => {
       }
       @Store()
       class MethodsStore {
-        @AutoWire()
-        part: MethodsStorePart;
+        constructor(public part: MethodsStorePart) {}
 
         c = 2;
         d() {

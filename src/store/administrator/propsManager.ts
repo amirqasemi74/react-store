@@ -7,7 +7,6 @@ export class PropsManager {
 
   register() {
     this.storeAdmin.hooksManager.reactHooks.add({
-      when: "AFTER_INSTANCE",
       hook: (storeAdmin, props) => {
         const propsPropertyKey = decoratorsMetadataStorage.get<PropsMetadata>(
           "Props",
