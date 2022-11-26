@@ -96,10 +96,11 @@ describe("Store Parts", () => {
     expect(hasErrorChanged).toBeCalledTimes(2);
   });
 
-  it("should store @Wire property be read only", () => {
+  it("should store part property be read only", () => {
     const errorMock = jest.spyOn(console, "error").mockImplementation();
     let pre, post;
     let store!: UserStore;
+
     @StorePart()
     class Validator {}
 
@@ -133,7 +134,7 @@ describe("Store Parts", () => {
 
     expect(pre.constructor === post.constructor).toBeTruthy();
     expect(errorMock).toHaveBeenLastCalledWith(
-      "`UserStore.validator` is decorated with `@Wire(...)` or `@AutoWire()`, so can't be mutated."
+      "`UserStore.validator` is an injected store part, so can't be mutated"
     );
 
     const pkInfo = StoreAdministrator.get(

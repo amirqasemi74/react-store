@@ -72,7 +72,7 @@ export class StorePropertyKeysManager {
         console.error(
           `\`${
             this.storeAdmin.type.name
-          }.${propertyKey.toString()}\` is decorated with \`@StorePart(...)\`, so can't be mutated.`
+          }.${propertyKey.toString()}\` is an injected store part, so can't be mutated`
         ),
     });
 

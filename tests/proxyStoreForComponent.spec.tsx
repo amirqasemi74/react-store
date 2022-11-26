@@ -79,7 +79,7 @@ describe("Proxy Store For Consumers Component", () => {
     expect(store.val[1][TARGET]).toBeUndefined();
   });
 
-  it("should return unproxied value for wired store part properties", () => {
+  it("should return unproxied value for injected store part properties", () => {
     let store!: TestStore;
 
     @StorePart()

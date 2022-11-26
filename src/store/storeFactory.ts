@@ -27,6 +27,7 @@ export class StoreFactory {
     useWillMount(() => {
       storeAdmin.createInstance(deps);
     });
+
     this.runHooks(storeAdmin, props);
 
     return storeAdmin;
@@ -38,15 +39,20 @@ export class StoreFactory {
 
   private static resolveStoreDeps(storeType: ClassType): unknown[] {
     // STORE
-    const storeDeps = useFixedLazyRef(() => getClassDependenciesType(storeType));
+    const storeDepsTypes = useFixedLazyRef(() =>
+      getClassDependenciesType(storeType)
+    );
 
+    /**
+     * Resolve Storical Dependencies using `useContext`
+     */
     const storeDepsContexts = useFixedLazyRef(() => {
       const storeDepsContexts = new Map<ClassType, StoreAdministratorReactContext>();
       const appContext = ReactStore.container.resolve(ReactApplicationContext);
 
       // Find dependencies which is store type
       // then resolve them from context
-      storeDeps.forEach((depType) => {
+      storeDepsTypes.forEach((depType) => {
         if (depType === storeType) {
           throw new Error(
             `You can't inject ${storeType.name} into ${storeType.name}!`
@@ -72,11 +78,12 @@ export class StoreFactory {
       return storeAdmin;
     });
 
+
     /**
-     * ********************************************************************
+     * Resolve Store Part dependencies
      */
     const storeStorePartTypes = useFixedLazyRef(() =>
-      storeDeps.filter(
+      storeDepsTypes.filter(
         (depType) =>
           !!decoratorsMetadataStorage.get<StorePartMetadata>("StorePart", depType)
             .length
@@ -89,7 +96,7 @@ export class StoreFactory {
     }));
 
     return useFixedLazyRef(() =>
-      storeDeps.map((depType) => {
+      storeDepsTypes.map((depType) => {
         const store = storicalDepsValues.find(
           (sdv) => sdv.storeAdmin.type === depType
         )?.storeAdmin.instance;
