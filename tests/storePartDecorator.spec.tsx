@@ -133,14 +133,12 @@ describe("Store Parts", () => {
 
     expect(pre.constructor === post.constructor).toBeTruthy();
     expect(errorMock).toHaveBeenLastCalledWith(
-      "`UserStore.validator` is decorated with `@Wire(...)` or `@AutoWire()`, so can't be mutated."
+      "`UserStore.validator` is an injected storePart, so can't be mutated."
     );
 
     const pkInfo = StoreAdministrator.get(
       store
-    )!.propertyKeysManager.observablePropertyKeys.get(
-      "validator"
-    ) as UnobservableProperty;
+    )!.propertyKeysManager.propertyKeys.get("validator") as UnobservableProperty;
 
     expect(pkInfo).toBeInstanceOf(UnobservableProperty);
     expect(pkInfo.isReadonly).toBeTruthy();

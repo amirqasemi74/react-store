@@ -14,7 +14,7 @@ import { getUnproxiedValue } from "src/utils/getUnProxiedValue";
 import { useFixedLazyRef } from "src/utils/useLazyRef";
 
 export class StorePropertyKeysManager {
-  readonly observablePropertyKeys = new Map<
+  readonly propertyKeys = new Map<
     PropertyKey,
     ObservableProperty | UnobservableProperty
   >();
@@ -72,7 +72,7 @@ export class StorePropertyKeysManager {
         console.error(
           `\`${
             this.storeAdmin.type.name
-          }.${propertyKey.toString()}\` is decorated with \`@StorePart(...)\`, so can't be mutated.`
+          }.${propertyKey.toString()}\` is an injected storePart, so can't be mutated.`
         ),
     });
 
@@ -134,7 +134,7 @@ export class StorePropertyKeysManager {
         matcher(propertyKey)
       );
       const value = this.storeAdmin.instance[propertyKey];
-      this.observablePropertyKeys.set(
+      this.propertyKeys.set(
         propertyKey,
         unobservablePK
           ? new UnobservableProperty(value, unobservablePK.isReadonly)
@@ -154,7 +154,7 @@ export class StorePropertyKeysManager {
   }
 
   private onGetPropertyKey(propertyKey: PropertyKey) {
-    return this.observablePropertyKeys.get(propertyKey)?.getValue("Store");
+    return this.propertyKeys.get(propertyKey)?.getValue("Store");
   }
 
   /**
@@ -164,7 +164,7 @@ export class StorePropertyKeysManager {
    */
   onSetPropertyKey(propertyKey: PropertyKey, value: unknown, force?: boolean) {
     value = deepUnproxy(value);
-    const info = this.observablePropertyKeys.get(propertyKey)!;
+    const info = this.propertyKeys.get(propertyKey)!;
 
     const storeValueAndRenderIfNeed = () => {
       const preValue = info?.getValue("Store");
@@ -197,13 +197,13 @@ export class StorePropertyKeysManager {
   }
 
   hasPendingSetStates() {
-    return Array.from(this.observablePropertyKeys.values()).some(
+    return Array.from(this.propertyKeys.values()).some(
       (info) => info instanceof ObservableProperty && info.isSetStatePending
     );
   }
 
   doPendingSetStates() {
-    this.observablePropertyKeys.forEach((info) => {
+    this.propertyKeys.forEach((info) => {
       if (info instanceof ObservableProperty && info.isSetStatePending) {
         info.reactSetState?.();
       }
@@ -216,7 +216,7 @@ export class StorePropertyKeysManager {
     this.storeAdmin.hooksManager.reactHooks.add({
       hook: () => {
         const propertyKeysInfo = useFixedLazyRef(() =>
-          Array.from(this.observablePropertyKeys.values()).filter(
+          Array.from(this.propertyKeys.values()).filter(
             (info) => info instanceof ObservableProperty
           )
         ) as ObservableProperty[];

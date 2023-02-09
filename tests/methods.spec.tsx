@@ -122,7 +122,7 @@ describe("Methods", () => {
 
   describe("Execution Context", () => {
     it("should render if store property of object type have change in deeper fields \
-    after store props reassigned by any object", async () => {
+    after store properties reassigned by any object", async () => {
       let appStore!: AppStore;
 
       @Store()

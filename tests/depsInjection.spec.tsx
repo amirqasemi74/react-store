@@ -87,7 +87,7 @@ describe("Dependency Injection", () => {
 
     const pkInfo = StoreAdministrator.get(
       store
-    )!.propertyKeysManager.observablePropertyKeys.get(
+    )!.propertyKeysManager.propertyKeys.get(
       "postService"
     ) as UnobservableProperty;
 
@@ -176,7 +176,7 @@ describe("Dependency Injection", () => {
       "`UserStore.appStore` is an injected store, so can't be mutated"
     );
     expect(
-      StoreAdministrator.get(store)!.propertyKeysManager.observablePropertyKeys.get(
+      StoreAdministrator.get(store)!.propertyKeysManager.propertyKeys.get(
         "appStore"
       )
     ).toBeInstanceOf(UnobservableProperty);

@@ -98,7 +98,7 @@ describe("Hook Decorator", () => {
 
     const pkInfo = StoreAdministrator.get(
       store
-    )!.propertyKeysManager.observablePropertyKeys.get("url") as UnobservableProperty;
+    )!.propertyKeysManager.propertyKeys.get("url") as UnobservableProperty;
 
     expect(pkInfo).toBeInstanceOf(UnobservableProperty);
     expect(pkInfo.isReadonly).toBeTruthy();

@@ -21,10 +21,8 @@ export class MethodProxyHandler implements ProxyHandler<object> {
       return this.directMutatedStoreProperties.get(propertyKey);
     }
 
-    if (
-      this.storeAdmin?.propertyKeysManager.observablePropertyKeys.has(propertyKey)
-    ) {
-      return this.storeAdmin?.propertyKeysManager.observablePropertyKeys
+    if (this.storeAdmin?.propertyKeysManager.propertyKeys.has(propertyKey)) {
+      return this.storeAdmin?.propertyKeysManager.propertyKeys
         .get(propertyKey)
         ?.getValue("State", false);
     }
@@ -43,7 +41,7 @@ export class MethodProxyHandler implements ProxyHandler<object> {
     if (this.storeAdmin?.propertyKeysManager.onSetPropertyKey(propertyKey, value)) {
       this.directMutatedStoreProperties.set(
         propertyKey,
-        this.storeAdmin.propertyKeysManager.observablePropertyKeys
+        this.storeAdmin.propertyKeysManager.propertyKeys
           .get(propertyKey)
           ?.getValue("Store")
       );
