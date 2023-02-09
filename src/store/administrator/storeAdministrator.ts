@@ -6,6 +6,8 @@ import { StoreMethodsManager } from "./methods/storeMethodsManager";
 import { StorePropertyKeysManager } from "./propertyKeys/storePropertyKeysManager";
 import { PropsManager } from "./propsManager";
 import { StoreEffectsManager } from "./storeEffectsManager";
+import { ReactApplicationContext } from "src/appContext";
+import { ReactStore } from "src/reactStore";
 import { ClassType } from "src/types";
 import { decoratorsMetadataStorage } from "src/utils/decoratorsMetadataStorage";
 
@@ -65,6 +67,12 @@ export class StoreAdministrator {
         this.storePartAdministrators.add(sourceStoreAdmin);
       }
     });
+
+    const preFetchedStore = ReactStore.container
+      .resolve(ReactApplicationContext)
+      .prefetchedStores.get(this.type);
+
+    console.log(preFetchedStore);
 
     this.instance = new this.type(...instanceDepsValue);
     this.instance[STORE_ADMINISTRATION] = this;

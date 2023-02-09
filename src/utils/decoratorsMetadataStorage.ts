@@ -45,6 +45,7 @@ type DecoratorType =
   | "Store"
   | "Inject"
   | "Effect"
+  | "PreFetch"
   | "StorePart"
   | "Unobserve"
   | "Observable"

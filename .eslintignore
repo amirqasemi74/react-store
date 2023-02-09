@@ -1,6 +1,5 @@
 dist
 coverage
-sampleApp/*
 tests/*
 *.config.js
 *.spec.ts
